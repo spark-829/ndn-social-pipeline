@@ -1,0 +1,56 @@
+# Daily pipeline jobs that run on GitHub (free) instead of Supabase.
+#
+# 01:00 UTC (9 am PH): TikTok. Python + yt-dlp scrape -> tiktok-ingest Edge Function -> raw.tiktok_*
+#                      Runs at the same time as the YouTube pg_cron job inside Supabase.
+# 03:00 UTC (11 am PH): YouTube backup. Calls youtube-snapshot; returns "already_done" if
+#                      pg_cron worked, or takes the snapshot if it didn't.
+# Both calls are outside activity, so the free Supabase project doesn't auto-pause.
+#
+# Repo secrets (Settings > Secrets and variables > Actions):
+#   SUPABASE_URL     https://bxjlpgzzowmbioowujug.supabase.co
+#   NDN_CRON_SECRET  same value as vault secret 'ndn_cron_secret'
+name: daily
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+    - cron: "0 3 * * *"
+  workflow_dispatch:          # "Run workflow" button: runs both jobs
+
+jobs:
+  tiktok:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 1 * * *'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      # Latest yt-dlp every run: TikTok changes break old versions; fixes ship fast.
+      - run: pip install -r requirements.txt && pip install -U yt-dlp
+      - name: Extract TikTok and upload to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: python extract_tiktok.py --upload --by github
+      - name: Keep raw files as a 90-day backup
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tiktok-raw-${{ github.run_id }}
+          path: data/raw/tiktok/
+          if-no-files-found: ignore
+          retention-days: 90
+
+  youtube-backup:
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 3 * * *'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call youtube-snapshot
+        run: |
+          curl --fail-with-body -sS --max-time 170 -X POST \
+            -H "Content-Type: application/json" \
+            -H "x-cron-secret: ${{ secrets.NDN_CRON_SECRET }}" \
+            -d '{}' \
+            "${{ secrets.SUPABASE_URL }}/functions/v1/youtube-snapshot?by=github"
