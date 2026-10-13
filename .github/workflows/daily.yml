@@ -1,10 +1,11 @@
 # Daily pipeline jobs that run on GitHub (free) instead of Supabase.
 #
-# 01:00 UTC (9 am PH): TikTok. Python + yt-dlp scrape -> tiktok-ingest Edge Function -> raw.tiktok_*
-#                      Runs at the same time as the YouTube pg_cron job inside Supabase.
+# TikTok: manual button only. TikTok blocks GitHub's datacenter IPs (empty response, tested
+#         2026-10-13), so the daily TikTok run happens on Vic's PC instead
+#         (Task Scheduler "NDN TikTok daily" -> run_tiktok_daily.cmd). Kept here to retest later.
 # 03:00 UTC (11 am PH): YouTube backup. Calls youtube-snapshot; returns "already_done" if
 #                      pg_cron worked, or takes the snapshot if it didn't.
-# Both calls are outside activity, so the free Supabase project doesn't auto-pause.
+# The YouTube call is outside activity, so the free Supabase project doesn't auto-pause.
 #
 # Repo secrets (Settings > Secrets and variables > Actions):
 #   SUPABASE_URL     https://bxjlpgzzowmbioowujug.supabase.co
@@ -13,13 +14,12 @@ name: daily
 
 on:
   schedule:
-    - cron: "0 1 * * *"
     - cron: "0 3 * * *"
   workflow_dispatch:          # "Run workflow" button: runs both jobs
 
 jobs:
   tiktok:
-    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 1 * * *'
+    if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:

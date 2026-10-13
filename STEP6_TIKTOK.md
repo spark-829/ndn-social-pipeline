@@ -20,11 +20,19 @@ yt-dlp --flat-playlist                 ──▶ every video: views, likes, comm
 
 ## Daily flow
 ```
-GitHub Actions 01:00 UTC → extract_tiktok.py --upload → Edge Function tiktok-ingest → raw.tiktok_responses
-                                                                                    raw.tiktok_runs
+Windows Task Scheduler "NDN TikTok daily" 09:30 PH → run_tiktok_daily.cmd
+  → extract_tiktok.py --upload --by pc → Edge Function tiktok-ingest → raw.tiktok_responses
+                                                                       raw.tiktok_runs
 ```
-The scrape can't run inside Supabase (Edge Functions run TypeScript, not Python), so GitHub
-runs it and the function only loads. Same secret header as youtube-snapshot.
+The scrape can't run inside Supabase (Edge Functions run TypeScript, not Python), so something
+else runs it and the function only loads. Same secret header as youtube-snapshot.
+
+**Why the PC, not GitHub:** the first GitHub Actions run (2026-10-13) got an empty response from
+TikTok. TikTok blocks datacenter IPs; a home connection looks like a normal visitor. The GitHub
+job is kept as a manual button to retest later. If the PC is off at 09:30, the task runs at next
+login ("start when available"). Missed days are gaps; counts are cumulative, so the next day still
+has correct totals, only the per-day split is lost. Log: `logs/tiktok_daily.log` (gitignored).
+Fallback if this also gets blocked: Apify.
 
 ## Data quality notes for Step 3
 - **Rounding:** TikTok sends counts ≥ 10,000 rounded to 3 digits (9.9M, 15.6K). Daily gains on
