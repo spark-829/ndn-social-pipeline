@@ -1,11 +1,12 @@
 # Daily pipeline jobs that run on GitHub (free) instead of Supabase.
 #
-# TikTok: manual button only. TikTok blocks GitHub's datacenter IPs (empty response, tested
-#         2026-10-13), so the daily TikTok run happens on Vic's PC instead
-#         (Task Scheduler "NDN TikTok daily" -> run_tiktok_daily.cmd). Kept here to retest later.
+# 01:00 UTC (9 am PH): TikTok. Python + yt-dlp scrape -> tiktok-ingest Edge Function -> raw.tiktok_*
+#                      yt-dlp must send Chrome's TLS fingerprint (curl-cffi): from GitHub's IPs
+#                      TikTok returns an empty video list otherwise (probe 2026-10-13: 0/4 plain,
+#                      4/4 impersonated). Vic's PC task "NDN TikTok daily" (09:30 PH) is the backup.
 # 03:00 UTC (11 am PH): YouTube backup. Calls youtube-snapshot; returns "already_done" if
 #                      pg_cron worked, or takes the snapshot if it didn't.
-# The YouTube call is outside activity, so the free Supabase project doesn't auto-pause.
+# Both calls are outside activity, so the free Supabase project doesn't auto-pause.
 #
 # Repo secrets (Settings > Secrets and variables > Actions):
 #   SUPABASE_URL     https://bxjlpgzzowmbioowujug.supabase.co
@@ -14,12 +15,13 @@ name: daily
 
 on:
   schedule:
+    - cron: "0 1 * * *"
     - cron: "0 3 * * *"
   workflow_dispatch:          # "Run workflow" button: runs both jobs
 
 jobs:
   tiktok:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == '0 1 * * *'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -28,12 +30,13 @@ jobs:
         with:
           python-version: "3.14"
       # Latest yt-dlp every run: TikTok changes break old versions; fixes ship fast.
-      - run: pip install -r requirements.txt && pip install -U yt-dlp
+      - run: pip install -r requirements.txt && pip install -U "yt-dlp[default,curl-cffi]"
       - name: Extract TikTok and upload to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
-        run: python extract_tiktok.py --upload --by github
+        # One retry after 2 min: a new attempt can get past a one-off empty response.
+        run: python extract_tiktok.py --upload --by github || (sleep 120 && python extract_tiktok.py --upload --by github)
       - name: Keep raw files as a 90-day backup
         if: always()
         uses: actions/upload-artifact@v4

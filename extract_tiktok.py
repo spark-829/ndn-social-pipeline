@@ -61,11 +61,16 @@ def fetch_profile(username: str, session=requests) -> dict:
 
 def fetch_videos(username: str, ydl_factory=None) -> dict:
     """yt-dlp flat listing of every video on the profile (metadata only, no downloads)."""
+    opts = {"extract_flat": True, "skip_download": True, "quiet": True, "no_warnings": True}
     if ydl_factory is None:
         import yt_dlp
+        from yt_dlp.networking.impersonate import ImpersonateTarget
         ydl_factory = yt_dlp.YoutubeDL
+        # Send Chrome's TLS fingerprint (needs curl_cffi). From GitHub's IPs TikTok returns an
+        # empty video list to Python's default fingerprint; with this it worked 4/4 (2026-10-13).
+        opts["impersonate"] = ImpersonateTarget.from_str("chrome")
     url = f"https://www.tiktok.com/@{username}"
-    with ydl_factory({"extract_flat": True, "skip_download": True, "quiet": True, "no_warnings": True}) as ydl:
+    with ydl_factory(opts) as ydl:
         info = ydl.sanitize_info(ydl.extract_info(url, download=False))
     for e in info.get("entries") or []:
         e.pop("thumbnails", None)
