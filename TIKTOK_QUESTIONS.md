@@ -164,7 +164,7 @@ Status words: **Now** = real data is enough. **Stand-in** = answerable with a st
 - Why: blogs say trending audio boosts reach, but no solid study shows it; one academic study (660 travel videos) found cover sounds had no effect on views. For a label the bigger question is the reverse: do NDN's songs become the trend.
 - Decision: whether to spend effort on trend posts, and which songs to push when they start trending.
 - Measure: performance index of trend posts vs NDN's normal posts; days each NDN song appears in TikTok Creative Center's PH top songs.
-- Status: New data. TikTok Creative Center lists trending songs and hashtags by country for free; we'd save a weekly snapshot (scrape test needed; paid Apify scrapers are the fallback we skip).
+- Status: Data collecting weekly since 2026-10-19 (`TikTok_NDN.md`, "Built 2026-10-19"). TikTok removed Creative Center's songs list, so the measure changes: trending songs = **weeks each NDN artist's song spends in Spotify PH's weekly top 200** (kworb, `staging.trend_spotify_ph_ndn`); trending hashtags = Creative Center's PH top 3 overall + per industry (`staging.trend_tiktok_hashtag`, 60 a week). History builds from now (no back-data), so trend-vs-normal post comparisons need a few months.
 
 **Q17 What should NDN post next week?**
 - Why: this is the point of the whole list: turn answers into a short posting brief.

@@ -5,13 +5,11 @@
 //                       - TikTok Creative Center top hashtags, last 7 days, overall + 19 industries.
 //                         Plain request, no signing (checked 2026-10-19); logged out = top 3 per list.
 //                       - kworb.net Spotify Philippines weekly chart (HTML page).
-//   POST ?part=deezer   Deezer catalog for every artist on NDN's YouTube, in 3 steps, each only for
-//                       what is missing or stale: search names -> song check (name + a posted
-//                       song) -> releases per artist (refetched
-//                       after 6 days, to catch new releases) -> track list per release (once).
-//                       Stops after `budget` requests (default 300) so a call stays well inside the
-//                       Edge Function time limit; pg_cron calls it again until nothing is left.
-//   ?by=pg_cron|manual  who called (stored in raw.music_runs)
+//   GET  ?part=deezer_todo[&since=ISO time]  next Deezer step for extract_music_catalog.py (home server, PH IP):
+//                           {step, items: [{key, path, query?}]}; step "done" when nothing is left.
+//   POST ?part=deezer_save  {step, rows: [{key, query?, payload}]} -> raw.deezer_* (untouched), or
+//                           {step: "run", status, detail} -> raw.music_runs
+//   ?by=pg_cron|server|manual  who called (stored in raw.music_runs)
 // Caller must send header x-cron-secret matching vault secret 'ndn_cron_secret'.
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import postgres from "npm:postgres@3.4.5";
@@ -22,9 +20,6 @@ const TIKTOK_API = "https://ads.tiktok.com/CreativeOne/KnowledgeAPI/GetHashtagLi
 // 26 and 30 returned nothing when probed; 10-29 are the industries the page filters by.
 const INDUSTRIES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29];
 const KWORB = "https://kworb.net/spotify/country/ph_weekly.html";
-const DEEZER = "https://api.deezer.com";
-const DEEZER_PER_SECOND = 8;           // Deezer allows 50 requests per 5 s
-const TIME_LIMIT_MS = 110_000;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const phDate = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
@@ -74,121 +69,74 @@ async function trends(): Promise<Record<string, unknown>> {
            hashtags, kworb_rows: kworbRows, failed };
 }
 
-// One Deezer GET. Deezer reports its rate limit inside a 200 reply ({"error":{"code":4}}).
-async function deezer(path: string): Promise<{ json: any } | null> {
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    const resp = await fetch(DEEZER + path);
-    const text = await resp.text();
-    let json: any = null;
-    try { json = JSON.parse(text); } catch { /* not JSON */ }
-    if (resp.status === 200 && json && !json.error) return { json };
-    if (json?.error?.code === 800) return null;                  // "no data": artist/album gone
-    await sleep(attempt * 2500);
-  }
-  throw new Error(`Deezer kept failing for ${path}`);
-}
+// Deezer runs from a Philippine IP (extract_music_catalog.py on the home server): Deezer filters
+// its catalog by the caller's country, and from Supabase's servers (Seoul) Lola Amour has 3
+// releases instead of 33 (checked 2026-10-20). This function only says what to fetch and saves it.
+const TODO_LIMIT = 400;
 
-async function deezerPart(budget: number) {
-  const started = Date.now();
-  let used = 0;
-  const done = { searched: 0, songChecks: 0, artists: 0, albums: 0 };
-  const outOfTime = () => used >= budget || Date.now() - started > TIME_LIMIT_MS;
-
-  // Runs jobs a few at a time, about DEEZER_PER_SECOND requests per second.
-  async function run<T>(items: T[], job: (item: T) => Promise<number>) {
-    for (let i = 0; i < items.length && !outOfTime(); i += DEEZER_PER_SECOND) {
-      const t0 = Date.now();
-      const batch = items.slice(i, i + Math.min(DEEZER_PER_SECOND, budget - used));
-      const counts = await Promise.all(batch.map(job));
-      used += counts.reduce((a, b) => a + b, 0);
-      await sleep(Math.max(0, 1000 - (Date.now() - t0)));
-    }
-  }
-
-  // 1. Search every NDN name not searched yet (names with no match are retried after 30 days).
+// What the server should fetch next, one step at a time (each step depends on the one before):
+// 1 names not searched (no-match names retried after 30 days) -> 2 song checks -> 3 release lists
+// (new artists, or older than 6 days) -> 4 track lists of releases we don't have.
+// since (optional ISO time): rows fetched before it count as missing, to refetch everything once.
+async function deezerTodo(since: string | null) {
+  const before = since ?? "1970-01-01T00:00:00Z";   // postgres.js can't send "-infinity" as a date
   const names = await sql`
-    select distinct on (c.name_key) c.name_key, c.name
+    select distinct on (c.name_key) c.name_key as key, c.name as query
     from staging.ndn_artist_credit c
     left join raw.deezer_search s on s.query_key = c.name_key
     left join staging.deezer_artist_match m on m.query_key = c.name_key
-    where s.query_key is null or (m.match_type = 'none' and s.fetched_at < now() - interval '30 days')
-    order by c.name_key, c.part_no`;
-  await run(names, async (n: any) => {
-    const r = await deezer(`/search/artist?limit=10&q=${encodeURIComponent(n.name)}`);
-    await sql`
-      insert into raw.deezer_search (query_key, query, payload) values (${n.name_key}, ${n.name}, ${sql.json(r?.json ?? { data: [] })})
-      on conflict (query_key) do update set query = excluded.query, fetched_at = now(), payload = excluded.payload`;
-    done.searched++;
-    return 1;
-  });
+    where s.query_key is null or s.fetched_at < ${before}::timestamptz
+       or (m.match_type = 'none' and s.fetched_at < now() - interval '30 days')
+    order by c.name_key, c.part_no limit ${TODO_LIMIT}`;
+  if (names.length) return { step: "search", items: names.map((n) => ({ key: n.key, path: `/search/artist?limit=10&q=${encodeURIComponent(n.query)}`, query: n.query })) };
 
-  // 1b. Song check: search "<name> <song>" with a song NDN posted; staging.deezer_artist_match
-  //     trusts the artist id that comes back with that song (fixes same-name artists).
-  const probes = outOfTime() ? [] : await sql`
-    select p.name_key, p.name, p.song from staging.ndn_artist_probe p
+  const probes = await sql`
+    select p.name_key as key, p.name || ' ' || p.song as query from staging.ndn_artist_probe p
     left join raw.deezer_track_search t using (name_key)
-    where t.name_key is null`;
-  await run(probes, async (p: any) => {
-    const query = `${p.name} ${p.song}`;
-    const r = await deezer(`/search?limit=10&q=${encodeURIComponent(query)}`);
-    await sql`
-      insert into raw.deezer_track_search (name_key, query, payload) values (${p.name_key}, ${query}, ${sql.json(r?.json ?? { data: [] })})
-      on conflict (name_key) do update set query = excluded.query, fetched_at = now(), payload = excluded.payload`;
-    done.songChecks++;
-    return 1;
-  });
+    where t.name_key is null or t.fetched_at < ${before}::timestamptz limit ${TODO_LIMIT}`;
+  if (probes.length) return { step: "probe", items: probes.map((n) => ({ key: n.key, path: `/search?limit=10&q=${encodeURIComponent(n.query)}`, query: n.query })) };
 
-  // 2. Releases of every matched artist (new ones, or last fetched more than 6 days ago).
-  const artists = outOfTime() ? [] : await sql`
-    select distinct a.deezer_artist_id
+  const artists = await sql`
+    select distinct a.deezer_artist_id::text as key
     from staging.ndn_artist a
     left join raw.deezer_artist_albums x using (deezer_artist_id)
-    where a.deezer_artist_id is not null and (x.deezer_artist_id is null or x.fetched_at < now() - interval '6 days')`;
-  await run(artists, async (a: any) => {
-    const data: unknown[] = [];
-    let path: string | null = `/artist/${a.deezer_artist_id}/albums?limit=100`;
-    let calls = 0;
-    while (path && calls < 5) {
-      const r = await deezer(path);
-      calls++;
-      if (!r) break;
-      data.push(...(r.json.data ?? []));
-      path = r.json.next ? String(r.json.next).replace(DEEZER, "") : null;
-    }
-    await sql`
-      insert into raw.deezer_artist_albums (deezer_artist_id, payload) values (${a.deezer_artist_id}, ${sql.json({ data })})
-      on conflict (deezer_artist_id) do update set fetched_at = now(), payload = excluded.payload`;
-    done.artists++;
-    return calls;
-  });
+    where a.deezer_artist_id is not null and (x.deezer_artist_id is null or x.fetched_at < now() - interval '6 days'
+                                              or x.fetched_at < ${before}::timestamptz)
+    limit ${TODO_LIMIT}`;
+  if (artists.length) return { step: "albums", items: artists.map((a) => ({ key: a.key, path: `/artist/${a.key}/albums?limit=100` })) };
 
-  // 3. Track list of every release we don't have yet (only artists matched right now).
-  const albums = outOfTime() ? [] : await sql`
-    select distinct r.album_id from staging.music_release r
+  const albums = await sql`
+    select distinct r.album_id::text as key from staging.music_release r
     join (select distinct deezer_artist_id from staging.ndn_artist where deezer_artist_id is not null) a using (deezer_artist_id)
     left join raw.deezer_album_tracks t using (album_id)
-    where t.album_id is null`;
-  await run(albums, async (al: any) => {
-    const r = await deezer(`/album/${al.album_id}/tracks?limit=200`);
-    await sql`
-      insert into raw.deezer_album_tracks (album_id, payload) values (${al.album_id}, ${sql.json(r?.json ?? { data: [] })})
-      on conflict (album_id) do update set fetched_at = now(), payload = excluded.payload`;
-    done.albums++;
-    return 1;
-  });
+    where t.album_id is null or t.fetched_at < ${before}::timestamptz limit ${TODO_LIMIT}`;
+  if (albums.length) return { step: "tracks", items: albums.map((a) => ({ key: a.key, path: `/album/${a.key}/tracks?limit=200` })) };
 
-  const [left] = await sql`
-    select
-      (select count(distinct c.name_key) from staging.ndn_artist_credit c
-        left join raw.deezer_search s on s.query_key = c.name_key where s.query_key is null) as names_left,
-      (select count(distinct a.deezer_artist_id) from staging.ndn_artist a
-        left join raw.deezer_artist_albums x using (deezer_artist_id)
-        where a.deezer_artist_id is not null and x.deezer_artist_id is null) as artists_left,
-      (select count(distinct r.album_id) from staging.music_release r
-        join (select distinct deezer_artist_id from staging.ndn_artist where deezer_artist_id is not null) a using (deezer_artist_id)
-        left join raw.deezer_album_tracks t using (album_id) where t.album_id is null) as albums_left`;
-  const finished = Number(left.names_left) + Number(left.artists_left) + Number(left.albums_left) === 0;
-  return { requests: used, ...done, ...left, finished };
+  return { step: "done", items: [] };
+}
+
+// Saves Deezer replies untouched. body: {step, rows: [{key, query?, payload}]} or {step: "run", detail}.
+async function deezerSave(body: any, by: string) {
+  const rows: any[] = Array.isArray(body?.rows) ? body.rows : [];
+  for (const r of rows) {
+    const payload = sql.json(r.payload ?? { data: [] });
+    if (body.step === "search") {
+      await sql`insert into raw.deezer_search (query_key, query, payload) values (${r.key}, ${r.query}, ${payload})
+        on conflict (query_key) do update set query = excluded.query, fetched_at = now(), payload = excluded.payload`;
+    } else if (body.step === "probe") {
+      await sql`insert into raw.deezer_track_search (name_key, query, payload) values (${r.key}, ${r.query}, ${payload})
+        on conflict (name_key) do update set query = excluded.query, fetched_at = now(), payload = excluded.payload`;
+    } else if (body.step === "albums") {
+      await sql`insert into raw.deezer_artist_albums (deezer_artist_id, payload) values (${r.key}::bigint, ${payload})
+        on conflict (deezer_artist_id) do update set fetched_at = now(), payload = excluded.payload`;
+    } else if (body.step === "tracks") {
+      await sql`insert into raw.deezer_album_tracks (album_id, payload) values (${r.key}::bigint, ${payload})
+        on conflict (album_id) do update set fetched_at = now(), payload = excluded.payload`;
+    } else {
+      throw new Error(`unknown step ${body?.step}`);
+    }
+  }
+  return { step: body.step, saved: rows.length, by };
 }
 
 Deno.serve(async (req) => {
@@ -199,14 +147,25 @@ Deno.serve(async (req) => {
   }
   const url = new URL(req.url);
   const part = url.searchParams.get("part");
-  if (part !== "trends" && part !== "deezer") return new Response("expected ?part=trends or ?part=deezer", { status: 400 });
   const by = url.searchParams.get("by") ?? "manual";
-  const budget = Math.min(Number(url.searchParams.get("budget") ?? 300) || 300, 800);
 
-  const [{ run_id }] = await sql`insert into raw.music_runs (part, run_by) values (${part}, ${by}) returning run_id`;
+  if (part === "deezer_todo") return Response.json(await deezerTodo(url.searchParams.get("since")));
+  if (part === "deezer_save") {
+    let body: any;
+    try { body = await req.json(); } catch { return new Response("body must be JSON", { status: 400 }); }
+    if (body?.step === "run") {          // the server's summary at the end of a run
+      await sql`insert into raw.music_runs (part, run_by, finished_at, status, detail)
+        values ('deezer', ${by}, now(), ${body.status ?? "ok"}, ${sql.json(body.detail ?? {})})`;
+      return Response.json({ status: "logged" });
+    }
+    return Response.json(await deezerSave(body, by));
+  }
+  if (part !== "trends") return new Response("expected ?part=trends, deezer_todo or deezer_save", { status: 400 });
+
+  const [{ run_id }] = await sql`insert into raw.music_runs (part, run_by) values ('trends', ${by}) returning run_id`;
   try {
-    const detail = part === "trends" ? await trends() : await deezerPart(budget);
-    const status = part === "trends" && (detail as any).failed.length ? "partial" : "ok";
+    const detail = await trends();
+    const status = (detail as any).failed.length ? "partial" : "ok";
     await sql`update raw.music_runs set finished_at = now(), status = ${status}, detail = ${sql.json(detail)} where run_id = ${run_id}`;
     return Response.json({ run_id, status, ...detail });
   } catch (e) {

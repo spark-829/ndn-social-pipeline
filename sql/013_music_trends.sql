@@ -6,7 +6,8 @@
 --        songs list is gone (all song/music URLs redirect to hashtags, checked 2026-10-19),
 --        so kworb is the trending-songs source.
 --   B. Every artist NDN has posted on YouTube, matched to Deezer, with their full catalog.
--- Loaded untouched by the Edge Function music-weekly; all cleaning happens in the views below.
+-- Loaded untouched through the Edge Function music-weekly (trends: fetched by the function;
+-- Deezer: fetched by extract_music_catalog.py on the home server). All cleaning is in the views below.
 
 ------------------------------------------------------------------ raw (Extract + Load)
 create table if not exists raw.music_runs (
@@ -317,8 +318,10 @@ from staging.trend_spotify_ph t;
 
 ------------------------------------------------------------------ schedule (pg_cron, PH = UTC+8)
 -- Mondays 10:00 PH: trends snapshot (kworb's weekly chart is out by Friday).
--- Mondays 10:10-11:50 PH, every 10 min: Deezer. Usually 1-2 calls do the week's work (new names,
--- releases refetched, tracks of new releases); the rest return in a second with "finished".
+-- Deezer is NOT scheduled here: Deezer filters its catalog by the caller's country and Supabase
+-- calls from Seoul (Lola Amour: 3 releases instead of 33). It runs Mondays 10:10 PH from the home
+-- server (PH IP): extract_music_catalog.py, which asks music-weekly what to fetch and saves through it.
+-- The pg_cron job 'ndn-music-deezer-weekly' used in the first test is switched off (active = false).
 select cron.schedule('ndn-music-trends-weekly', '0 2 * * 1', $$
   select net.http_post(
     url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url')
@@ -327,14 +330,7 @@ select cron.schedule('ndn-music-trends-weekly', '0 2 * * 1', $$
       'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'ndn_cron_secret')),
     body := '{}'::jsonb, timeout_milliseconds := 150000);
 $$);
-select cron.schedule('ndn-music-deezer-weekly', '10-59/10 2-3 * * 1', $$
-  select net.http_post(
-    url := (select decrypted_secret from vault.decrypted_secrets where name = 'project_url')
-           || '/functions/v1/music-weekly?part=deezer&by=pg_cron&budget=500',
-    headers := jsonb_build_object('Content-Type', 'application/json',
-      'x-cron-secret', (select decrypted_secret from vault.decrypted_secrets where name = 'ndn_cron_secret')),
-    body := '{}'::jsonb, timeout_milliseconds := 150000);
-$$);
+
 
 -- Checks:
 --   select * from raw.music_runs order by run_id desc limit 5;
