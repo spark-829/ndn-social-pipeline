@@ -1,3 +1,4 @@
 requests>=2.31
 python-dotenv>=1.0
 yt-dlp[default,curl-cffi]>=2026.8.19   # curl-cffi = Chrome TLS fingerprint for TikTok
+psycopg[binary]>=3.2                 # export_tableau.py (COPY from Supabase)

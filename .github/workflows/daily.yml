@@ -37,6 +37,14 @@ jobs:
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
         # One retry after 2 min: a new attempt can get past a one-off empty response.
         run: python extract_tiktok.py --upload --by github || (sleep 120 && python extract_tiktok.py --upload --by github)
+      # Full caption + auto-captions for videos new in today's snapshot (usually 0-3, seconds).
+      # Goes through the tiktok-details Edge Function; a failure here doesn't fail the snapshot.
+      - name: Fetch details for new videos
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: python extract_tiktok_details.py --max-errors 3
       - name: Keep raw files as a 90-day backup
         if: always()
         uses: actions/upload-artifact@v4
