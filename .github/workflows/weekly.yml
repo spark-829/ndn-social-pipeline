@@ -1,0 +1,36 @@
+# Weekly TikTok extras (extract_tiktok_extras.py -> tiktok-extras Edge Function -> raw.tiktok_*).
+# Mondays 02:30 UTC = 10:30 PH, after the Monday trends + Deezer runs.
+# Video pages, sound counts, comments, artist + benchmark profiles. Usually 10-20 minutes;
+# the first backfill was done from Vic's PC on 2026-10-20.
+# Repo secrets: SUPABASE_URL, NDN_CRON_SECRET (same as daily.yml).
+name: weekly
+
+on:
+  schedule:
+    - cron: "30 2 * * 1"
+  workflow_dispatch:             # "Run workflow" button; leave blank for a full run
+    inputs:
+      steps:
+        description: "steps, e.g. pages,sounds,comments,profiles"
+        default: "pages,sounds,comments,profiles"
+      limit:
+        description: "max items per step (blank = no limit)"
+        default: ""
+
+jobs:
+  tiktok-extras:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install -r requirements.txt && pip install -U "yt-dlp[default,curl-cffi]"
+      - run: python -m playwright install --with-deps chromium
+      - name: Extract TikTok extras and upload to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: |
+          python extract_tiktok_extras.py --by github             --steps "${{ inputs.steps || 'pages,sounds,comments,profiles' }}"             ${{ inputs.limit && format('--limit {0}', inputs.limit) || '' }}
