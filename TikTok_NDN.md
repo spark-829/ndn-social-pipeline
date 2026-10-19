@@ -64,3 +64,11 @@ Goal: suggest, for each day or week, **which NDN clip to post or which YouTube s
 - Do trending-now artists beat older popular artists on TikTok, or the other way round?
 - Is the first song uploaded after a show the best performer from that show?
 - Does a shorter gap between show and upload mean more views?
+
+## TikTok extras (built 2026-10-20, weekly)
+
+`extract_tiktok_extras.py` → Edge Function `tiktok-extras` → `raw.tiktok_video_page`, `raw.tiktok_sound_stats`, `raw.tiktok_comments` (+ `raw.tiktok_comment_fetch`), `raw.tiktok_accounts` (list), `raw.tiktok_account_snapshot`; views in `sql/014_tiktok_extras.sql`. Runs Mondays 10:30 PH on GitHub Actions (`.github/workflows/weekly.yml`, "Run workflow" button has steps + limit inputs). Run log: `raw.music_runs` where part = 'tiktok_extras'.
+- How each part is fetched: video page = yt-dlp's own page reader (plain requests get a 1.4 KB challenge page); sound page and profiles = headless Chromium (the numbers load by JavaScript; also gets past the home-IP block on profiles); comments = TikTok's web comment list with Chrome TLS (works unsigned). Tested from Vic's PC and from GitHub (all 4 steps OK).
+- "shares" in our snapshots = TikTok shareCount (yt-dlp calls it repost_count). TikTok's own repost count is `staging.tiktok_video_page.reposts`.
+- Artist accounts: found from NDN's @tags when the handle contains the artist's name (43 of 69 tagged handles at first count); others (e.g. @anqelaken = Angela Ken) need a row in `raw.tiktok_accounts` (role 'artist', artist_name_key). Benchmark accounts: rows with role 'benchmark' (so far `wish1075official`, from wish1075.com).
+- First run: PC backfill 2026-10-20 03:04-04:00 PH (980 video pages, 950 of 955 sounds, comments for 6 videos), stopped so Vic could turn the PC off; GitHub run 39315979394 (started 04:02 PH) does the rest (about 48,000 comments + profiles). Early finds: "Panalangin" (Apo Hiking Society) sound used in 43,900 videos; NDN original sounds in 1-2 each; 894 of 955 sounds are NDN originals.

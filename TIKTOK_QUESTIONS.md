@@ -160,6 +160,8 @@ Status words: **Now** = real data is enough. **Stand-in** = answerable with a st
 - Status: New data. Our captions are cut off in the profile list (tags show up as `#cozyc`, `#liveatthec`), so tags must come from each video's own page.
 - First look (real, cut-off captions, not adjusted): no tags 741 videos, median 9,821 views; 1-3 tags 223 videos, median 25,100; 4+ tags 15 videos, median 11,900. Top tags: #cozycove, #liveatthecozycove, #opm, #baguio.
 
+> 2026-10-20: weekly "TikTok extras" now collect, per video: sound (id, original or not), TikTok's real repost count, tagged place, @mentions, TikTok's suggested search words; per sound: how many videos use it (Q12, `staging.tiktok_sound_stats`); all top-level comments (`staging.tiktok_comment`); artists' own TikTok accounts and benchmark accounts (`staging.tiktok_account_snapshot_other`). Details in `TikTok_NDN.md`.
+
 **Q16 Does joining a trend (trending sound or hashtag in the PH) lift a video, and how often do NDN songs become trends?**
 - Why: blogs say trending audio boosts reach, but no solid study shows it; one academic study (660 travel videos) found cover sounds had no effect on views. For a label the bigger question is the reverse: do NDN's songs become the trend.
 - Decision: whether to spend effort on trend posts, and which songs to push when they start trending.
