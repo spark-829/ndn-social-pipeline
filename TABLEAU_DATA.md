@@ -110,3 +110,22 @@ Chart titles stay neutral; findings live only in the daily text so no number goe
 
 Exercise: on dashboard 2, compare the top 5 by `views_per_day` with the top 5 by `vs_series_median`. Which list
 would you show NDN's marketing team, and why?
+## Dashboard v3 plan (agreed with Vic 2026-10-20; build after all data sets are done)
+
+**Platform colors** (every chart that shows platforms). Vic asked for TikTok black, YouTube red, Instagram pink; adjusted so they work on the dark cards (#1a1a19) and pass `validate_palette.js --mode dark --pairs all`:
+- TikTok `#00a0d0` (TikTok's cyan accent; black is invisible on the dark cards)
+- YouTube `#e8302a`
+- Instagram `#d6249f` (magenta-pink; brand pink #e1306c is too close to red, normal-vision ΔE 10 < 15)
+- Cyan vs pink is a WARN for deuteranopia (ΔE 7.8), legal only with platform name labels on or beside every mark: always label.
+
+**New charts** (data set 1 onwards):
+1. Executive: "Trending now" table: NDN artists in Spotify PH weekly top 200, rank, change, streams, Action (boost video + post clip / check unused footage). `staging.trend_spotify_ph_ndn` + `music_catalog_status`.
+2. Top 10 to invite: ranked table with the score and its parts as small bars (see `INVITE_SCORE.md`).
+3. Unused songs per artist: bar, posted vs not posted, click to list songs (hide merged Deezer profiles, filter intros/live versions).
+4. Fresh vs older song: TikTok performance index dot plot by song age at posting.
+5. After 4-8 weeks of history: rising songs (weekly streams lines) and Q16 (NDN post week marked on the song's streams line).
+6. Artist listener cities: top 5 Spotify cities per artist (bar), Baguio/Metro Manila highlighted, for show location and lineup.
+
+**Dashboard 4, the 5th page (later): Benchmark.** Weekly YouTube stats of comparable PH live-session channels vs NDN, indexed to 100 at the first week (one axis, no dual axis).
+
+**Demographics:** NDN's own audience (age, gender, city, returning viewers) is not public; it needs YouTube Analytics through NDN's account (Phase 2). Public now: each artist's top 5 Spotify cities (data set 3).
