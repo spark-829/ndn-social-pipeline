@@ -1,6 +1,6 @@
 # Weekly TikTok extras (extract_tiktok_extras.py -> tiktok-extras Edge Function -> raw.tiktok_*).
 # Mondays 02:30 UTC = 10:30 PH, after the Monday trends + Deezer runs.
-# Video pages, sound counts, comments, artist + benchmark profiles. Usually 10-20 minutes;
+# Video pages, sound counts, comments, artist profiles; then benchmark accounts' latest 50 videos. Usually 10-20 minutes;
 # the first backfill was done from Vic's PC on 2026-10-20.
 # Repo secrets: SUPABASE_URL, NDN_CRON_SECRET (same as daily.yml).
 name: weekly
@@ -34,3 +34,11 @@ jobs:
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
         run: |
           python extract_tiktok_extras.py --by github             --steps "${{ inputs.steps || 'pages,sounds,comments,profiles' }}"             ${{ inputs.limit && format('--limit {0}', inputs.limit) || '' }}
+      # Benchmark accounts (sql/020): counts for each account's latest 50 videos (top 10 trending).
+      - name: Benchmark accounts, latest 50 videos
+        if: always()
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: python extract_benchmarks_tiktok.py --weekly --by github

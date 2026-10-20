@@ -45,6 +45,13 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
         run: python extract_tiktok_details.py --max-errors 3
+      # Benchmark accounts (sql/020): followers, hearts, video count -> benchmarks Edge Function.
+      - name: Benchmark accounts, daily totals
+        continue-on-error: true
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: python extract_benchmarks_tiktok.py --daily --by github
       - name: Keep raw files as a 90-day backup
         if: always()
         uses: actions/upload-artifact@v4
