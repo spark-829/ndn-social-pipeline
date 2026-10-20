@@ -21,7 +21,7 @@ Every part is a percentile rank (0-100) within this week's candidate pool, so on
 | Momentum | 25% | Spotify PH weekly chart: weeks on chart, best rank, rank change (kworb, have it) + monthly listeners growth over 8 weeks (Spotify page, data set 3) |
 | PH local reach | 20% | Listeners in PH cities from the artist's top 5 Spotify cities; Metro Manila + Baguio/North Luzon counted first (data set 3) |
 | Fan demand | 15% | How often fans name the artist in NDN's YouTube/TikTok/IG comments, per 1,000 comments (data set 5) |
-| NDN track record | 15% | Artists who played: median TikTok performance index + YouTube views vs channel median (have it). New artists get 50 and a "new" tag |
+| NDN track record | 15% | Artists who played: median TikTok performance index + YouTube performance index, size-adjusted, and share of current YouTube views (have it; defined in `YOUTUBE_QUESTIONS.md` Q13). Later: Spotify lift after a session (Q12). New artists get 50 and a "new" tag |
 | Size | 15% | Monthly listeners, log scale (data set 3) |
 | Fan loyalty | 10% | Spotify followers ÷ monthly listeners (data set 3) |
 
