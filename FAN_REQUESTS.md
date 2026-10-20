@@ -19,6 +19,17 @@ Conclusion: names + rules find the **candidates** well, but only about half are 
 
 ## Part A: YouTube comments extract
 
+**Built 2026-10-21** (`sql/018_youtube_comments.sql`, `supabase/functions/youtube-comments/`). Also built: views `staging.youtube_comment_todo` (what's left to fetch) and `staging.fan_comment` (Part B step 1). Differences from the plan: the stop point is the newest comment's **time** (`newest_at`), not its id; a video cut off by the 100 s budget is saved as `partial` with its page token and goes first next call; `error` videos are retried after 6 days, `disabled` ones only if their count grows. Tested on 8 videos (10 units). Backfill: pg_cron every 3 min, 15:30-16:57 PH Wed 2026-10-21 (after the 15:00 PH quota reset), removed by a cleanup job at 17:05 PH. To-do at start: 1,013 videos, ~180k comments incl. replies, ≤ 2,550 units.
+
+Check after 17:00 PH:
+```sql
+select run_by, status, detail from raw.music_runs where part = 'youtube_comments' order by run_id desc limit 10;
+select status, count(*), sum(saved) from raw.youtube_comment_fetch group by 1;   -- expect all ok/disabled, no partial
+select reason, count(*) from staging.youtube_comment_todo group by 1;            -- expect empty (or a few 'grew')
+select pg_size_pretty(pg_total_relation_size('raw.youtube_comments'));
+select jobname from cron.job where jobname like 'ndn-youtube-comments%';         -- expect only -weekly
+```
+
 | Item | Plan |
 |---|---|
 | API call | `commentThreads.list` (part=snippet, maxResults=100, order=time, textFormat=plainText). 1 quota unit per page of 100 |
@@ -51,7 +62,7 @@ Conclusion: names + rules find the **candidates** well, but only about half are 
 
 ## Build order (one session each)
 
-1. sql/018 tables + views, Edge Function `youtube-comments`, test on 5 videos, then the backfill on a non-Monday.
+1. ~~sql/018 tables + views, Edge Function `youtube-comments`, test on 5 videos, then the backfill on a non-Monday.~~ Built 2026-10-21; backfill runs 15:30 PH same day.
 2. `artist_alias`, `comment_artist_hit`, candidates; Claude labels the TikTok candidates first (small), then YouTube.
 3. Rule check, `fan_demand_artist`, `fan_upload_request`, update `INVITE_SCORE.md`, add the weekly labeling step to the 15:00 routine.
 
