@@ -1,0 +1,31 @@
+# Weekly Spotify artist pages + kworb (extract_spotify.py -> spotify-weekly Edge Function -> raw.spotify_*, raw.kworb_*).
+# Mondays 02:45 UTC = 10:45 PH, after the TikTok extras run. Usually 5-10 minutes.
+# The first search + snapshot was done from Vic's PC on 2026-10-20.
+# Repo secrets: SUPABASE_URL, NDN_CRON_SECRET (same as daily.yml).
+name: spotify
+
+on:
+  schedule:
+    - cron: "45 2 * * 1"
+  workflow_dispatch:
+    inputs:
+      steps:
+        description: "steps, e.g. search,artists,kworb"
+        default: "search,artists,kworb"
+
+jobs:
+  spotify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install requests python-dotenv playwright
+      - run: python -m playwright install --with-deps chromium
+      - name: Extract Spotify + kworb and upload to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: python extract_spotify.py --by github --steps "${{ inputs.steps || 'search,artists,kworb' }}"
