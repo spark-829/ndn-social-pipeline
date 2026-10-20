@@ -22,6 +22,16 @@ Find each account's YouTube and Instagram from its TikTok bio / website first; d
 - **Instagram:** Business Discovery (Business/Creator accounts only): followers, media count, per-post likes/comments/views/reposts, 1 call per account.
 - **Not free:** watch time, audience, Facebook. Same limits as NDN.
 
-## Open questions for the build session
-1. Which 2 more accounts (propose with reasons: PH, live sessions, similar size or the leader to chase).
-2. Weekly or daily snapshots for benchmarks (size: check DB, ~230/500 MB after YouTube comments).
+## Scope decided (Vic, 2026-10-21): small on purpose, to save database space
+
+Vic only wants to see each benchmark's **overall growth** and their **top 10 trending videos right now**. So instead of
+"all the free data" per video:
+- **Daily: account totals only** per platform (followers/subscribers, total views or likes, video count). ~15 rows a day.
+- **Weekly: top 10 trending per account per platform** = the 10 videos with the most views gained in the last 7 days.
+  To get the gain: read the counts of their recent uploads (e.g. last ~50) each week, store counts only (no titles
+  repeated, no descriptions; title once per video), keep the top 10 for the dashboard.
+- No per-video daily history, no benchmark comments.
+- Size estimate: ~0.2 MB a day for all benchmarks (measure in the build session).
+
+## Open question for the build session
+1. Which 2 more accounts (propose with reasons: PH, live sessions, similar size or the leader to chase). Vic OKs.
