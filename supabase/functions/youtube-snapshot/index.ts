@@ -25,6 +25,24 @@ class QuotaExceeded extends Error {}
 const redact = (s: string, key: string) => s.split(key).join("REDACTED");
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+// v2 (sql/019, DB space): text that doesn't change day to day (description, localizations,
+// thumbnails, player) is moved out of the daily reply into raw.youtube_video_static, which gets a
+// row only for a new video or a changed field. snippet.localized is dropped when it is an exact
+// copy of title + description (always so far). Daily reply: 1.19 MB -> 0.20 MB.
+type Static = { video_id: string; description: string | null; localizations: unknown; thumbnails: unknown; player: unknown };
+function splitStatic(payload: any, out: Static[]) {
+  for (const it of payload.items ?? []) {
+    const sn = it.snippet ?? {};
+    out.push({ video_id: it.id, description: sn.description ?? null, localizations: it.localizations ?? null,
+               thumbnails: sn.thumbnails ?? null, player: it.player ?? null });
+    const loc = sn.localized;
+    if (loc && Object.keys(loc).length === 2 && loc.title === sn.title && loc.description === sn.description) {
+      delete sn.localized;
+    }
+    delete sn.description; delete sn.thumbnails; delete it.localizations; delete it.player;
+  }
+}
+
 async function callApi(endpoint: string, params: Record<string, string>, key: string) {
   const url = `${API}/${endpoint}?` + new URLSearchParams({ ...params, key });
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
@@ -86,9 +104,11 @@ Deno.serve(async (req) => {
     } while (token);
 
     // 3) full details for every video, 50 IDs per call
+    const statics: Static[] = [];
     for (let i = 0; i < ids.length; i += BATCH) {
       const res = await callApi("videos", { part: VIDEO_PARTS, id: ids.slice(i, i + BATCH).join(",") }, key);
       units++;
+      splitStatic(res.payload, statics);
       files.push({ name: `videos_${String(i / BATCH + 1).padStart(3, "0")}`, ...res });
     }
 
@@ -100,11 +120,22 @@ Deno.serve(async (req) => {
           values (${snapshotDate}, ${f.name}, ${stamp}, ${f.url}, ${tx.json(f.payload as any)})`;
       }
       await tx`
+        insert into raw.youtube_video_static (video_id, seen_date, description, localizations, thumbnails, player)
+        select s.video_id, ${snapshotDate}::date, s.description, s.localizations, s.thumbnails, s.player
+        from jsonb_to_recordset(${tx.json(statics as any)}::jsonb)
+             as s(video_id text, description text, localizations jsonb, thumbnails jsonb, player jsonb)
+        left join lateral (select * from raw.youtube_video_static l where l.video_id = s.video_id
+                           order by l.seen_date desc limit 1) l on true
+        where l.video_id is null
+           or (l.description, l.localizations, l.thumbnails, l.player)
+              is distinct from (s.description, s.localizations, s.thumbnails, s.player)
+        on conflict do nothing`;
+      await tx`
         insert into raw.youtube_runs (snapshot_date, extracted_at, channel_id, videos, playlist_pages, quota_units_used, triggered_by)
         values (${snapshotDate}, ${stamp}, ${NDN_CHANNEL_ID}, ${ids.length}, ${pages}, ${units}, ${triggeredBy})`;
     });
 
-    const summary = { status: "done", snapshot_date: snapshotDate, videos: ids.length, playlist_pages: pages, quota_units_used: units };
+    const summary = { status: "done", version: 2, snapshot_date: snapshotDate, videos: ids.length, playlist_pages: pages, quota_units_used: units };
     console.log(summary);
     return Response.json(summary);
   } catch (err) {
