@@ -3,7 +3,7 @@
 Independent analysis of public data, not affiliated with Nine Degrees North.
 
 Draft 1, 2026-10-21. Account @ninedegreesnorthrecords: 120,173 followers (exact, about +250 a day this week), 874 posts on the profile (the API returns 898). In 2026 so far: 157 Reels, 43 carousels and 27 photos, about 5.4 posts a week. Most Reels point to a YouTube session: "premieres TONIGHT at 7PM" posted at 6 pm, then "now streaming" after.
-Reel views below come from a one-off, read-only pull on 2026-10-21 (all 898 posts, 10 API calls). The daily pull doesn't collect views yet (see Data).
+Reel views below come from a one-off, read-only pull on 2026-10-21 (all 898 posts, 10 API calls). The daily pull collects views and reposts from 2026-10-21 on (see Data).
 The algorithm notes behind this file live in the `social-media-management` skill (`references/instagram.md`).
 
 ## How Instagram decides who sees a post
@@ -24,8 +24,8 @@ What this means for NDN: a Reel earns reach when the people it's tested on watch
 | Signal | Public (we collect it) | Only NDN can see |
 |---|---|---|
 | Likes, comment count | Yes, daily (likes hidden on 26 posts) | |
-| Reel views | Public in the API, **not collected daily yet** | Reach (unique accounts); views from followers vs non-followers |
-| Reposts | Public in the API since Apr 2026, **not collected daily yet** | Sends (DM shares), shares outside Instagram, saves |
+| Reel views | Yes, daily from 2026-10-21 (Reels only) | Reach (unique accounts); views from followers vs non-followers |
+| Reposts | Yes, daily from 2026-10-21 (public in the API since Apr 2026) | Sends (DM shares), shares outside Instagram, saves |
 | Caption, type (Reel, carousel, photo), post time | Yes, daily | |
 | Followers | Account total, exact, daily | Follows per post, profile visits |
 | Watch time | No | Average watch time, skips under 3 s, retention graph |
@@ -163,7 +163,7 @@ Measure conventions for Instagram:
   - Track record, Instagram part: median index of the artist's Reels (Q1) and the size-adjusted ratio.
   - Fan demand: reposts per 1,000 views on the artist's Reels (Q4); comments in Phase 2.
   - Momentum: the artist's own Instagram followers and growth (New data: artists' accounts, data set 6).
-- Status: index Now, once captions parse properly (only 349 of 635 Reels give a song and artist today). Artist accounts: New data.
+- Status: index Now (captions parse better since 2026-10-21: an artist is found for 518 of 896 posts, was 387). Artist accounts: New data.
 - First look (real, artists with 3+ parsed Reels 2024-26, median index): Janine Berdin 40.9 (3 Reels), Cup of Joe 4.5 (7), fitterkarma 4.5 (4), Maki 4.2 (7), Angela Ken 3.0 (4), TJ Monterde 2.1 (4). Cup of Joe also has 3 of the 5 most passed-on Reels (Q4).
 
 **Q14 What should NDN post on Instagram next week?**
@@ -187,7 +187,7 @@ This list is also the ask when Vic offers NDN free analyst work.
 ## What comes next
 
 1. Vic reviews this list: cut, add or reorder questions.
-2. Small data fixes first (gap list below; build only after Vic agrees). Adding views and reposts to the daily pull costs no extra API calls, and every day without it is a day of Reel views we can't get back.
+2. ~~Small data fixes first~~ Done 2026-10-21 (Vic agreed): views, reposts and totals in the daily pull; caption parser v3 (see Data).
 3. Answer with data we have: Q1 first (it fixes the Instagram index), then Q6, Q11 and Q4; Q10 and Q9 once daily views run.
 4. Then redesign the Instagram page of dashboard v3 so each chart answers one ★ question (with the `dataviz` skill).
 
@@ -195,7 +195,13 @@ This list is also the ask when Vic offers NDN free analyst work.
 
 Already collected daily (Edge Function `instagram-snapshot`, pg_cron 09:05 PH, 9 calls): every post's caption, type, time, likes and comments, plus followers, follows and media count. It lands in `raw.instagram_responses` → `staging.instagram_post_snapshot`, `staging.instagram_account_snapshot`, `mart.dim_video` (platform 'Instagram').
 
-Gap list (fields tested 2026-10-21 with a one-off, read-only pull through the same API):
+**Built 2026-10-21 (Vic: "step 1 and 2"):**
+- Edge Function `instagram-snapshot` v3 also asks for `view_count`, `reposts_count`, `total_like_count`, `total_comments_count` (no extra calls). First run with them: 2026-10-21 09:05 PH. Check: `select snapshot_date, count(views), sum(views) from staging.instagram_post_snapshot group by 1 order by 1 desc limit 2` (expect about 635 Reels with views on the newest day).
+- `sql/017_instagram_views_parse.sql`: new columns `views`, `reposts`, `total_likes`, `total_comments` in `staging.instagram_post_snapshot`; Instagram views flow into `mart.dim_video.latest_views` and `mart.fact_video_daily` (so `views_gained` works from the second day); new `staging.instagram_post_latest` (one row per post: format, caption type, hashtag count, latest counts).
+- Title parser v3 (`mart.parse_title`, used by all platforms): reads "<Song> by <Artist> premieres TONIGHT…" and "… is now streaming…", uses the first line that looks like a song line instead of the whole caption, strips leading emoji and list numbers. Artist found: Instagram 387 → 518 posts, TikTok 397 → 503, YouTube 869 → 872; no YouTube title lost. The 10 Instagram captions that lost a value were event posters whose old value was junk.
+- The scorecard's Instagram metric stays likes until views have a week of history (dashboard v3).
+
+Gap list (fields tested 2026-10-21 with a one-off, read-only pull through the same API; rows 1-4 built):
 
 | Gap | Questions | Extract that fills it | Cost |
 |---|---|---|---|

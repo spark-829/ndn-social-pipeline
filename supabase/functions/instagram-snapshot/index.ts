@@ -17,7 +17,11 @@ const MAX_PAGES = 50;                  // safety stop: 5,000 posts
 const MAX_RETRIES = 4;
 const MIN_COVERAGE = 0.95;             // fail if fewer posts come back than the profile shows
 const PROFILE = "username,name,biography,website,followers_count,follows_count,media_count";
-const MEDIA = "id,caption,media_type,media_product_type,timestamp,permalink,like_count,comments_count";
+// view_count = Reels only (paid + organic; since Apr 2026 also Facebook views of crossposted reels).
+// reposts_count and the total_* counts (Instagram + crossposted Facebook) are public since Apr 2026.
+// Tested 2026-10-21: all four come back for NDN; comments, collaborators, shares, saves are refused.
+const MEDIA = "id,caption,media_type,media_product_type,timestamp,permalink,like_count,comments_count," +
+              "view_count,reposts_count,total_like_count,total_comments_count";
 
 const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { prepare: false });
 
