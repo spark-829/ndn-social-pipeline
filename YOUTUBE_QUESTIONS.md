@@ -44,7 +44,7 @@ Status words: **Now** = real data is enough. **Stand-in** = answerable with a st
 
 Measure conventions for YouTube (same idea as TikTok Q14):
 - **Performance index** = a session's views ÷ the median views of the 30 full sessions posted nearest in time (15 before, 15 after). 1.0 = typical for its period. Sessions under 14 days old are left out of lifetime comparisons.
-- NDN's YouTube is far more hit-driven than its TikTok: a quarter of sessions sit under 0.2, a quarter over 8.4, the top 10% over 36. So TikTok's "breakout = 2×" is too low here. Proposal: **hit = index ≥ 10** (126 of 551 sessions, 23%).
+- NDN's YouTube is far more hit-driven than its TikTok: a quarter of sessions sit under 0.2, a quarter over 8.4, the top 10% over 36. **Bands (decided 2026-10-21):** use the bands creator tools use for "outlier" videos (vidIQ: under 2×, 2-5×, 5-10×, over 10× the channel's typical video). They are a tool convention, not a YouTube rule, but the same bands work for every platform, so TikTok and YouTube can be compared. NDN YouTube sessions (551, lifetime): 2×+ 221 (40%), 5×+ 163 (30%), **hit = 10×+ 126 (23%)**. TikTok keeps "breakout = 2×" as its first band. Ours uses the median of the 30 nearest sessions, not the channel average, because one viral session would inflate an average.
 - Compare Shorts with Shorts of the same period (counting changed 2025-03-31), and treat 2026-08-24 as a break for all views.
 
 ### Attract: does YouTube show new sessions beyond the fans?
@@ -138,7 +138,7 @@ Measure conventions for YouTube (same idea as TikTok Q14):
 - Why: YouTube retired its Trending page in July 2025; the API's "most popular" list now returns the Trending Music chart per country. YouTube ads reach about 59.6M people in the Philippines (Digital 2026, secondary report), so a PH trend is a big audience.
 - Decision: invite candidates with momentum (invite score "Momentum"); songs to schedule while they are hot.
 - Measure: daily snapshot of the 30 PH Trending Music videos; artists matched to NDN's and the Spotify artist list; days on the list per artist.
-- Status: Collecting daily since 2026-10-20 (`staging.youtube_trending_ph`). Matching artists from titles: still to write.
+- Status: Collecting daily since 2026-10-20 (`staging.youtube_trending_ph`). Matching artists from titles: later, with dashboard v3 (Vic, 2026-10-21).
 - First look (2026-10-20): 30 videos, none from NDN; led by lyric channels and VEVO uploads, so artists must be read from video titles.
 
 ### Music outcome: why a label is on YouTube
