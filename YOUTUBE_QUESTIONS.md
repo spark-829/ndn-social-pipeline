@@ -85,7 +85,7 @@ Measure conventions for YouTube (same idea as TikTok Q14):
 
 **Q5 ★ Does the song choice decide a session's views?**
 - Why: Search ranks by how well a video matches what people type, plus how searchers watched it. Up next follows the song being watched. A well-known song has search demand and many related videos to sit next to.
-- Decision: setlist advice for each visit: which song to film and premiere first, which to cut as Shorts, and how to balance the label's new single (Q12 tells whether a session lifts a new song on Spotify).
+- Decision: which sessions to premiere first and promote (Shorts, TikTok, Instagram), and which to cut Shorts from. Not used for song advice to artists (Vic, 2026-10-21).
 - Measure: index by the song's rank among the artist's Spotify songs (kworb), within the same artist. Second cut: song age (release date from Deezer).
 - Status: Now (rough answer below).
 - First look (real, kworb 2026-10-20, Cozy Cove sessions): artist's #1 Spotify song: median index 13.7 (n 77, median 3.8M views); #2-5: 6.0 (125); other songs: 1.2 (102); artists too small for kworb: 0.29 (154). **Within the same artist** (53 artists with both): sessions of their top-3 Spotify songs got 9.6× the views of their other sessions; the top song won for 50 of 53 artists. Caveat: Spotify rank is today's, and a session may itself have made the song bigger (Q12 tests that direction).
@@ -152,12 +152,11 @@ Measure conventions for YouTube (same idea as TikTok Q14):
 
 **Q13 How do YouTube results feed the invite score?**
 - Why: the score (`INVITE_SCORE.md`) gives 15% to "NDN track record" and 15% to "Fan demand"; both need YouTube.
-- Decision: who to invite next, and what to ask them to play.
+- Decision: who to invite next (no song advice: Vic, 2026-10-21).
 - Measure:
   - Track record, YouTube half: median index of the artist's sessions at least 30 days old (Q1), plus the size-adjusted ratio (Q1) and their share of NDN's current daily views (Q8). Once Q12 has answers: the Spotify lift. New artists get 50 and a "new" tag.
   - Fan demand: YouTube comments naming the artist (data set 5).
   - Cooldown (10 months) starts from the first YouTube upload of the latest visit, as now.
-  - Song advice for an invited artist comes from Q5 (their best-known songs), shown next to the score, not in it.
 - Status: Now for the index; size-adjusted and evergreen parts Now; lift Wait; fan demand after data set 5.
 - First look (real, Cozy Cove sessions 2024-26, artists with 3+ sessions, median index): Dionela 105, Silent Sanctuary 95, Moonstar88 76 (latest visit Jan 2026, so cooling down until about Nov 2026), Freestyle 63, Sponge Cola 47, fitterkarma 46.
 
