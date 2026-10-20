@@ -12,6 +12,10 @@ on:
       steps:
         description: "steps, e.g. search,artists,kworb"
         default: "search,artists,kworb"
+      check:
+        description: "only test that Spotify + kworb answer (saves nothing)"
+        type: boolean
+        default: false
 
 jobs:
   spotify:
@@ -28,4 +32,4 @@ jobs:
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
-        run: python extract_spotify.py --by github --steps "${{ inputs.steps || 'search,artists,kworb' }}"
+        run: python extract_spotify.py --by github --steps "${{ inputs.steps || 'search,artists,kworb' }}" ${{ inputs.check && '--check' || '' }}

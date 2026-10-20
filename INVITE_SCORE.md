@@ -29,7 +29,8 @@ Why these weights: momentum and local reach get the most because the decision is
 
 Rules:
 - Candidates = artists in the Spotify PH top 200 in the last 8 weeks + every artist who has played for NDN (OPM only; Vic checks unclear ones).
-- Artists who played in the last 6 months are listed separately ("too soon to re-invite").
+- **Cooldown 10 months (Vic, 2026-10-20):** an artist who performed is not recommended again until 10 months after the performance. Performance date = first NDN post of the artist's latest visit (a new visit = posts more than 60 days after the previous one; the session is filmed before it goes up, so this date is a little late, never early). They are listed separately as "cooling down until <date>".
+- Songs not posted yet: NDN has not posted every song an artist performed, so a missing NDN song never counts against an artist (matching or scoring).
 - The table shows each part as a small bar so the reason is visible, not just the total.
 - Missing: fee and availability (not public). Once NDN shares ticket sales, add a "draw" part and lower Size and Momentum.
 - Check after 8 weeks: do the weights put artists NDN actually booked near the top? If not, adjust and note why here.

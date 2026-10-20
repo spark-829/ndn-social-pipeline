@@ -11,6 +11,7 @@ Steps (each only for what is new or due):
 
     py extract_spotify.py                          # all steps
     py extract_spotify.py --steps search --dry-run # print picks, save nothing
+    py extract_spotify.py --check                  # does Spotify + kworb answer from this machine?
 Needs SUPABASE_URL and NDN_CRON_SECRET (.env or environment). Also: playwright + chromium.
 """
 import argparse, html, json, logging, os, re, sys, time
@@ -279,11 +280,19 @@ def main():
     ap.add_argument("--limit", type=int, default=2000)
     ap.add_argument("--by", default="manual")
     ap.add_argument("--dry-run", action="store_true", help="fetch and print, save nothing")
+    ap.add_argument("--check", action="store_true", help="only test that Spotify and kworb answer from here")
     args = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")      # names like DENȲ or Mỹ Anh on a Windows console
     sys.stderr.reconfigure(encoding="utf-8")
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     load_dotenv()
+    if args.check:
+        sp = Spotify()
+        stats = slim(sp.overview(WARM_ARTIST))["stats"]
+        sp.close()
+        k = requests.get(KWORB.format(WARM_ARTIST), headers={"User-Agent": UA}, timeout=30).status_code
+        print(f"Spotify OK: Esremborak {stats['monthlyListeners']:,} monthly listeners; kworb HTTP {k}")
+        return
     feed = Feed(os.environ["SUPABASE_URL"], os.environ["NDN_CRON_SECRET"], args.by)
     detail, state, status = {}, {}, "ok"
     try:
