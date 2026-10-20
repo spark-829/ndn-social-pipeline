@@ -82,8 +82,8 @@ where r.file_name like 'videos\_%'
 order by i->>'id', r.snapshot_date desc;
 
 ------------------------------------------------------------------ part 2: monthly synthetic trim
--- STATUS 2026-10-21: NOT APPLIED yet (part 1 is applied). Waiting for Vic's OK on the dashboard
--- history window; run this part before 2026-11-13.
+-- STATUS: applied 2026-10-21 after Vic's OK ("delete synthetic, never real data"). Only the 4 tables in
+-- schema synthetic are touched; raw.* is only read for the first real day.
 -- Cutoff per platform = (first real day - 10 months) + (full months of real data so far).
 -- Synthetic YouTube starts 2025-12-12 (real 2026-10-12), TikTok 2025-12-13 (real 2026-10-13),
 -- so the first delete is on 2026-11-13 and removes Dec 12/13 - Jan 11/12. Safe to run any day:

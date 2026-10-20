@@ -13,8 +13,8 @@ Handles checked 2026-10-21 from each account's own bio, YouTube links page or we
 | Wish 107.5 (Wish Bus) | Claude, 2026-10-20 | @wish1075official | UCdfq8-581QVUtVsa8ChVnDQ (@wishfm1075official) | wish1075 |
 | Jess & Pat's | Vic, 2026-10-21 | @jessxpats | UCPBPWR8nuHPKt5X_qPk3t1A (12 videos, inactive since May 2020) | jessxpats |
 | Backyard Live | Vic, 2026-10-21 | @backyard.live | UC1P5pdk6RAUJqaIRPUC0jWg | backyard.live |
-| Tower of Doom (Tower Sessions) | Claude, 2026-10-21, **Vic to OK** | none listed | UCh__YhmGdnvPh5fSdF8DJnQ (@towerofdoomrecords) | towerofdoom |
-| Vibe PH (Vibe+) | Claude, 2026-10-21, **Vic to OK** | @vibeph.tv | UC6hmtt5JtP0e_FNAtWsq2Yw (@vibephtv) | vibeph.tv |
+| Tower of Doom (Tower Sessions) | Claude, OK by Vic 2026-10-21 | none listed | UCh__YhmGdnvPh5fSdF8DJnQ (@towerofdoomrecords) | towerofdoom |
+| Vibe PH (Vibe+) | Claude, OK by Vic 2026-10-21 | @vibeph.tv | UC6hmtt5JtP0e_FNAtWsq2Yw (@vibephtv) | vibeph.tv |
 
 **Why these 2** (picked from NDN's own data: `staging.youtube_search_result`, the channels that rank next to NDN in
 the 90 weekly song searches, keeping those that post live performances and are still active):
