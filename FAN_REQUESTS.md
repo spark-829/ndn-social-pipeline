@@ -79,8 +79,43 @@ YouTube (6,831 of 143,934). So keep the text only where it's useful, and keep th
 ## Build order (one session each)
 
 1. ~~sql/018 tables + views, Edge Function `youtube-comments`, test on 5 videos, then the backfill on a non-Monday.~~ Built 2026-10-21; backfill runs 15:30 PH same day.
-2. `artist_alias`, `comment_artist_hit`, candidates, `comment_artist_mention` counts; Claude labels the TikTok candidates first (small), then YouTube. Then the storage rule above (prune + filter at load time), after Vic's OK.
-3. Rule check, `fan_demand_artist`, `fan_upload_request`, update `INVITE_SCORE.md`, add the weekly labeling step to the 15:00 routine.
+2. ~~`artist_alias`, `comment_artist_hit`, candidates, `comment_artist_mention` counts; Claude labels the candidates.~~ Built 2026-10-21 (`sql/023_fan_requests.sql`). Storage rule (prune) still waits for Vic's OK.
+3. ~~Rule check, `fan_demand_artist`, `fan_upload_request`, update `INVITE_SCORE.md`.~~ Built 2026-10-21. Weekly labeling routine: waiting for Vic's OK (see Part C).
+
+## Part C: what was built (2026-10-21, real data)
+
+**Matching.** Each comment is split into words, each word reduced to letters + digits, and runs of 1-4 words are
+compared with the artist names by equality (`mart.scan_comment_hits`, 3 s per 20k comments; all 164,657 in ~25 s).
+Names: `mart.artist_alias` (299 names, 278 artists: Spotify name, NDN credit, TikTok handle). Stoplist after
+checking the top 45: Because, This Band, Much Love, The Sun, Deny, We Got, Day One, Justin, Nicole, and bare
+"Janine" (Janine Teñoso vs Janine Berdin). Known trap: Maki's song "Dilaw" sets off the band Dilaw (labels fix it).
+
+**Request words** (`staging.request_word`): strong = next, invite, guest, sunod, upload, full version, request,
+collab (count alone); weak = please/pls variants, balik, kailan, spotify, sana, naman, perform, sundan (only next to
+a name). "perform" and "sundan" alone were 413 comments, nearly all praise or lyrics.
+
+**Labels** (`raw.comment_label`): Claude read 2,163 candidates: 385 artist requests, 449 song requests, 128 collab
+requests, 200 upload requests, the rest mention/noise. 1,809 comments that name another artist with no request
+word got `mention_no_ask` by rule. Artists asked for who aren't in the list are stored as `ask:<name>` with
+`asked_name` (Urbandub, Cueshé, Franco, IV of Spades, Arthur Nery, BINI, SB19, ...): Vic decides which to add.
+
+**Rule check (step 6).** Request words alone: 54% of flagged comments are real requests (< 85%), so reading
+stays. The "name, no request word = no ask" rule: 6 of a random 100 were missed requests (~93% of requests
+caught overall). Two leftover blank-artist rows from a parsing slip can't affect outputs (they have no artist).
+
+**Outputs.**
+- `mart.fan_demand_artist`: last 12 months, distinct fans asking (invite = artist + collab, more = song +
+  upload), per-1,000-comment rates per platform, last NDN post and `cooling_down` (10-month rule).
+  Top 2026-10-21: Hale 39 fans (mostly "Broken Sonnet next"), Urbandub 22 and Cueshé 22 (never played),
+  Cup of Joe 20, Parokya Ni Edgar 17, Typecast 15, Join The Club 14, Chicosci 12 (never played).
+- `mart.fan_upload_request`: sessions fans want posted or put on Spotify, with the most-liked ask.
+- `mart.comment_artist_mention`: counts per video x artist (kept if comment text is pruned later).
+
+**Weekly.** pg_cron `ndn-fan-requests-weekly` Tue 12:00 PH runs `mart.weekly_fan_requests()` (scan new comments,
+rule labels; returns how many wait for reading). Reading the rest (~100 a week) needs a Claude routine: proposed
+as a separate Tuesday 15:30 PH routine, not inside the 15:00 dashboard-text routine (that one must only touch
+`mart.insights`). Prompt: read `select platform, comment_id, text, other_artists from staging.fan_request_candidate
+where how = 'read' and not labeled`, then insert into `raw.comment_label` with the same labels and `ask:<name>` rule.
 
 ## Exercise for Vic (teaching)
 

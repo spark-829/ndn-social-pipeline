@@ -2,7 +2,8 @@
 // Small on purpose (Vic 2026-10-21): daily account totals + weekly counts of the latest 50 uploads.
 //   ?step=daily    YouTube channel totals (1 unit for all) + Instagram profile totals   (pg_cron daily)
 //   ?step=weekly   latest 50 uploads per account: YouTube (2 units each) + Instagram    (pg_cron Monday)
-//   ?step=catalog&account=K&platform=YouTube|Instagram   one-time full upload history (sql/021)
+//   ?step=catalog&account=K&platform=YouTube|Instagram[&after=cursor]   one-time full upload history (sql/021)
+//   ?step=artist_ig[&limit=60]   artists' own Instagram followers (sql/024)          (pg_cron Wed, 4 calls an hour apart)
 //   GET  ?step=tiktok                 -> {items: [{account_key, handle}]}  for extract_benchmarks_tiktok.py
 //   POST ?step=tiktok_daily  {rows: [{account_key, followers, hearts, videos}]}
 //   POST ?step=tiktok_weekly {rows: [{account_key, videos: [{id, title, url, published_at, views, likes, comments}]}]}
@@ -121,8 +122,11 @@ async function weekly(accts: Account[], day: string, log: Record<string, unknown
 // One-time catalog (sql/021): every upload of one account on one platform, date + today's counts.
 // YouTube: whole uploads playlist (~2 units per 50 videos). Instagram: back to IG_SINCE (Business
 // Discovery pages of 100). Call per account and platform so each call stays well under the time limit.
+// Instagram saves page by page and stops after IG_PAGES pages or at Meta's hourly app limit; the log
+// then holds next_after, and ?after=<cursor> resumes (Wish 107.5 has ~29k posts, 2026-10-21).
 const IG_SINCE = "2024-01-01";
-async function catalog(a: Account, platform: string, day: string, log: Record<string, unknown>) {
+const IG_PAGES = 25;
+async function catalog(a: Account, platform: string, day: string, log: Record<string, unknown>, start?: string) {
   const videos: Video[] = [];
   if (platform === "YouTube" && a.youtube_channel_id) {
     let token: string | undefined;
@@ -140,23 +144,61 @@ async function catalog(a: Account, platform: string, day: string, log: Record<st
       token = pl.nextPageToken;
     } while (token);
   } else if (platform === "Instagram" && a.instagram_username) {
-    let after: string | undefined, pages = 0, done = false;
-    do {
-      const bd = await ig(a.instagram_username, `media${after ? `.after(${after})` : ""}.limit(100){${IG_MEDIA}}`);
-      const data = bd.media?.data ?? [];
-      for (const m of data) {
-        if (m.timestamp < IG_SINCE) { done = true; break; }
-        videos.push({ id: m.id, title: short(m.caption), url: m.permalink, kind: m.media_product_type,
-          published_at: m.timestamp, views: num(m.view_count), likes: num(m.like_count), comments: num(m.comments_count) });
-      }
-      after = data.length === 100 ? bd.media?.paging?.cursors?.after : undefined;
-      pages++;
-    } while (after && !done && pages < 150);
+    let after = start, pages = 0, saved = 0, done = false;
+    try {
+      do {
+        const bd = await ig(a.instagram_username, `media${after ? `.after(${after})` : ""}.limit(100){${IG_MEDIA}}`);
+        const page: Video[] = [];
+        for (const m of bd.media?.data ?? []) {
+          if (m.timestamp < IG_SINCE) { done = true; break; }
+          page.push({ id: m.id, title: short(m.caption), url: m.permalink, kind: m.media_product_type,
+            published_at: m.timestamp, views: num(m.view_count), likes: num(m.like_count), comments: num(m.comments_count) });
+        }
+        await saveVideos(day, a.account_key, platform, page);
+        saved += page.length;
+        // Business Discovery gives only cursors (no paging.next), and pages can be short mid-list:
+        // go on while a cursor comes back and the page wasn't empty
+        after = (bd.media?.data ?? []).length ? bd.media?.paging?.cursors?.after : undefined;
+        pages++;
+      } while (after && !done && pages < IG_PAGES);
+    } catch (e) {
+      log[`${a.account_key}.${platform}.error`] = String(e).slice(0, 200);
+    }
+    log[`${a.account_key}.${platform}`] = saved;
+    if (after && !done) log.next_after = after;
+    return;
   } else {
     throw new Error(`no ${platform} account for ${a.account_key}`);
   }
   for (let i = 0; i < videos.length; i += 1000) await saveVideos(day, a.account_key, platform, videos.slice(i, i + 1000));
   log[`${a.account_key}.${platform}`] = videos.length;
+}
+
+// Artists' own Instagram (sql/024): followers + posts for up to `limit` artists not fetched in 6 days.
+// Business Discovery only sees Business/Creator accounts; others are saved as found = false.
+async function artistIg(day: string, limit: number, log: Record<string, unknown>) {
+  const due = await sql<{ spotify_id: string; username: string }[]>`
+    select a.spotify_id, a.username from staging.artist_instagram a
+    where not exists (select 1 from raw.artist_instagram_weekly w
+                      where w.spotify_id = a.spotify_id and w.snapshot_date > ${day}::date - 6)
+    order by a.spotify_id limit ${limit}`;
+  let found = 0, missing = 0;
+  for (const a of due) {
+    try {
+      const bd = await ig(a.username, "followers_count,media_count");
+      await sql`insert into raw.artist_instagram_weekly (snapshot_date, spotify_id, username, found, followers, posts)
+        values (${day}, ${a.spotify_id}, ${a.username}, true, ${num(bd.followers_count)}, ${num(bd.media_count)})
+        on conflict (snapshot_date, spotify_id) do nothing`;
+      found++;
+    } catch (e) {
+      const msg = String(e).slice(0, 200);
+      if (/request limit|\(#4\)|\(#17\)|\(#32\)/i.test(msg)) { log.stopped = msg; break; }   // Meta's hourly limit: next call
+      await sql`insert into raw.artist_instagram_weekly (snapshot_date, spotify_id, username, found, error)
+        values (${day}, ${a.spotify_id}, ${a.username}, false, ${msg}) on conflict (snapshot_date, spotify_id) do nothing`;
+      missing++;
+    }
+  }
+  log.artist_ig = { due: due.length, found, missing };
 }
 
 Deno.serve(async (req) => {
@@ -184,8 +226,9 @@ Deno.serve(async (req) => {
     else if (step === "catalog") {
       const a = accts.find((x) => x.account_key === url.searchParams.get("account"));
       if (!a) return new Response("unknown or inactive account", { status: 400 });
-      await catalog(a, url.searchParams.get("platform") ?? "", day, log);
+      await catalog(a, url.searchParams.get("platform") ?? "", day, log, url.searchParams.get("after") ?? undefined);
     }
+    else if (step === "artist_ig") await artistIg(day, Number(url.searchParams.get("limit") ?? 60), log);
     else if (step === "tiktok_daily") {
       for (const r of (await req.json()).rows ?? []) {
         await saveDaily(day, r.account_key, "TikTok", { followers: r.followers, likes: r.hearts, posts: r.videos });

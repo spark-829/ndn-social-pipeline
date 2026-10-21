@@ -145,7 +145,10 @@ def slim(a):
     return {
         "profile": {"name": a["profile"]["name"],
                     "verified": ((a.get("onPlatformReputationTrait") or {}).get("verification") or {}).get("isVerified",
-                                a["profile"].get("verified"))},
+                                a["profile"].get("verified")),
+                    # social links: the artist's Instagram username for sql/024
+                    "externalLinks": [{"name": l.get("name"), "url": l.get("url")}
+                                      for l in ((a["profile"].get("externalLinks") or {}).get("items") or [])]},
         "stats": a.get("stats"),
         "topTracks": [{"id": t["track"]["id"], "name": t["track"]["name"], "playcount": t["track"].get("playcount")}
                       for t in (disc.get("topTracks") or {}).get("items", []) if t.get("track")],

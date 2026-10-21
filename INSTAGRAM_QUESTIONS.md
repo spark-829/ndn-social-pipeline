@@ -201,7 +201,7 @@ Already collected daily (Edge Function `instagram-snapshot`, pg_cron 09:05 PH, 9
 - Title parser v3 (`mart.parse_title`, used by all platforms): reads "<Song> by <Artist> premieres TONIGHT…" and "… is now streaming…", uses the first line that looks like a song line instead of the whole caption, strips leading emoji and list numbers. Artist found: Instagram 387 → 518 posts, TikTok 397 → 503, YouTube 869 → 872; no YouTube title lost. The 10 Instagram captions that lost a value were event posters whose old value was junk.
 - The scorecard's Instagram metric stays likes until views have a week of history (dashboard v3).
 
-Gap list (fields tested 2026-10-21 with a one-off, read-only pull through the same API; rows 1-4 built):
+Gap list (fields tested 2026-10-21 with a one-off, read-only pull through the same API; rows 1-6 built):
 
 | Gap | Questions | Extract that fills it | Cost |
 |---|---|---|---|
@@ -209,8 +209,8 @@ Gap list (fields tested 2026-10-21 with a one-off, read-only pull through the sa
 | Reposts, daily | Q4, Q13 | Add `reposts_count` (every post returns it) | No extra calls |
 | Facebook part of likes and comments | Caveat checks | Add `total_like_count`, `total_comments_count` | No extra calls |
 | Song, artist, series and caption type from the caption | Q6, Q7, Q11, Q13 | SQL: teach `mart.parse_title` the Instagram captions ("<Song> (<Series>) by <Artist> premieres TONIGHT…", "… is now streaming…", "<Artist> performs '<Song>'"). Today many come back empty ("Shelter of the Broken by Ice Seguerra premieres TONIGHT") or wrong (artist "Angela Ken is") | SQL only |
-| Reel → YouTube session and Spotify track | Q6, Q12 | SQL view like `staging.youtube_session_spotify` | SQL only |
-| Artists' and benchmark Instagram accounts | Q13 Momentum, data set 6 | Business Discovery weekly on each artist's account (Business or Creator accounts only); handles from bios and TikTok mentions | 1 call per account (more for all their posts) |
+| Reel → YouTube session and Spotify track | Q6, Q12 | Built 2026-10-21: `staging.social_youtube_link` (sql/022, Instagram + TikTok): 444 of 521 Reels with a song → YouTube session, 293 → Spotify track | SQL only |
+| Artists' and benchmark Instagram accounts | Q13 Momentum, data set 6 | Built 2026-10-21 (sql/024): usernames from each artist's Spotify page links (NDN captions don't @-tag), `benchmarks?step=artist_ig` Wed 09:30-12:30 PH → `raw.artist_instagram_weekly`, `mart.artist_instagram_growth` | 1 call per account |
 | Comment text | Q5, data set 5 | Not possible: the API refuses another account's comments (tested). Phase 2 | — |
 | Stories, reach, watch time, sends, saves, follows per post, audience | Q3, Q9, Phase 2 list | Not public | — |
 | Reel length | Q3 | Not in the API. Skip until Phase 2 | — |
