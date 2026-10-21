@@ -60,10 +60,26 @@ select jobname from cron.job where jobname like 'ndn-youtube-comments%';        
 - Song requests stay inside artist demand. No song advice (Vic, 2026-10-21).
 - Later: YouTube timestamps in comments ("2:15 🔥") vs the most-replayed graph (`raw.youtube_heatmap`). Optional, not in this build.
 
+## Storage rule (Vic 2026-10-21: storing every comment is overkill) — PROPOSED, Vic to OK
+
+Comments were 70 MB (YouTube 61, TikTok 9) = ~30% of the database. Measured 2026-10-21: the top 10
+comments per video by likes hold 96% of all comment likes on TikTok (4,633 of 20,723 comments) and 71% on
+YouTube (6,831 of 143,934). So keep the text only where it's useful, and keep the rest as counts:
+1. **Keep text:** top 10 per video by likes + every **candidate** (names another artist, or has a strong
+   request word; ~3k now, ~100 a week). Everything else: not stored.
+2. **Keep counts for all comments:** `mart.comment_artist_mention` (platform, video_id, spotify_id, comments,
+   likes): how often each artist is named under each video ("most mentioned"), counted before the text is dropped.
+   Plus comments read per video (already in the `*_comment_fetch` tables).
+3. **Order matters:** build `artist_alias` + name hits on ALL stored comments first, save the counts, label the
+   candidates, then delete the other comments and VACUUM FULL (70 → ~7 MB). Deleting is not reversible: Vic OKs first.
+4. **From then on, filter at load time:** `youtube-comments` and the TikTok `comments` step still read every new
+   comment (needed to count mentions; YouTube quota cost unchanged), but save only the top 10 + candidates + counts.
+   Top 10 is re-checked weekly: a comment that climbs into the top 10 later gets saved then.
+
 ## Build order (one session each)
 
 1. ~~sql/018 tables + views, Edge Function `youtube-comments`, test on 5 videos, then the backfill on a non-Monday.~~ Built 2026-10-21; backfill runs 15:30 PH same day.
-2. `artist_alias`, `comment_artist_hit`, candidates; Claude labels the TikTok candidates first (small), then YouTube.
+2. `artist_alias`, `comment_artist_hit`, candidates, `comment_artist_mention` counts; Claude labels the TikTok candidates first (small), then YouTube. Then the storage rule above (prune + filter at load time), after Vic's OK.
 3. Rule check, `fan_demand_artist`, `fan_upload_request`, update `INVITE_SCORE.md`, add the weekly labeling step to the 15:00 routine.
 
 ## Exercise for Vic (teaching)
