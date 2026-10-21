@@ -29,6 +29,9 @@ import yt_dlp
 
 SAVE_BATCH = 25
 PAUSE = 2.0          # seconds between videos, to stay polite
+RETRY_WAIT = 300     # failed videos get one more try after this pause. In the first run (2026-10-20)
+                     # all 85 errors were YouTube throttling ("Video unavailable" or "rate-limited");
+                     # the same videos worked the next day
 
 
 def load_env():
@@ -68,28 +71,37 @@ def main():
 
     todo = call("GET", f"part=heatmap_todo&limit={args.limit}")["items"]
     print(f"{len(todo)} videos due")
-    rows, stats = [], {"due": len(todo), "found": 0, "no_graph": 0, "errors": 0}
+    rows, stats = [], {"due": len(todo), "found": 0, "no_graph": 0, "errors": 0, "retried": 0}
     opts = {"quiet": True, "no_warnings": True, "skip_download": True}
     started = time.time()
     with yt_dlp.YoutubeDL(opts) as ydl:
-        for n, item in enumerate(todo, 1):
-            try:
-                row = fetch(ydl, item["video_id"])
-                rows.append(row)
-                stats["found" if row["found"] else "no_graph"] += 1
-            except Exception as e:                       # one bad video must not stop the run
-                stats["errors"] += 1
-                print(f"  {item['video_id']}: {str(e)[:120]}")
-                if stats["errors"] >= 10 and stats["found"] == 0:
-                    print("10 errors and no graphs: YouTube is probably blocking this IP; stopping")
+        ids, failed = [item["video_id"] for item in todo], []
+        for attempt in (1, 2):
+            if attempt == 2:
+                if not failed or stats["found"] == 0:
                     break
-            if len(rows) >= SAVE_BATCH:
-                call("POST", "part=heatmap_save", {"rows": rows})
-                rows = []
-                print(f"  {n}/{len(todo)} saved")
-            time.sleep(PAUSE)
+                print(f"{len(failed)} failed; waiting {RETRY_WAIT} s, then one more try")
+                time.sleep(RETRY_WAIT)
+                ids, failed, stats["retried"] = failed, [], len(failed)
+            for n, video_id in enumerate(ids, 1):
+                try:
+                    row = fetch(ydl, video_id)
+                    rows.append(row)
+                    stats["found" if row["found"] else "no_graph"] += 1
+                except Exception as e:                   # one bad video must not stop the run
+                    failed.append(video_id)
+                    print(f"  {video_id}: {str(e)[:120]}")
+                    if len(failed) >= 10 and stats["found"] == 0:
+                        print("10 errors and no graphs: YouTube is probably blocking this IP; stopping")
+                        break
+                if len(rows) >= SAVE_BATCH:
+                    call("POST", "part=heatmap_save", {"rows": rows})
+                    rows = []
+                    print(f"  {n}/{len(ids)} saved")
+                time.sleep(PAUSE * attempt)              # slower on the retry
     if rows:
         call("POST", "part=heatmap_save", {"rows": rows})
+    stats["errors"] = len(failed)
     stats["minutes"] = round((time.time() - started) / 60, 1)
     status = "ok" if stats["errors"] < max(5, stats["due"] // 10) else "failed"
     call("POST", f"part=run&by={args.by}", {"status": status, "detail": stats})
