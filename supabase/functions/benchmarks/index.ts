@@ -2,6 +2,7 @@
 // Small on purpose (Vic 2026-10-21): daily account totals + weekly counts of the latest 50 uploads.
 //   ?step=daily    YouTube channel totals (1 unit for all) + Instagram profile totals   (pg_cron daily)
 //   ?step=weekly   latest 50 uploads per account: YouTube (2 units each) + Instagram    (pg_cron Monday)
+//   ?step=catalog&account=K&platform=YouTube|Instagram   one-time full upload history (sql/021)
 //   GET  ?step=tiktok                 -> {items: [{account_key, handle}]}  for extract_benchmarks_tiktok.py
 //   POST ?step=tiktok_daily  {rows: [{account_key, followers, hearts, videos}]}
 //   POST ?step=tiktok_weekly {rows: [{account_key, videos: [{id, title, url, published_at, views, likes, comments}]}]}
@@ -19,7 +20,9 @@ const IG_MEDIA = "id,caption,media_product_type,timestamp,permalink,like_count,c
 const sql = postgres(Deno.env.get("SUPABASE_DB_URL")!, { prepare: false });
 const phDate = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
 const num = (v: unknown) => (v === undefined || v === null || v === "" ? null : Number(v));
-const short = (s: unknown) => (typeof s === "string" ? s.split("\n")[0].slice(0, 150) : null);
+// Cut by characters, not UTF-16 units: slicing through an emoji leaves half of it, which Postgres rejects.
+const short = (s: unknown) =>
+  (typeof s === "string" ? Array.from(s.toWellFormed().split("\n")[0]).slice(0, 150).join("") : null);
 
 type Account = { account_key: string; tiktok_handle: string | null; youtube_channel_id: string | null; instagram_username: string | null };
 type Video = { id: string; title: string | null; url: string | null; kind: string | null; published_at: string | null;
@@ -115,6 +118,47 @@ async function weekly(accts: Account[], day: string, log: Record<string, unknown
   }
 }
 
+// One-time catalog (sql/021): every upload of one account on one platform, date + today's counts.
+// YouTube: whole uploads playlist (~2 units per 50 videos). Instagram: back to IG_SINCE (Business
+// Discovery pages of 100). Call per account and platform so each call stays well under the time limit.
+const IG_SINCE = "2024-01-01";
+async function catalog(a: Account, platform: string, day: string, log: Record<string, unknown>) {
+  const videos: Video[] = [];
+  if (platform === "YouTube" && a.youtube_channel_id) {
+    let token: string | undefined;
+    do {
+      const params: Record<string, string> = { part: "contentDetails", playlistId: "UU" + a.youtube_channel_id.slice(2), maxResults: "50" };
+      if (token) params.pageToken = token;
+      const pl = await yt("playlistItems", params);
+      const ids = (pl.items ?? []).map((i: any) => i.contentDetails.videoId);
+      if (ids.length) {
+        const vs = await yt("videos", { part: "snippet,statistics", id: ids.join(",") });
+        for (const v of vs.items ?? []) videos.push({ id: v.id, title: short(v.snippet.title),
+          url: `https://www.youtube.com/watch?v=${v.id}`, kind: "video", published_at: v.snippet.publishedAt,
+          views: num(v.statistics.viewCount), likes: num(v.statistics.likeCount), comments: num(v.statistics.commentCount) });
+      }
+      token = pl.nextPageToken;
+    } while (token);
+  } else if (platform === "Instagram" && a.instagram_username) {
+    let after: string | undefined, pages = 0, done = false;
+    do {
+      const bd = await ig(a.instagram_username, `media${after ? `.after(${after})` : ""}.limit(100){${IG_MEDIA}}`);
+      const data = bd.media?.data ?? [];
+      for (const m of data) {
+        if (m.timestamp < IG_SINCE) { done = true; break; }
+        videos.push({ id: m.id, title: short(m.caption), url: m.permalink, kind: m.media_product_type,
+          published_at: m.timestamp, views: num(m.view_count), likes: num(m.like_count), comments: num(m.comments_count) });
+      }
+      after = data.length === 100 ? bd.media?.paging?.cursors?.after : undefined;
+      pages++;
+    } while (after && !done && pages < 150);
+  } else {
+    throw new Error(`no ${platform} account for ${a.account_key}`);
+  }
+  for (let i = 0; i < videos.length; i += 1000) await saveVideos(day, a.account_key, platform, videos.slice(i, i + 1000));
+  log[`${a.account_key}.${platform}`] = videos.length;
+}
+
 Deno.serve(async (req) => {
   const [{ secret }] = await sql`
     select decrypted_secret as secret from vault.decrypted_secrets where name = 'ndn_cron_secret'`;
@@ -137,6 +181,11 @@ Deno.serve(async (req) => {
   try {
     if (step === "daily") await daily(accts, day, log);
     else if (step === "weekly") await weekly(accts, day, log);
+    else if (step === "catalog") {
+      const a = accts.find((x) => x.account_key === url.searchParams.get("account"));
+      if (!a) return new Response("unknown or inactive account", { status: 400 });
+      await catalog(a, url.searchParams.get("platform") ?? "", day, log);
+    }
     else if (step === "tiktok_daily") {
       for (const r of (await req.json()).rows ?? []) {
         await saveDaily(day, r.account_key, "TikTok", { followers: r.followers, likes: r.hearts, posts: r.videos });

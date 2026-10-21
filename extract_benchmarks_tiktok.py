@@ -5,6 +5,7 @@ Asks the `benchmarks` Edge Function which handles to fetch and posts the results
             GitHub daily.yml, after the NDN snapshot
   --weekly  counts for the latest 50 videos of each account (yt-dlp flat listing)
             GitHub weekly.yml, Mondays
+  --catalog every video of each account, once (sql/021: real upload history instead of synthetic)
 
 Profile pages: plain request first (works from GitHub), headless browser if that fails
 (Vic's home IP gets blocked on plain requests; needs playwright + chromium).
@@ -40,15 +41,15 @@ def profile_stats(handle, browser_holder):
     return {"followers": s.get("followerCount"), "hearts": s.get("heartCount"), "videos": s.get("videoCount")}
 
 
-def latest_videos(handle):
+def latest_videos(handle, limit=LATEST):
     import yt_dlp
     from yt_dlp.networking.impersonate import ImpersonateTarget
     opts = {"extract_flat": True, "skip_download": True, "quiet": True, "no_warnings": True,
-            "playlistend": LATEST, "impersonate": ImpersonateTarget.from_str("chrome")}
+            "playlistend": limit, "impersonate": ImpersonateTarget.from_str("chrome")}
     with yt_dlp.YoutubeDL(opts) as ydl:
         info = ydl.extract_info(f"https://www.tiktok.com/@{handle}", download=False)
     out = []
-    for e in (info.get("entries") or [])[:LATEST]:
+    for e in (info.get("entries") or [])[:limit]:
         if not e.get("id") or e.get("timestamp") is None:
             continue
         out.append({"id": str(e["id"]), "title": e.get("title") or e.get("description"),
@@ -65,6 +66,7 @@ def main(argv=None):
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--daily", action="store_true")
     mode.add_argument("--weekly", action="store_true")
+    mode.add_argument("--catalog", action="store_true")
     ap.add_argument("--by", default="manual")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s", datefmt="%H:%M:%S")
@@ -79,7 +81,8 @@ def main(argv=None):
             if args.daily:
                 rows.append({"account_key": a["account_key"], **profile_stats(a["handle"], browser)})
             else:
-                rows.append({"account_key": a["account_key"], "videos": latest_videos(a["handle"])})
+                rows.append({"account_key": a["account_key"],
+                             "videos": latest_videos(a["handle"], None if args.catalog else LATEST)})
             log.info("%s: ok", a["handle"])
         except Exception as err:                       # one account failing shouldn't stop the others
             failed.append(a["handle"])
@@ -88,9 +91,15 @@ def main(argv=None):
         browser[0].close()
 
     step = "tiktok_daily" if args.daily else "tiktok_weekly"
-    r = requests.post(url, params={"step": step, "by": args.by}, json={"rows": rows}, headers=headers, timeout=150)
-    print(r.status_code, r.text[:500])
-    return 0 if r.ok and not failed else 1
+    if args.catalog:      # big lists: one account and at most 500 videos per request
+        rows = [{"account_key": r["account_key"], "videos": r["videos"][i:i + 500]}
+                for r in rows for i in range(0, len(r["videos"]), 500)]
+    ok = True
+    for chunk in ([rows] if not args.catalog else [[r] for r in rows]):
+        r = requests.post(url, params={"step": step, "by": args.by}, json={"rows": chunk}, headers=headers, timeout=150)
+        print(r.status_code, r.text[:500])
+        ok = ok and r.ok
+    return 0 if ok and not failed else 1
 
 
 if __name__ == "__main__":

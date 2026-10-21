@@ -4,29 +4,32 @@ Goal (Vic, 2026-10-21): **collect all the data we can get for free** on comparab
 dashboard's 5th page "Benchmark" (`TABLEAU_DATA.md`: weekly stats vs NDN, indexed to 100 at the first week) and the
 invite score's Momentum part.
 
-## Accounts
+## Accounts (v2, Vic 2026-10-21: domestic, Asia, international; `sql/021_benchmarks_v2.sql`)
 
-Handles checked 2026-10-21 from each account's own bio, YouTube links page or website (not guessed).
+Handles from each account's own YouTube links page / bio; TikTok accounts checked verified (except Backyard Live).
 
-| Account | Given by | TikTok | YouTube | Instagram |
+| Region | Account | TikTok | YouTube | Instagram |
 |---|---|---|---|---|
-| Wish 107.5 (Wish Bus) | Claude, 2026-10-20 | @wish1075official | UCdfq8-581QVUtVsa8ChVnDQ (@wishfm1075official) | wish1075 |
-| Jess & Pat's | Vic, 2026-10-21 | @jessxpats | UCPBPWR8nuHPKt5X_qPk3t1A (12 videos, inactive since May 2020) | jessxpats |
-| Backyard Live | Vic, 2026-10-21 | @backyard.live | UC1P5pdk6RAUJqaIRPUC0jWg | backyard.live |
-| Tower of Doom (Tower Sessions) | Claude, OK by Vic 2026-10-21 | none listed | UCh__YhmGdnvPh5fSdF8DJnQ (@towerofdoomrecords) | towerofdoom |
-| Vibe PH (Vibe+) | Claude, OK by Vic 2026-10-21 | @vibeph.tv | UC6hmtt5JtP0e_FNAtWsq2Yw (@vibephtv) | vibeph.tv |
+| domestic | Wish 107.5 (Wish Bus) | @wish1075official | UCdfq8-581QVUtVsa8ChVnDQ (16.1M) | wish1075 |
+| domestic | Backyard Live | @backyard.live | UC1P5pdk6RAUJqaIRPUC0jWg (40k) | backyard.live |
+| asia | THE FIRST TAKE (Japan) | @the_first_take | UC9zY_E8mcAo_Oq772LEZq8Q (12.4M) | the_firsttake |
+| asia | it's Live (Korea, MBC) | @itslive_official | UCB9e3pof1o83aa0kkaoeJGA (2.34M) | itslive_official |
+| international | NPR Music (Tiny Desk) | @npr_music (started Feb 2026) | UC4eYXhJI4-7wSWc8UNRwD4A (13.1M) | nprmusic |
 
-**Why these 2** (picked from NDN's own data: `staging.youtube_search_result`, the channels that rank next to NDN in
-the 90 weekly song searches, keeping those that post live performances and are still active):
-- **Tower of Doom**: the closest peer. Same format (indie OPM studio live sessions, "Tower Sessions"), 1.21M YouTube
-  subscribers vs NDN 1.51M, and it ranks higher than anyone else for NDN's songs (average rank 5.3 in 9 searches).
-- **Vibe PH**: the fast riser. TV5's all-OPM countdown with live performances ("Legit Vibe"), channel started
-  April 2025, already 49k subscribers / 19M views; shows up in 12 of NDN's searches.
-- Left out: All Music MYX (MYX Live! performances, 13 searches, but no upload since April 2020); karaoke/lyric
-  channels (rank often, but not live sessions).
-To drop one: `update raw.benchmark_accounts set active = false where account_key = 'tower';`
+- Tiny Desk has no channel of its own: NPR Music's totals include its other videos.
+- Dropped 2026-10-21 (kept inactive, one day of data): Jess & Pat's, Tower of Doom, Vibe PH.
 
-Find each account's YouTube and Instagram from its TikTok bio / website first; don't guess handles.
+## Past data (Vic: real past data beats synthetic)
+
+- **Got (free, real):** a one-time catalog of every upload with today's counts, pulled 2026-10-21:
+  YouTube all videos (12,965), TikTok all videos yt-dlp lists (it's Live: only 420 of ~2,680, TikTok cut the
+  list short), Instagram since 2024-01-01. → `mart.benchmark_upload_history`: uploads and current views per
+  month of upload. Older months had longer to collect views: compare accounts within a month, not months.
+- **Not available free:** follower history before 2026-10-21. Social Blade's free page shows 14 days (YouTube
+  only; TikTok/Instagram pages are behind a bot check); the Wayback Machine is blocked on Vic's network (DNS
+  fails on the PC and the server). Growth lines start 2026-10-21.
+- Instagram catalogs for Backyard, NPR and Wish hit Meta's hourly app limit; one-time pg_cron jobs retry them
+  19:20 / 19:25 / 20:30 PH 2026-10-21 and remove themselves at 21:00.
 
 ## What "all the free data" means per platform (to check and build)
 
@@ -60,7 +63,7 @@ Vic only wants to see each benchmark's **overall growth** and their **top 10 tre
 - Collected by Edge Function `benchmarks` (YouTube API ~11 units/week + 1/day; Instagram Business Discovery 5
   calls/day + 5/week) and `extract_benchmarks_tiktok.py` (profile page, browser fallback; yt-dlp latest 50).
 - The weekly TikTok profile job no longer snapshots benchmark accounts (`raw.tiktok_accounts` rows set inactive).
-- **Instagram hides Reel views for Backyard Live and Vibe PH**: their top 10 ranks by likes gained (`measure` column).
+- **Instagram hides Reel views for Backyard Live (and Vibe PH, dropped)**: their top 10 ranks by likes gained (`measure` column).
   For the others only Reels have views, so photo posts drop out of their ranking.
 - First weekly snapshot taken 2026-10-21 (Wed), so the first top 10 appears after Mon 2026-10-26 (5-day gain, scaled to 7).
-- Size: 0.47 MB for the first day + first weekly run (all 5 accounts); then ~13 rows/day + ~700 rows/week.
+- Size: 7.8 MB after the catalogs (2026-10-21); then ~15 rows/day + ~750 rows/week.
