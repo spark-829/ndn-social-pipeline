@@ -1,4 +1,4 @@
-/// Who to invite to Live at The Cozy Cove: score 0-100, its six parts and the raw numbers (sql/025).
+/// Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026).
 table invite
 	lineageTag: f1ebbbac-1284-5517-ad56-570cd722122f
 
@@ -30,6 +30,13 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	column found_via
+		dataType: string
+		lineageTag: 33cfe52b-f33c-5d76-93cf-925f693f47ed
+		sourceColumn: found_via
+
+		annotation SummarizationSetBy = User
+
 	column on_chart
 		dataType: string
 		lineageTag: 2d7ae0b9-b1c6-523a-bcd2-3104a4f18888
@@ -55,6 +62,69 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	column tiktok_points
+		dataType: double
+		formatString: #,0.00
+		lineageTag: bcb3c65a-2586-5f54-a86f-e2cffdf7d11d
+		summarizeBy: none
+		sourceColumn: tiktok_points
+
+		annotation SummarizationSetBy = User
+
+	column spotify_points
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 1ece7857-5da5-5d36-8dca-b4c1ce566233
+		summarizeBy: none
+		sourceColumn: spotify_points
+
+		annotation SummarizationSetBy = User
+
+	column other_points
+		dataType: double
+		formatString: #,0.00
+		lineageTag: e6e7632e-c0c4-5cb4-9e7e-696b27c5a63e
+		summarizeBy: none
+		sourceColumn: other_points
+
+		annotation SummarizationSetBy = User
+
+	column tt_song_videos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 43b22bba-1400-56b2-9775-56035642dd98
+		summarizeBy: none
+		sourceColumn: tt_song_videos
+
+		annotation SummarizationSetBy = User
+
+	column tt_song_growth
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9353fd20-2c5d-560c-bded-ff2c0e1f88f0
+		summarizeBy: none
+		sourceColumn: tt_song_growth
+
+		annotation SummarizationSetBy = User
+
+	column tt_follower_growth
+		dataType: int64
+		formatString: #,0
+		lineageTag: 741db54e-1f65-5631-8776-d9910ab683c9
+		summarizeBy: none
+		sourceColumn: tt_follower_growth
+
+		annotation SummarizationSetBy = User
+
+	column track_record
+		dataType: int64
+		formatString: #,0
+		lineageTag: 93f38ac2-4b37-5531-a986-3241087a5f6b
+		summarizeBy: none
+		sourceColumn: track_record
+
+		annotation SummarizationSetBy = User
+
 	column new_hit_hype
 		dataType: int64
 		formatString: #,0
@@ -64,10 +134,71 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	column momentum
+		dataType: int64
+		formatString: #,0
+		lineageTag: d85e3716-3003-58e9-8137-54f876ed6de8
+		summarizeBy: none
+		sourceColumn: momentum
+
+		annotation SummarizationSetBy = User
+
+	column local_reach
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0f11f1f0-d45f-5c85-b178-dfc3f10f8aaa
+		summarizeBy: none
+		sourceColumn: local_reach
+
+		annotation SummarizationSetBy = User
+
+	column fan_demand
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2caa7a8b-accf-5aba-bee0-ee912adf7489
+		summarizeBy: none
+		sourceColumn: fan_demand
+
+		annotation SummarizationSetBy = User
+
+	column size
+		dataType: int64
+		formatString: #,0
+		lineageTag: cd06292c-91ac-5eeb-8fb3-4c76499e420a
+		summarizeBy: none
+		sourceColumn: size
+
+		annotation SummarizationSetBy = User
+
 	column new_hit
 		dataType: string
 		lineageTag: d6a58ea9-23ee-5b6a-a01f-b1307367fd88
 		sourceColumn: new_hit
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_found_on
+		dataType: string
+		lineageTag: a8cce8b7-2e31-5366-aca4-4e38f68369ff
+		sourceColumn: new_hit_found_on
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_tiktok_videos
+		dataType: double
+		formatString: #,0.00
+		lineageTag: bd01c85f-95ff-5f2b-84be-b5cb5ad87233
+		summarizeBy: none
+		sourceColumn: new_hit_tiktok_videos
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_tiktok_growth_4w
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 3d3714bf-8fbb-5020-8e66-c4cd24a4026b
+		summarizeBy: none
+		sourceColumn: new_hit_tiktok_growth_4w
 
 		annotation SummarizationSetBy = User
 
@@ -114,57 +245,19 @@ table invite
 
 		annotation SummarizationSetBy = User
 
-	column momentum
-		dataType: int64
-		formatString: #,0
-		lineageTag: d85e3716-3003-58e9-8137-54f876ed6de8
-		summarizeBy: none
-		sourceColumn: momentum
+	column top_tiktok_song
+		dataType: string
+		lineageTag: 70bcbbf3-8773-5d93-ab03-03596f494ddf
+		sourceColumn: top_tiktok_song
 
 		annotation SummarizationSetBy = User
 
-	column local_reach
-		dataType: int64
-		formatString: #,0
-		lineageTag: 0f11f1f0-d45f-5c85-b178-dfc3f10f8aaa
+	column top_tiktok_song_videos
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6a5d15ee-f87d-5ef7-9e12-1cb371b4bdd6
 		summarizeBy: none
-		sourceColumn: local_reach
-
-		annotation SummarizationSetBy = User
-
-	column fan_demand
-		dataType: int64
-		formatString: #,0
-		lineageTag: 2caa7a8b-accf-5aba-bee0-ee912adf7489
-		summarizeBy: none
-		sourceColumn: fan_demand
-
-		annotation SummarizationSetBy = User
-
-	column track_record
-		dataType: int64
-		formatString: #,0
-		lineageTag: 93f38ac2-4b37-5531-a986-3241087a5f6b
-		summarizeBy: none
-		sourceColumn: track_record
-
-		annotation SummarizationSetBy = User
-
-	column size
-		dataType: int64
-		formatString: #,0
-		lineageTag: cd06292c-91ac-5eeb-8fb3-4c76499e420a
-		summarizeBy: none
-		sourceColumn: size
-
-		annotation SummarizationSetBy = User
-
-	column loyalty
-		dataType: int64
-		formatString: #,0
-		lineageTag: f75d29b3-bfb4-59e1-b847-64260898a95c
-		summarizeBy: none
-		sourceColumn: loyalty
+		sourceColumn: top_tiktok_song_videos
 
 		annotation SummarizationSetBy = User
 
@@ -238,12 +331,28 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	column tiktok_found_by
+		dataType: string
+		lineageTag: d02c90b1-a553-506f-9927-d672f4a04fca
+		sourceColumn: tiktok_found_by
+
+		annotation SummarizationSetBy = User
+
 	column tiktok_followers
 		dataType: int64
 		formatString: #,0
 		lineageTag: 9613d626-3b40-5cb3-98b3-16e0300f1a71
 		summarizeBy: none
 		sourceColumn: tiktok_followers
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_follower_growth_4w
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6db2e3ae-05d6-50e7-9b0f-ee9d530f4f77
+		summarizeBy: none
+		sourceColumn: tiktok_follower_growth_4w
 
 		annotation SummarizationSetBy = User
 
@@ -340,6 +449,6 @@ table invite
 				let
 				    Source = fnLoadCsv("invite.csv"),
 				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
-				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"hit_status", type text}, {"ndn_history", type text}, {"on_chart", type text}, {"status_rank", Int64.Type}, {"score", type number}, {"new_hit_hype", Int64.Type}, {"new_hit", type text}, {"new_hit_daily_streams", Int64.Type}, {"new_hit_released", type date}, {"top_song", type text}, {"top_song_daily_streams", Int64.Type}, {"top_song_on_ndn", type text}, {"momentum", Int64.Type}, {"local_reach", Int64.Type}, {"fan_demand", Int64.Type}, {"track_record", Int64.Type}, {"size", Int64.Type}, {"loyalty", Int64.Type}, {"monthly_listeners", Int64.Type}, {"spotify_followers", Int64.Type}, {"followers_per_listener", type number}, {"ph_listeners", type number}, {"manila_baguio_listeners", type number}, {"best_chart_rank", Int64.Type}, {"weeks_on_chart", Int64.Type}, {"tiktok_handle", type text}, {"tiktok_followers", Int64.Type}, {"fans_asking", Int64.Type}, {"tiktok_asks", Int64.Type}, {"ndn_youtube_videos", Int64.Type}, {"ndn_tiktok_clips", Int64.Type}, {"ndn_tiktok_index", type number}, {"ndn_youtube_index", type number}, {"latest_visit", type date}, {"last_ndn_post", type date}, {"cooldown_until", type date}}, "en-US")
+				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"hit_status", type text}, {"ndn_history", type text}, {"found_via", type text}, {"on_chart", type text}, {"status_rank", Int64.Type}, {"score", type number}, {"tiktok_points", type number}, {"spotify_points", type number}, {"other_points", type number}, {"tt_song_videos", Int64.Type}, {"tt_song_growth", Int64.Type}, {"tt_follower_growth", Int64.Type}, {"track_record", Int64.Type}, {"new_hit_hype", Int64.Type}, {"momentum", Int64.Type}, {"local_reach", Int64.Type}, {"fan_demand", Int64.Type}, {"size", Int64.Type}, {"new_hit", type text}, {"new_hit_found_on", type text}, {"new_hit_tiktok_videos", type number}, {"new_hit_tiktok_growth_4w", type number}, {"new_hit_daily_streams", Int64.Type}, {"new_hit_released", type date}, {"top_song", type text}, {"top_song_daily_streams", Int64.Type}, {"top_song_on_ndn", type text}, {"top_tiktok_song", type text}, {"top_tiktok_song_videos", type number}, {"monthly_listeners", Int64.Type}, {"spotify_followers", Int64.Type}, {"followers_per_listener", type number}, {"ph_listeners", type number}, {"manila_baguio_listeners", type number}, {"best_chart_rank", Int64.Type}, {"weeks_on_chart", Int64.Type}, {"tiktok_handle", type text}, {"tiktok_found_by", type text}, {"tiktok_followers", Int64.Type}, {"tiktok_follower_growth_4w", type number}, {"fans_asking", Int64.Type}, {"tiktok_asks", Int64.Type}, {"ndn_youtube_videos", Int64.Type}, {"ndn_tiktok_clips", Int64.Type}, {"ndn_tiktok_index", type number}, {"ndn_youtube_index", type number}, {"latest_visit", type date}, {"last_ndn_post", type date}, {"cooldown_until", type date}}, "en-US")
 				in
 				    Typed

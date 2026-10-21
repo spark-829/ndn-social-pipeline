@@ -4,10 +4,10 @@
   "position": {
     "x": 30,
     "y": 1048,
-    "z": 13000,
+    "z": 14000,
     "height": 320,
     "width": 760,
-    "tabOrder": 13000
+    "tabOrder": 14000
   },
   "visual": {
     "visualType": "tableEx",
@@ -83,12 +83,27 @@
                       "Entity": "_Measures"
                     }
                   },
+                  "Property": "Not top_tiktok_song"
+                }
+              },
+              "queryRef": "_Measures.Not top_tiktok_song",
+              "nativeQueryRef": "Not top_tiktok_song",
+              "displayName": "Top TikTok song"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
                   "Property": "Not top_song"
                 }
               },
               "queryRef": "_Measures.Not top_song",
               "nativeQueryRef": "Not top_song",
-              "displayName": "Top song now"
+              "displayName": "Top Spotify song"
             },
             {
               "field": {

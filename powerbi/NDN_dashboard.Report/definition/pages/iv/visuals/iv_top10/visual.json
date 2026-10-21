@@ -4,10 +4,10 @@
   "position": {
     "x": 30,
     "y": 288,
-    "z": 11000,
+    "z": 12000,
     "height": 360,
     "width": 1540,
-    "tabOrder": 11000
+    "tabOrder": 12000
   },
   "visual": {
     "visualType": "tableEx",
@@ -53,21 +53,6 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv ndn_history"
-                }
-              },
-              "queryRef": "_Measures.Inv ndn_history",
-              "nativeQueryRef": "Inv ndn_history",
-              "displayName": "NDN history"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
                   "Property": "Inv score"
                 }
               },
@@ -83,12 +68,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv new_hit_hype"
+                  "Property": "Inv tiktok_points"
                 }
               },
-              "queryRef": "_Measures.Inv new_hit_hype",
-              "nativeQueryRef": "Inv new_hit_hype",
-              "displayName": "New-hit hype 25%"
+              "queryRef": "_Measures.Inv tiktok_points",
+              "nativeQueryRef": "Inv tiktok_points",
+              "displayName": "TikTok points (of 55)"
             },
             {
               "field": {
@@ -98,12 +83,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv momentum"
+                  "Property": "Inv spotify_points"
                 }
               },
-              "queryRef": "_Measures.Inv momentum",
-              "nativeQueryRef": "Inv momentum",
-              "displayName": "Momentum 20%"
+              "queryRef": "_Measures.Inv spotify_points",
+              "nativeQueryRef": "Inv spotify_points",
+              "displayName": "Spotify points (of 30)"
             },
             {
               "field": {
@@ -113,12 +98,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv local_reach"
+                  "Property": "Inv other_points"
                 }
               },
-              "queryRef": "_Measures.Inv local_reach",
-              "nativeQueryRef": "Inv local_reach",
-              "displayName": "Local reach 15%"
+              "queryRef": "_Measures.Inv other_points",
+              "nativeQueryRef": "Inv other_points",
+              "displayName": "Other points (of 15)"
             },
             {
               "field": {
@@ -128,12 +113,42 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv fan_demand"
+                  "Property": "Inv tt_song_videos"
                 }
               },
-              "queryRef": "_Measures.Inv fan_demand",
-              "nativeQueryRef": "Inv fan_demand",
-              "displayName": "Fan demand 10%"
+              "queryRef": "_Measures.Inv tt_song_videos",
+              "nativeQueryRef": "Inv tt_song_videos",
+              "displayName": "TikTok videos using the song 25%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv tt_song_growth"
+                }
+              },
+              "queryRef": "_Measures.Inv tt_song_growth",
+              "nativeQueryRef": "Inv tt_song_growth",
+              "displayName": "Their 4-week growth 15%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv tt_follower_growth"
+                }
+              },
+              "queryRef": "_Measures.Inv tt_follower_growth",
+              "nativeQueryRef": "Inv tt_follower_growth",
+              "displayName": "Artist TikTok follower growth 10%"
             },
             {
               "field": {
@@ -148,7 +163,67 @@
               },
               "queryRef": "_Measures.Inv track_record",
               "nativeQueryRef": "Inv track_record",
-              "displayName": "Track record 10%"
+              "displayName": "NDN TikTok record 5%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv new_hit_hype"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_hype",
+              "nativeQueryRef": "Inv new_hit_hype",
+              "displayName": "Song's Spotify streams 15%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv momentum"
+                }
+              },
+              "queryRef": "_Measures.Inv momentum",
+              "nativeQueryRef": "Inv momentum",
+              "displayName": "PH chart 10%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv local_reach"
+                }
+              },
+              "queryRef": "_Measures.Inv local_reach",
+              "nativeQueryRef": "Inv local_reach",
+              "displayName": "Manila + Baguio 5%"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv fan_demand"
+                }
+              },
+              "queryRef": "_Measures.Inv fan_demand",
+              "nativeQueryRef": "Inv fan_demand",
+              "displayName": "Fan requests 10%"
             },
             {
               "field": {
@@ -163,22 +238,7 @@
               },
               "queryRef": "_Measures.Inv size",
               "nativeQueryRef": "Inv size",
-              "displayName": "Size 10%"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Inv loyalty"
-                }
-              },
-              "queryRef": "_Measures.Inv loyalty",
-              "nativeQueryRef": "Inv loyalty",
-              "displayName": "Loyalty 10%"
+              "displayName": "Size 5%"
             }
           ]
         }
@@ -257,7 +317,175 @@
             }
           },
           "selector": {
-            "metadata": "_Measures.Inv score"
+            "metadata": "_Measures.Inv tt_song_videos"
+          }
+        },
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#5c4a2a'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#7a6a52'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#3a3124'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Inv tt_song_growth"
+          }
+        },
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#5c4a2a'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#7a6a52'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#3a3124'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Inv tt_follower_growth"
+          }
+        },
+        {
+          "properties": {
+            "dataBars": {
+              "positiveColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#5c4a2a'"
+                      }
+                    }
+                  }
+                }
+              },
+              "negativeColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#7a6a52'"
+                      }
+                    }
+                  }
+                }
+              },
+              "axisColor": {
+                "solid": {
+                  "color": {
+                    "expr": {
+                      "Literal": {
+                        "Value": "'#3a3124'"
+                      }
+                    }
+                  }
+                }
+              },
+              "reverseDirection": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              },
+              "hideText": {
+                "expr": {
+                  "Literal": {
+                    "Value": "false"
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Inv track_record"
           }
         },
         {
@@ -537,119 +765,7 @@
             }
           },
           "selector": {
-            "metadata": "_Measures.Inv track_record"
-          }
-        },
-        {
-          "properties": {
-            "dataBars": {
-              "positiveColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#5c4a2a'"
-                      }
-                    }
-                  }
-                }
-              },
-              "negativeColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#7a6a52'"
-                      }
-                    }
-                  }
-                }
-              },
-              "axisColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#3a3124'"
-                      }
-                    }
-                  }
-                }
-              },
-              "reverseDirection": {
-                "expr": {
-                  "Literal": {
-                    "Value": "false"
-                  }
-                }
-              },
-              "hideText": {
-                "expr": {
-                  "Literal": {
-                    "Value": "false"
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
             "metadata": "_Measures.Inv size"
-          }
-        },
-        {
-          "properties": {
-            "dataBars": {
-              "positiveColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#5c4a2a'"
-                      }
-                    }
-                  }
-                }
-              },
-              "negativeColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#7a6a52'"
-                      }
-                    }
-                  }
-                }
-              },
-              "axisColor": {
-                "solid": {
-                  "color": {
-                    "expr": {
-                      "Literal": {
-                        "Value": "'#3a3124'"
-                      }
-                    }
-                  }
-                }
-              },
-              "reverseDirection": {
-                "expr": {
-                  "Literal": {
-                    "Value": "false"
-                  }
-                }
-              },
-              "hideText": {
-                "expr": {
-                  "Literal": {
-                    "Value": "false"
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "_Measures.Inv loyalty"
           }
         }
       ]
@@ -749,7 +865,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Top 10 to invite: the score and its parts'"
+                  "Value": "'Top 10 to invite: the score and its parts, TikTok first'"
                 }
               }
             }
@@ -769,7 +885,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Top 10 to invite: the score and its parts'"
+                  "Value": "'Top 10 to invite: the score and its parts, TikTok first'"
                 }
               }
             },
@@ -832,7 +948,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Only artists with a NEW HIT that is not on NDN''s YouTube yet (a top-5 Spotify song released after their last NDN visit). Parts are percentiles 0-100, weighted as shown'"
+                  "Value": "'Only artists with a NEW SONG not on NDN''s YouTube yet (out after their last NDN visit). Parts are percentiles 0-100 among all candidates, weighted as shown; no data = 0'"
                 }
               }
             },

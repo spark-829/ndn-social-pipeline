@@ -82,7 +82,7 @@ TABLE_NOTES = {
     "fan_upload": "Artists whose sessions fans ask NDN to upload or put on streaming.",
     "bench_accounts": "Latest followers per benchmark account and platform, NDN included.",
     "bench_uploads": "Uploads of the last 12 months (older than 14 days): count and median views today.",
-    "invite": "Who to invite to Live at The Cozy Cove: score 0-100, its six parts and the raw numbers (sql/025).",
+    "invite": "Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026).",
     "dim_account": "One row per benchmark account and its region; filters both benchmark tables.",
 }
 
@@ -335,13 +335,19 @@ IF ( NOT ISBLANK ( [{pre} Score Raw] ),
 
 
 # invite columns shown in the tables: (column, DAX aggregate, format)
-INVITE_TEXT = ["ndn_history", "new_hit", "top_song", "top_song_on_ndn", "hit_status"]
-INVITE_COLUMNS = [("score", "SUM", "0.0"), ("new_hit_hype", "SUM", "0"), ("new_hit_daily_streams", "SUM", "#,0"),
-                  ("new_hit_released", "MAX", "yyyy-mm-dd"), ("top_song_daily_streams", "SUM", "#,0"), ("momentum", "SUM", "0"), ("local_reach", "SUM", "0"),
-                  ("fan_demand", "SUM", "0"), ("track_record", "SUM", "0"), ("size", "SUM", "0"), ("loyalty", "SUM", "0"),
+INVITE_TEXT = ["ndn_history", "found_via", "new_hit", "new_hit_found_on", "top_song", "top_song_on_ndn",
+               "top_tiktok_song", "hit_status", "tiktok_handle"]
+INVITE_COLUMNS = [("score", "SUM", "0.0"), ("tiktok_points", "SUM", "0.0"), ("spotify_points", "SUM", "0.0"),
+                  ("other_points", "SUM", "0.0"), ("tt_song_videos", "SUM", "0"), ("tt_song_growth", "SUM", "0"),
+                  ("tt_follower_growth", "SUM", "0"), ("track_record", "SUM", "0"), ("new_hit_hype", "SUM", "0"),
+                  ("momentum", "SUM", "0"), ("local_reach", "SUM", "0"), ("fan_demand", "SUM", "0"), ("size", "SUM", "0"),
+                  ("new_hit_tiktok_videos", "SUM", "#,0"), ("new_hit_tiktok_growth_4w", "SUM", "+0%;-0%;0%"),
+                  ("new_hit_daily_streams", "SUM", "#,0"), ("new_hit_released", "MAX", "yyyy-mm-dd"),
+                  ("top_song_daily_streams", "SUM", "#,0"), ("top_tiktok_song_videos", "SUM", "#,0"),
                   ("monthly_listeners", "SUM", "#,0"), ("spotify_followers", "SUM", "#,0"),
                   ("manila_baguio_listeners", "SUM", "#,0"), ("best_chart_rank", "MIN", "0"),
-                  ("weeks_on_chart", "MAX", "0"), ("tiktok_followers", "SUM", "#,0"), ("tiktok_asks", "SUM", "#,0"),
+                  ("weeks_on_chart", "MAX", "0"), ("tiktok_followers", "SUM", "#,0"),
+                  ("tiktok_follower_growth_4w", "SUM", "+0.0%;-0.0%;0.0%"), ("tiktok_asks", "SUM", "#,0"),
                   ("fans_asking", "SUM", "#,0"), ("ndn_youtube_videos", "SUM", "#,0"), ("ndn_tiktok_clips", "SUM", "#,0"),
                   ("last_ndn_post", "MAX", "yyyy-mm-dd"), ("cooldown_until", "MAX", "yyyy-mm-dd")]
 
@@ -713,35 +719,41 @@ def invite() -> Page:
     pg = Page("iv", "Invite", 1302 + 56)
     pg.header("Who to invite", "Which artists should NDN invite to Live at The Cozy Cove next, and why?")
     pg.filters([(col("invite", "ndn_history"), "NDN history", "Dropdown"),
+                (col("invite", "found_via"), "Found via", "Dropdown"),
                 (col("invite", "on_chart"), "On the Spotify PH chart (8 weeks)", "Dropdown")])
     for i, ((x, w), m) in enumerate(zip(grid(4), ["Artists scored", "Recommended now", "Not now", "Cooling down now"])):
         pg.kpi(f"k{i}", x, 112, w, m)
-    parts = [("score", "Score"), ("new_hit_hype", "New-hit hype 25%"), ("momentum", "Momentum 20%"),
-             ("local_reach", "Local reach 15%"), ("fan_demand", "Fan demand 10%"), ("track_record", "Track record 10%"),
-             ("size", "Size 10%"), ("loyalty", "Loyalty 10%")]
+    parts = [("score", "Score"), ("tiktok_points", "TikTok points (of 55)"), ("spotify_points", "Spotify points (of 30)"),
+             ("other_points", "Other points (of 15)"),
+             ("tt_song_videos", "TikTok videos using the song 25%"), ("tt_song_growth", "Their 4-week growth 15%"),
+             ("tt_follower_growth", "Artist TikTok follower growth 10%"), ("track_record", "NDN TikTok record 5%"),
+             ("new_hit_hype", "Song's Spotify streams 15%"), ("momentum", "PH chart 10%"),
+             ("local_reach", "Manila + Baguio 5%"), ("fan_demand", "Fan requests 10%"), ("size", "Size 5%")]
     art = (col("invite", "artist"), "Artist")
     pg.table("top10", 30, 222, 1540, 360,
-             [(meas("Inv Rank"), "#"), art, (meas("Inv ndn_history"), "NDN history"),
-              *[(meas(f"Inv {c}"), lab) for c, lab in parts]],
-             "Top 10 to invite: the score and its parts",
-             "Only artists with a NEW HIT that is not on NDN's YouTube yet (a top-5 Spotify song released after their "
-             "last NDN visit). Parts are percentiles 0-100, weighted as shown", meas("Inv Rank"), "Ascending",
-             bars=[f"Inv {c}" for c, _ in parts])
+             [(meas("Inv Rank"), "#"), art, *[(meas(f"Inv {c}"), lab) for c, lab in parts]],
+             "Top 10 to invite: the score and its parts, TikTok first",
+             "Only artists with a NEW SONG not on NDN's YouTube yet (out after their last NDN visit). Parts are percentiles "
+             "0-100 among all candidates, weighted as shown; no data = 0", meas("Inv Rank"), "Ascending",
+             bars=[f"Inv {c}" for c, _ in parts[4:]])
     pg.table("why", 30, 602, 1540, 360,
-             [(meas("Inv Rank"), "#"), art, (meas("Inv new_hit"), "New hit to film"),
-              (meas("Inv new_hit_daily_streams"), "Its Spotify streams/day"), (meas("Inv new_hit_released"), "Released"),
-              (meas("Inv top_song"), "Top song now"), (meas("Inv top_song_on_ndn"), "Top song on NDN?"),
-              (meas("Inv monthly_listeners"), "Monthly listeners"), (meas("Inv best_chart_rank"), "Best PH chart rank"),
-              (meas("Inv manila_baguio_listeners"), "Manila + Baguio listeners"),
-              (meas("Inv tiktok_followers"), "TikTok followers"), (meas("Inv fans_asking"), "Fans asking NDN"),
-              (meas("Inv last_ndn_post"), "Last NDN post")],
-             "The numbers behind the top 10: the song to film and the reach behind it",
-             "Spotify daily streams via kworb (weekly), Spotify artist page, PH weekly chart, artist TikTok, fan comments",
+             [(meas("Inv Rank"), "#"), art, (meas("Inv new_hit"), "New song to film"),
+              (meas("Inv new_hit_found_on"), "Found on"),
+              (meas("Inv new_hit_tiktok_videos"), "TikTok videos using it"),
+              (meas("Inv new_hit_tiktok_growth_4w"), "Change in 4 weeks"),
+              (meas("Inv new_hit_daily_streams"), "Spotify streams/day"), (meas("Inv new_hit_released"), "Out since"),
+              (meas("Inv tiktok_handle"), "Artist TikTok"), (meas("Inv tiktok_followers"), "TikTok followers"),
+              (meas("Inv best_chart_rank"), "Best PH chart rank"), (meas("Inv fans_asking"), "Fans asking NDN"),
+              (meas("Inv found_via"), "Found via"), (meas("Inv last_ndn_post"), "Last NDN post")],
+             "The numbers behind the top 10: the song to film and why it is hot now",
+             "TikTok: the artist's own released songs in their latest 30 videos, 'videos using this sound' weekly. "
+             "Spotify: daily streams (kworb), PH weekly chart. Fan requests from NDN comments",
              meas("Inv Rank"), "Ascending")
     (x1, w1), (x2, w2) = grid(2)
     pg.table("notnow", x1, 982, w1, 320,
              [(meas("Not Rank"), "#"), art, (meas("Not score"), "Score"), (meas("Not hit_status"), "Why not now"),
-              (meas("Not top_song"), "Top song now"), (meas("Not top_song_daily_streams"), "Streams/day")],
+              (meas("Not top_tiktok_song"), "Top TikTok song"), (meas("Not top_song"), "Top Spotify song"),
+              (meas("Not top_song_daily_streams"), "Streams/day")],
              "High score, but not now: no new song to film",
              "Their current hit is already on NDN's YouTube, or nothing new since their last visit", meas("Not Rank"),
              "Ascending")

@@ -4,10 +4,10 @@
   "position": {
     "x": 30,
     "y": 668,
-    "z": 12000,
+    "z": 13000,
     "height": 360,
     "width": 1540,
-    "tabOrder": 12000
+    "tabOrder": 13000
   },
   "visual": {
     "visualType": "tableEx",
@@ -58,7 +58,52 @@
               },
               "queryRef": "_Measures.Inv new_hit",
               "nativeQueryRef": "Inv new_hit",
-              "displayName": "New hit to film"
+              "displayName": "New song to film"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv new_hit_found_on"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_found_on",
+              "nativeQueryRef": "Inv new_hit_found_on",
+              "displayName": "Found on"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv new_hit_tiktok_videos"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_tiktok_videos",
+              "nativeQueryRef": "Inv new_hit_tiktok_videos",
+              "displayName": "TikTok videos using it"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv new_hit_tiktok_growth_4w"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_tiktok_growth_4w",
+              "nativeQueryRef": "Inv new_hit_tiktok_growth_4w",
+              "displayName": "Change in 4 weeks"
             },
             {
               "field": {
@@ -73,7 +118,7 @@
               },
               "queryRef": "_Measures.Inv new_hit_daily_streams",
               "nativeQueryRef": "Inv new_hit_daily_streams",
-              "displayName": "Its Spotify streams/day"
+              "displayName": "Spotify streams/day"
             },
             {
               "field": {
@@ -88,7 +133,7 @@
               },
               "queryRef": "_Measures.Inv new_hit_released",
               "nativeQueryRef": "Inv new_hit_released",
-              "displayName": "Released"
+              "displayName": "Out since"
             },
             {
               "field": {
@@ -98,72 +143,12 @@
                       "Entity": "_Measures"
                     }
                   },
-                  "Property": "Inv top_song"
+                  "Property": "Inv tiktok_handle"
                 }
               },
-              "queryRef": "_Measures.Inv top_song",
-              "nativeQueryRef": "Inv top_song",
-              "displayName": "Top song now"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Inv top_song_on_ndn"
-                }
-              },
-              "queryRef": "_Measures.Inv top_song_on_ndn",
-              "nativeQueryRef": "Inv top_song_on_ndn",
-              "displayName": "Top song on NDN?"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Inv monthly_listeners"
-                }
-              },
-              "queryRef": "_Measures.Inv monthly_listeners",
-              "nativeQueryRef": "Inv monthly_listeners",
-              "displayName": "Monthly listeners"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Inv best_chart_rank"
-                }
-              },
-              "queryRef": "_Measures.Inv best_chart_rank",
-              "nativeQueryRef": "Inv best_chart_rank",
-              "displayName": "Best PH chart rank"
-            },
-            {
-              "field": {
-                "Measure": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "_Measures"
-                    }
-                  },
-                  "Property": "Inv manila_baguio_listeners"
-                }
-              },
-              "queryRef": "_Measures.Inv manila_baguio_listeners",
-              "nativeQueryRef": "Inv manila_baguio_listeners",
-              "displayName": "Manila + Baguio listeners"
+              "queryRef": "_Measures.Inv tiktok_handle",
+              "nativeQueryRef": "Inv tiktok_handle",
+              "displayName": "Artist TikTok"
             },
             {
               "field": {
@@ -188,12 +173,42 @@
                       "Entity": "_Measures"
                     }
                   },
+                  "Property": "Inv best_chart_rank"
+                }
+              },
+              "queryRef": "_Measures.Inv best_chart_rank",
+              "nativeQueryRef": "Inv best_chart_rank",
+              "displayName": "Best PH chart rank"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
                   "Property": "Inv fans_asking"
                 }
               },
               "queryRef": "_Measures.Inv fans_asking",
               "nativeQueryRef": "Inv fans_asking",
               "displayName": "Fans asking NDN"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv found_via"
+                }
+              },
+              "queryRef": "_Measures.Inv found_via",
+              "nativeQueryRef": "Inv found_via",
+              "displayName": "Found via"
             },
             {
               "field": {
@@ -327,7 +342,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'The numbers behind the top 10: the song to film and the reach behind it'"
+                  "Value": "'The numbers behind the top 10: the song to film and why it is hot now'"
                 }
               }
             }
@@ -347,7 +362,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'The numbers behind the top 10: the song to film and the reach behind it'"
+                  "Value": "'The numbers behind the top 10: the song to film and why it is hot now'"
                 }
               }
             },
@@ -410,7 +425,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Spotify daily streams via kworb (weekly), Spotify artist page, PH weekly chart, artist TikTok, fan comments'"
+                  "Value": "'TikTok: the artist''s own released songs in their latest 30 videos, ''videos using this sound'' weekly. Spotify: daily streams (kworb), PH weekly chart. Fan requests from NDN comments'"
                 }
               }
             },

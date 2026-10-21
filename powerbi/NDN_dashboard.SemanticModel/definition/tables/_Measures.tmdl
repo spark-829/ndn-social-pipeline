@@ -495,25 +495,45 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 4865c1f5-c92c-51ea-a131-47a4be535258
 
+	measure 'Inv tiktok_points' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_points] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 63522144-923c-5219-810f-4225e22050ab
+
+	measure 'Inv spotify_points' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_points] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 2417cfba-ef18-592e-854b-2cfb69f4f99d
+
+	measure 'Inv other_points' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[other_points] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: b12c5d06-f74a-5ab6-a0c3-3a322bed1af1
+
+	measure 'Inv tt_song_videos' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_videos] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 89341512-b48a-55f4-9c00-8b99fb45967e
+
+	measure 'Inv tt_song_growth' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_growth] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 0d2584a0-5fc2-5936-a6f8-40aa1072cddd
+
+	measure 'Inv tt_follower_growth' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_follower_growth] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: f7ea8ce0-50ef-5dae-8237-2f5af04349c2
+
+	measure 'Inv track_record' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: aa2872f0-39bb-5d11-939f-90941436daf4
+
 	measure 'Inv new_hit_hype' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: d2f304fe-3fb3-5023-982f-9f482a98d184
-
-	measure 'Inv new_hit_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 74ae8e42-b9d0-584a-adb2-ad18fadfccf3
-
-	measure 'Inv new_hit_released' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
-		formatString: yyyy-mm-dd
-		displayFolder: 2 Invite
-		lineageTag: daa41d8c-49bf-5a67-80c5-210ab3481589
-
-	measure 'Inv top_song_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 0dba82e3-7a33-5ca2-b7f2-98f31d42e9f9
 
 	measure 'Inv momentum' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		formatString: 0
@@ -530,20 +550,40 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: a1bebcee-82b3-512c-830e-e2b13b545ef3
 
-	measure 'Inv track_record' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
-		formatString: 0
-		displayFolder: 2 Invite
-		lineageTag: aa2872f0-39bb-5d11-939f-90941436daf4
-
 	measure 'Inv size' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: 2eed0536-46ac-5271-a2e4-d6f89e7ef4df
 
-	measure 'Inv loyalty' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
-		formatString: 0
+	measure 'Inv new_hit_tiktok_videos' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_videos] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
 		displayFolder: 2 Invite
-		lineageTag: 8ec800bc-ea34-5a90-889b-eea50533ab5c
+		lineageTag: 71a872fb-dadb-5161-9c85-dfcf85fd4445
+
+	measure 'Inv new_hit_tiktok_growth_4w' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_growth_4w] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 2 Invite
+		lineageTag: 46818193-3b6d-531d-929c-43765f3cb455
+
+	measure 'Inv new_hit_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 74ae8e42-b9d0-584a-adb2-ad18fadfccf3
+
+	measure 'Inv new_hit_released' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: daa41d8c-49bf-5a67-80c5-210ab3481589
+
+	measure 'Inv top_song_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 0dba82e3-7a33-5ca2-b7f2-98f31d42e9f9
+
+	measure 'Inv top_tiktok_song_videos' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_tiktok_song_videos] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: b85e02aa-649a-5889-92c9-45bb3a52afe7
 
 	measure 'Inv monthly_listeners' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		formatString: #,0
@@ -574,6 +614,11 @@ table _Measures
 		formatString: #,0
 		displayFolder: 2 Invite
 		lineageTag: 70ddc59d-af59-5bd4-bff9-627577395e61
+
+	measure 'Inv tiktok_follower_growth_4w' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_follower_growth_4w] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Invite
+		lineageTag: 3b67298f-9d3c-5164-90c5-6905c5804f40
 
 	measure 'Inv tiktok_asks' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		formatString: #,0
@@ -609,9 +654,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: ffaf36d9-863b-5868-b222-a3d17a5e8696
 
+	measure 'Inv found_via' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[found_via] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: ae5fa0c7-5449-5e37-b45e-b23ca8d6bd2d
+
 	measure 'Inv new_hit' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: f7aaf9b3-ebb9-517d-a2c6-c60687de5612
+
+	measure 'Inv new_hit_found_on' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit_found_on] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: e3d8307b-b382-5caa-bb9b-4a321ce9d637
 
 	measure 'Inv top_song' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		displayFolder: 2 Invite
@@ -621,9 +674,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 63ff9032-041e-54cb-a6c0-a15fd8911e95
 
+	measure 'Inv top_tiktok_song' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_tiktok_song] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: cec3c89f-dc38-52d7-a1a9-18a41ecaf254
+
 	measure 'Inv hit_status' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: 961861ed-c435-56ce-a896-e77ec53ef767
+
+	measure 'Inv tiktok_handle' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[tiktok_handle] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: ed75142a-759e-5a2f-8e2b-4af78bef57d8
 
 	measure 'Not Score Raw' = CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Not now" ) )
 		formatString: 0.0
@@ -647,25 +708,45 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 15260a33-ec6f-5419-b87e-b6f8368d47f0
 
+	measure 'Not tiktok_points' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_points] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: f974802e-ab78-53f3-bdfc-4b2331ec3371
+
+	measure 'Not spotify_points' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_points] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 86453dec-4cd0-5e6a-a519-6ed2d75b7128
+
+	measure 'Not other_points' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[other_points] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: bab0729a-2a38-5e00-aea4-e4232dfa0f19
+
+	measure 'Not tt_song_videos' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_videos] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 65eb5603-1b75-5754-b873-b42cecbeb9d9
+
+	measure 'Not tt_song_growth' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_growth] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: abb3adce-cb03-5b1a-8418-7c366f9829f9
+
+	measure 'Not tt_follower_growth' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_follower_growth] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 7132e8eb-d095-50d2-abf8-3ce00a53b1d5
+
+	measure 'Not track_record' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: c7f65220-ac68-5098-ba77-d148e3360e83
+
 	measure 'Not new_hit_hype' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: 0e6ec647-b20c-5156-bd51-215bf1976203
-
-	measure 'Not new_hit_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 20945601-7e18-5ec1-9881-485abbda6f5b
-
-	measure 'Not new_hit_released' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
-		formatString: yyyy-mm-dd
-		displayFolder: 2 Invite
-		lineageTag: e9af1c89-0c41-5f43-89c7-8de9a3bef37e
-
-	measure 'Not top_song_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 67b12951-c4e7-5c2b-97d1-67282827973f
 
 	measure 'Not momentum' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		formatString: 0
@@ -682,20 +763,40 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 3e08eeea-a6ed-511d-9a6b-ad0d43bc522c
 
-	measure 'Not track_record' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
-		formatString: 0
-		displayFolder: 2 Invite
-		lineageTag: c7f65220-ac68-5098-ba77-d148e3360e83
-
 	measure 'Not size' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: 8b127915-97c8-53d2-9771-cbdcc67ad955
 
-	measure 'Not loyalty' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
-		formatString: 0
+	measure 'Not new_hit_tiktok_videos' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_videos] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
 		displayFolder: 2 Invite
-		lineageTag: 5bfc2dec-971e-53d8-9e62-efb734fb3ce5
+		lineageTag: 3b8f1c7f-7084-5de3-9b49-0f86e021582e
+
+	measure 'Not new_hit_tiktok_growth_4w' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_growth_4w] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 2 Invite
+		lineageTag: c38eccf8-e833-5197-838b-1c3530fbf424
+
+	measure 'Not new_hit_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 20945601-7e18-5ec1-9881-485abbda6f5b
+
+	measure 'Not new_hit_released' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: e9af1c89-0c41-5f43-89c7-8de9a3bef37e
+
+	measure 'Not top_song_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 67b12951-c4e7-5c2b-97d1-67282827973f
+
+	measure 'Not top_tiktok_song_videos' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_tiktok_song_videos] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 8b397fc1-a1fa-5216-9581-918fa95c97f7
 
 	measure 'Not monthly_listeners' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		formatString: #,0
@@ -726,6 +827,11 @@ table _Measures
 		formatString: #,0
 		displayFolder: 2 Invite
 		lineageTag: 418edaf8-951d-5300-8fc4-c5c920a809f6
+
+	measure 'Not tiktok_follower_growth_4w' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_follower_growth_4w] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Invite
+		lineageTag: 2a57fd3c-234f-5398-8d29-7f2dc575b066
 
 	measure 'Not tiktok_asks' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		formatString: #,0
@@ -761,9 +867,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 99acd904-f418-5b52-918f-f762ccdb80f3
 
+	measure 'Not found_via' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[found_via] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: bf37ee94-27df-5472-92f9-b9dfdc60e834
+
 	measure 'Not new_hit' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: a938bf4c-431d-5c49-b9ec-4f37c9241ad4
+
+	measure 'Not new_hit_found_on' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit_found_on] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 8cfac447-f78e-5f08-919c-4444ac4dbe43
 
 	measure 'Not top_song' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		displayFolder: 2 Invite
@@ -773,9 +887,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 68f022b0-ed81-50dd-a57f-254ad97a28fb
 
+	measure 'Not top_tiktok_song' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_tiktok_song] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 0c079837-b526-5ced-a8c1-c9dcd0ab1551
+
 	measure 'Not hit_status' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: 10ef02aa-0fb1-5a04-9684-d18ca9a6265d
+
+	measure 'Not tiktok_handle' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[tiktok_handle] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 9152cb3a-061a-5d05-b558-aa122e224b40
 
 	measure 'Cool Score Raw' = CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Cooling down" ) )
 		formatString: 0.0
@@ -799,25 +921,45 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 2abb3c19-31f2-5a49-868e-85607d27c298
 
+	measure 'Cool tiktok_points' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_points] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 9c431b29-c016-5ce0-9225-3d48d6ab213d
+
+	measure 'Cool spotify_points' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_points] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: d669ea79-c215-5578-b062-12388c4bfb8f
+
+	measure 'Cool other_points' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[other_points] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 618032ab-a699-5407-842a-d1bc9de2b8ea
+
+	measure 'Cool tt_song_videos' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_videos] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 78970d5f-f4b6-5569-8a28-7ae415f85fb8
+
+	measure 'Cool tt_song_growth' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_song_growth] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: f0ec2d06-bc27-50bd-84fe-70a419ad8a73
+
+	measure 'Cool tt_follower_growth' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tt_follower_growth] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 6c111b70-0b22-571e-b96b-9086a1a2583e
+
+	measure 'Cool track_record' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: afe3ef06-6402-5cb9-96bf-5223a55a1708
+
 	measure 'Cool new_hit_hype' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: 20088741-d138-5f8c-98fd-da88b0279716
-
-	measure 'Cool new_hit_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 9a083ee9-f282-5eb8-9a36-fb11513237ec
-
-	measure 'Cool new_hit_released' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
-		formatString: yyyy-mm-dd
-		displayFolder: 2 Invite
-		lineageTag: 48168cbe-880e-5a8d-8ac4-96a79b863c9d
-
-	measure 'Cool top_song_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
-		formatString: #,0
-		displayFolder: 2 Invite
-		lineageTag: 7c69b936-f705-526f-8726-3471cfaf2e67
 
 	measure 'Cool momentum' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		formatString: 0
@@ -834,20 +976,40 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 479981ba-02dc-55ec-8711-264acd0a026a
 
-	measure 'Cool track_record' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
-		formatString: 0
-		displayFolder: 2 Invite
-		lineageTag: afe3ef06-6402-5cb9-96bf-5223a55a1708
-
 	measure 'Cool size' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		formatString: 0
 		displayFolder: 2 Invite
 		lineageTag: da00c6fe-35ae-5b76-bf73-8615ff8355e9
 
-	measure 'Cool loyalty' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
-		formatString: 0
+	measure 'Cool new_hit_tiktok_videos' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_videos] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
 		displayFolder: 2 Invite
-		lineageTag: d93ecc2f-7df1-52f3-8d6f-82eda475dd70
+		lineageTag: bacd81e0-ba2e-5ef5-8984-11d617c9eab1
+
+	measure 'Cool new_hit_tiktok_growth_4w' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_tiktok_growth_4w] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: +0%;-0%;0%
+		displayFolder: 2 Invite
+		lineageTag: 8555eb70-543d-53c2-93a5-a71f2f22f3ae
+
+	measure 'Cool new_hit_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 9a083ee9-f282-5eb8-9a36-fb11513237ec
+
+	measure 'Cool new_hit_released' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 48168cbe-880e-5a8d-8ac4-96a79b863c9d
+
+	measure 'Cool top_song_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 7c69b936-f705-526f-8726-3471cfaf2e67
+
+	measure 'Cool top_tiktok_song_videos' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_tiktok_song_videos] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: d8ab4889-0ec3-55b1-803a-9fc9771cdc48
 
 	measure 'Cool monthly_listeners' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		formatString: #,0
@@ -878,6 +1040,11 @@ table _Measures
 		formatString: #,0
 		displayFolder: 2 Invite
 		lineageTag: 960ed969-c0f7-5743-ab97-3a52baac882e
+
+	measure 'Cool tiktok_follower_growth_4w' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_follower_growth_4w] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: +0.0%;-0.0%;0.0%
+		displayFolder: 2 Invite
+		lineageTag: 70fcc29d-0573-53eb-a124-d5b60687a25b
 
 	measure 'Cool tiktok_asks' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		formatString: #,0
@@ -913,9 +1080,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: ad14cea6-1062-56b3-9329-f158a25bdeb6
 
+	measure 'Cool found_via' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[found_via] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 44da90da-56b5-5a36-9080-b27c5461581b
+
 	measure 'Cool new_hit' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: 99de7939-be26-566b-bfcf-a22df9430bfa
+
+	measure 'Cool new_hit_found_on' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit_found_on] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: e39f5be3-2b0b-5dfa-b9b6-2f773e679353
 
 	measure 'Cool top_song' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		displayFolder: 2 Invite
@@ -925,9 +1100,17 @@ table _Measures
 		displayFolder: 2 Invite
 		lineageTag: 797d3418-4721-5d31-8bf7-82e722b3f68c
 
+	measure 'Cool top_tiktok_song' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_tiktok_song] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: f6f51f57-05bd-56a7-8ee3-ac264e8b5a9e
+
 	measure 'Cool hit_status' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
 		displayFolder: 2 Invite
 		lineageTag: 330ff7d0-7129-5786-972b-1ef1755837c2
+
+	measure 'Cool tiktok_handle' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[tiktok_handle] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 9db883ef-1dbb-56d2-a72a-f7d5c5c4eb2f
 
 	measure 'Artists scored' = COUNTROWS ( invite )
 		formatString: #,0

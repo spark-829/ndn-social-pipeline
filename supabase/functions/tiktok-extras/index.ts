@@ -1,7 +1,8 @@
 // Supabase Edge Function: the Load side of extract_tiktok_extras.py (sql/014_tiktok_extras.sql).
 // The script runs where TikTok answers (GitHub Actions weekly; Vic's PC for tests) and has no
 // database password, only NDN_CRON_SECRET.
-//   GET  ?step=pages|sounds|comments|profiles&limit=N  -> {items: [...]} what to fetch next
+//   GET  ?step=pages|sounds|comments|profiles|artist_videos|artist_sounds&limit=N  -> {items: [...]} what to fetch next
+//        (artist_videos + artist_sounds: sql/026, the TikTok-first invite score)
 //   POST ?step=...  {rows: [...]}                          -> saves them (upsert)
 //   POST ?step=run  {status, detail}                       -> run log row in raw.music_runs (part tiktok_extras)
 // Same secret check as the other functions.
@@ -42,10 +43,47 @@ async function todo(step: string, limit: number) {
         union
         select c.handle from staging.tiktok_artist_account_candidate c
         where not exists (select 1 from raw.tiktok_accounts a where a.handle = c.handle)
+        union
+        select handle from staging.artist_tiktok_account where found_by = 'Instagram name, checked'
       )
       select a.handle from accts a
       left join raw.tiktok_account_snapshot s on s.handle = a.handle and s.snapshot_date > ${phDate()}::date - 6
       where s.handle is null limit ${limit}`;
+  }
+  if (step === "artist_videos") {
+    // known artist accounts weekly; for artists without one, their Instagram username as a guess (kept only when the
+    // display name matches, staging.artist_tiktok_account). Unmatched or missing guesses: tried again after 30 days.
+    return await sql`
+      with h as (
+        select handle, null::text as guess_for from raw.tiktok_accounts where role = 'artist' and active
+        union
+        select c.handle, null from staging.tiktok_artist_account_candidate c
+        where not exists (select 1 from raw.tiktok_accounts a where a.handle = c.handle)
+        union
+        select tiktok_handle, null from raw.spotify_artists where active and tiktok_handle is not null
+        union
+        select ig.username, ig.spotify_id from staging.artist_instagram ig
+        join raw.spotify_artists a on a.spotify_id = ig.spotify_id and a.active
+        where ig.username is not null
+          and not exists (select 1 from staging.artist_tiktok_account t
+                          where t.spotify_id = ig.spotify_id and t.found_by <> 'Instagram name, checked')
+      ), one as (
+        select distinct on (handle) handle, guess_for from h order by handle, guess_for nulls first
+      )
+      select o.handle, o.guess_for from one o
+      left join raw.tiktok_artist_video_fetch f using (handle)
+      where f.handle is null
+         or (f.fetched_at < now() - interval '6 days'
+             and (o.guess_for is null or exists (select 1 from staging.artist_tiktok_account t where t.handle = o.handle)))
+         or f.fetched_at < now() - interval '30 days'
+      order by o.guess_for is not null, f.fetched_at nulls first limit ${limit}`;
+  }
+  if (step === "artist_sounds") {  // artists' own released songs (sound made in the last 3 years), once per week
+    return await sql`
+      select s.music_id, min(s.sound_title) as title from staging.tiktok_artist_sound s
+      left join raw.tiktok_sound_stats st on st.music_id = s.music_id and st.snapshot_date > ${phDate()}::date - 6
+      where st.music_id is null and s.sound_created > ${phDate()}::date - 1096
+      group by s.music_id order by max(s.own_videos) desc limit ${limit}`;
   }
   throw new Error(`unknown step ${step}`);
 }
@@ -56,7 +94,16 @@ async function save(step: string, rows: any[]) {
     if (step === "pages") {
       await sql`insert into raw.tiktok_video_page (video_id, item) values (${r.video_id}, ${sql.json(r.item)})
         on conflict (video_id) do update set fetched_at = now(), item = excluded.item`;
-    } else if (step === "sounds") {
+    } else if (step === "artist_videos") {
+      await sql`insert into raw.tiktok_artist_video_fetch (handle, guess_for, found, nickname, videos)
+        values (${r.handle}, ${r.guess_for ?? null}, ${!!r.found}, ${r.nickname ?? null}, ${(r.videos ?? []).length})
+        on conflict (handle) do update set fetched_at = now(), guess_for = excluded.guess_for, found = excluded.found,
+          nickname = excluded.nickname, videos = excluded.videos`;
+      await sql`insert into raw.tiktok_artist_video (handle, video_id, posted_at, views, music)
+        select ${r.handle}, x->>'video_id', to_timestamp((x->>'posted_at')::bigint), (x->>'views')::bigint, x->'music'
+        from jsonb_array_elements(${sql.json(r.videos ?? [])}) x where x->>'video_id' is not null
+        on conflict (handle, video_id) do update set fetched_at = now(), views = excluded.views, music = excluded.music`;
+    } else if (step === "sounds" || step === "artist_sounds") {
       await sql`insert into raw.tiktok_sound_stats (music_id, snapshot_date, payload) values (${r.music_id}, ${day}, ${sql.json(r.payload)})
         on conflict (music_id, snapshot_date) do update set fetched_at = now(), payload = excluded.payload`;
     } else if (step === "comments") {

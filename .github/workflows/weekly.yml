@@ -2,6 +2,8 @@
 # Mondays 02:30 UTC = 10:30 PH, after the Monday trends + Deezer runs.
 # Video pages, sound counts, comments, artist profiles; then benchmark accounts' latest 50 videos. Usually 10-20 minutes;
 # the first backfill was done from Vic's PC on 2026-10-20.
+# Job tiktok-artists runs beside it (own runner and time limit): artists' latest 30 videos and the weekly
+# "videos using this sound" for their own songs (sql/026, TikTok-first invite score). First run from Vic's PC 2026-10-22.
 # Repo secrets: SUPABASE_URL, NDN_CRON_SECRET (same as daily.yml).
 name: weekly
 
@@ -11,7 +13,7 @@ on:
   workflow_dispatch:             # "Run workflow" button; leave blank for a full run
     inputs:
       steps:
-        description: "steps, e.g. pages,sounds,comments,profiles"
+        description: "steps, e.g. pages,sounds,comments,profiles (artist_videos,artist_sounds = job tiktok-artists only)"
         default: "pages,sounds,comments,profiles"
       limit:
         description: "max items per step (blank = no limit)"
@@ -42,3 +44,21 @@ jobs:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
         run: python extract_benchmarks_tiktok.py --weekly --by github
+
+  tiktok-artists:
+    if: ${{ !inputs.steps || contains(inputs.steps, 'artist') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install -r requirements.txt && pip install -U "yt-dlp[default,curl-cffi]"
+      - run: python -m playwright install --with-deps chromium
+      - name: Artists' TikTok videos + own-song sound counts
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: |
+          python extract_tiktok_extras.py --by github --steps artist_videos,artist_sounds             ${{ inputs.limit && format('--limit {0}', inputs.limit) || '' }}

@@ -23,11 +23,11 @@
                       "Entity": "invite"
                     }
                   },
-                  "Property": "on_chart"
+                  "Property": "found_via"
                 }
               },
-              "queryRef": "invite.on_chart",
-              "nativeQueryRef": "on_chart",
+              "queryRef": "invite.found_via",
+              "nativeQueryRef": "found_via",
               "active": true
             }
           ]
@@ -61,7 +61,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'On the Spotify PH chart (8 weeks)'"
+                  "Value": "'Found via'"
                 }
               }
             }
@@ -217,7 +217,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'On the Spotify PH chart (8 weeks) filter, this page only'"
+                  "Value": "'Found via filter, this page only'"
                 }
               }
             }
@@ -237,7 +237,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'On the Spotify PH chart (8 weeks)'"
+                  "Value": "'Found via'"
                 }
               }
             },

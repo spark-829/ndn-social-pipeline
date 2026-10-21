@@ -4,8 +4,10 @@ logged-out Spotify web player's own API, read through a headless browser (the We
 Premium since Feb 2026 and no longer gives followers).
 
 Steps (each only for what is new or due):
+  playlists  Spotify's own playlists in raw.spotify_playlists (sql/026: "Viral Hits Philippines"), all tracks
   search   find the Spotify artist for each NDN artist and listed TikTok artist account:
-           kworb chart link > track search confirmed by an NDN song > exact name (Vic checks)
+           kworb chart link > track search confirmed by an NDN song > exact name (Vic checks);
+           also the PH weekly chart + playlist artists outside NDN (invite candidates, sql/026)
   artists  each artist page: monthly listeners, followers, world rank, top 5 cities, top tracks
   kworb    each artist's kworb.net songs page: total and daily streams per song (plain request)
 
@@ -19,10 +21,14 @@ import argparse, html, json, logging, os, re, sys, time
 import requests
 from dotenv import load_dotenv
 
-STEPS = ["search", "artists", "kworb"]
+STEPS = ["playlists", "search", "artists", "kworb"]
 PATHFINDER = "https://api-partner.spotify.com/pathfinder/v2/query"
 WARM_ARTIST = "3LiUry0ss8UpPzbBmM9bDP"      # Esremborak: any artist page, to catch the API calls
 OPS = ("queryArtistOverview", "searchArtists", "searchDesktop")
+PLAYLIST_OP = "fetchPlaylist"               # caught when a playlist page opens (playlists step only)
+CHART_EVIDENCE = {"kworb_chart": "artist link on the kworb Spotify PH weekly chart",
+                  "ph_chart": "on the kworb Spotify PH weekly chart (invite candidate, not an NDN artist)",
+                  "viral_playlist": "in Spotify's Viral Hits Philippines playlist (invite candidate, not an NDN artist)"}
 KWORB = "https://kworb.net/spotify/artist/{}_songs.html"
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36")
@@ -76,13 +82,14 @@ class Spotify:
     def _catch(self, req):
         if req.url.startswith(PATHFINDER) and req.post_data:
             body = json.loads(req.post_data)
-            if body.get("operationName") in OPS:
+            if body.get("operationName") in OPS + (PLAYLIST_OP,):
                 self.calls[body["operationName"]] = body
                 self.headers = {k: v for k, v in req.headers.items()
                                 if k in ("authorization", "client-token", "app-platform", "spotify-app-version", "content-type")}
 
     def warm(self):
-        self.calls.clear()
+        for op in OPS:
+            self.calls.pop(op, None)
         for url, ops in ((f"https://open.spotify.com/artist/{WARM_ARTIST}", OPS[:1]),
                          ("https://open.spotify.com/search/esremborak/artists", OPS[1:])):
             self.page.goto(url, wait_until="domcontentloaded", timeout=60_000)
@@ -133,6 +140,33 @@ class Spotify:
                     {"id": a["uri"].split(":")[-1], "name": a["profile"]["name"]} for a in t.get("artists", {}).get("items", [])]})
         return out
 
+    def playlist(self, playlist_id):
+        """Every track of a playlist: open its page once to catch the call, then page through 100 at a time."""
+        if PLAYLIST_OP not in self.calls:
+            self.page.goto(f"https://open.spotify.com/playlist/{playlist_id}", wait_until="domcontentloaded", timeout=60_000)
+            for _ in range(40):
+                if PLAYLIST_OP in self.calls:
+                    break
+                self.page.wait_for_timeout(500)
+            else:
+                raise RuntimeError(f"playlist {playlist_id}: the page did not make a {PLAYLIST_OP} call")
+        tracks, total, meta = [], None, {}
+        while total is None or len(tracks) < total:
+            pl = self.query(PLAYLIST_OP, uri=f"spotify:playlist:{playlist_id}", offset=len(tracks), limit=100)["data"]["playlistV2"]
+            meta = meta or {"name": pl.get("name"), "description": pl.get("description")}
+            content = pl.get("content") or {}
+            total, items = content.get("totalCount", 0), content.get("items") or []
+            if not items:
+                break
+            for it in items:
+                t = (it.get("itemV2") or {}).get("data") or {}
+                tracks.append({"pos": len(tracks) + 1, "track_id": (t.get("uri") or "").split(":")[-1] or None,
+                               "name": t.get("name"),
+                               "artists": [{"id": a["uri"].split(":")[-1], "name": a["profile"]["name"]}
+                                           for a in (t.get("artists") or {}).get("items", [])],
+                               "added_at": (it.get("addedAt") or {}).get("isoString")})
+        return {"playlist_id": playlist_id, "payload": {**meta, "total": total, "tracks": tracks}}
+
     def close(self):
         self.browser.close()
         self._pw.stop()
@@ -178,8 +212,9 @@ def pick_artist(sp, item):
     """Return {spotify_id, name, match_type, evidence} or None, plus the name-search results."""
     if item.get("chart_id"):
         a = sp.overview(item["chart_id"])
-        return {"spotify_id": item["chart_id"], "name": a["profile"]["name"], "match_type": "kworb_chart",
-                "evidence": "artist link on the kworb Spotify PH weekly chart"}, []
+        kind = item.get("chart_type") or "kworb_chart"
+        return {"spotify_id": item["chart_id"], "name": a["profile"]["name"], "match_type": kind,
+                "evidence": CHART_EVIDENCE[kind]}, []
     want = key(item["query"])
     results = sp.search_artists(item["query"])
     exact = [r for r in results if key(r["name"]) == want]
@@ -259,13 +294,16 @@ def run_step(step, feed, limit, dry_run, state):
                              "tiktok_handle": it.get("tiktok_handle"), "results": results, "pick": pick})
             elif step == "artists":
                 rows.append({"spotify_id": it["spotify_id"], "payload": slim(sp.overview(it["spotify_id"]))})
+            elif step == "playlists":
+                rows.append(sp.playlist(it["playlist_id"]))
+                log.info("playlist %s: %d tracks", it["name"], len(rows[-1]["payload"]["tracks"]))
             else:
                 rows.append(kworb_page(session, it["spotify_id"]))
                 time.sleep(1)                 # kworb is one person's site: one page a second
             done += 1
         except Exception as e:
             fails += 1
-            log.warning("%s %s: %s", step, it.get("query") or it.get("spotify_id"), str(e)[:200])
+            log.warning("%s %s: %s", step, it.get("query") or it.get("spotify_id") or it.get("playlist_id"), str(e)[:200])
             if fails >= MAX_FAILS:
                 log.error("%s: %d failures, stopping this step", step, fails)
                 break

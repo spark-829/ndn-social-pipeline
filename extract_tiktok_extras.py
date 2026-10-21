@@ -8,12 +8,16 @@ Steps (each only for what is new or due):
   comments  top-level comments through TikTok's web comment list (plain request, Chrome TLS)
   profiles  artists' own accounts (auto-found from @mentions, or listed by Vic) and benchmark
             accounts, in a headless browser
+  artist_videos  each artist account's latest 30 videos with their sound, via yt-dlp's account
+            listing (sql/026); also tries artists' Instagram usernames as TikTok handles
+  artist_sounds  "videos using this sound" for the artists' own released songs found above
 
 Where it works (tested 2026-10-20): all four from Vic's PC (home IP), where plain profile
 requests are blocked. GitHub Actions runs it weekly (.github/workflows/weekly.yml).
 
     py extract_tiktok_extras.py                      # all steps
     py extract_tiktok_extras.py --steps comments --limit 50
+    py extract_tiktok_extras.py --steps artist_videos,artist_sounds
 Needs SUPABASE_URL and NDN_CRON_SECRET (.env or environment). Also: playwright + chromium.
 """
 import argparse, json, logging, os, re, sys, time
@@ -21,12 +25,15 @@ import argparse, json, logging, os, re, sys, time
 import requests
 from dotenv import load_dotenv
 
-STEPS = ["pages", "sounds", "comments", "profiles"]
+STEPS = ["pages", "sounds", "comments", "profiles", "artist_videos", "artist_sounds"]
 UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36")
 EMBED_RE = re.compile(r'<script id="__UNIVERSAL_DATA_FOR_REHYDRATION__"[^>]*>(.*?)</script>', re.S)
 DROP_FROM_PAGE = ("video", "author", "desc", "imagePost")   # links that expire + caption we already have
 COMMENT_FIELDS = ("cid", "text", "create_time", "digg_count", "reply_comment_total", "author_pin", "is_author_digged")
+MUSIC_FIELDS = ("id", "title", "authorName", "original", "album", "duration")
+ARTIST_LATEST = 30
+SOUND_UNAVAILABLE = 202001   # music/detail statusCode for a sound that is gone or not shown here (checked 2026-10-22)
 SAVE_EVERY = 25
 MAX_FAILS = 25          # per step: stop the step if TikTok keeps refusing
 
@@ -81,6 +88,45 @@ class Pages:
         self.ydl.close()
 
 
+class ArtistVideos:
+    """An account's latest videos with their sound, from yt-dlp's account listing (the headless-browser
+    profile page gets an empty video list). yt-dlp keeps the song title but drops the sound id, so its
+    parser is wrapped to keep the music fields."""
+    def __init__(self):
+        import yt_dlp
+        from yt_dlp.extractor import tiktok as tt
+        from yt_dlp.networking.impersonate import ImpersonateTarget
+        if not getattr(tt.TikTokBaseIE, "_ndn_keeps_music", False):
+            parse = tt.TikTokBaseIE._parse_aweme_video_web
+
+            def keep_music(ie, aweme, *args, **kwargs):
+                out = parse(ie, aweme, *args, **kwargs)
+                out["ndn_music"] = {k: (aweme.get("music") or {}).get(k) for k in MUSIC_FIELDS}
+                return out
+            tt.TikTokBaseIE._parse_aweme_video_web = keep_music
+            tt.TikTokBaseIE._ndn_keeps_music = True
+        self.ydl = yt_dlp.YoutubeDL({"extract_flat": True, "skip_download": True, "quiet": True, "no_warnings": True,
+                                     "playlistend": ARTIST_LATEST, "impersonate": ImpersonateTarget.from_str("chrome")})
+
+    def fetch(self, item):
+        h = item["handle"]
+        try:
+            info = self.ydl.extract_info(f"https://www.tiktok.com/@{h}", download=False)
+        except Exception as e:
+            # a guessed handle that doesn't exist: saved as not found (tried again after 30 days)
+            if item.get("guess_for") and "secondary user ID" in str(e):
+                return {"handle": h, "guess_for": item["guess_for"], "found": False, "videos": []}
+            raise
+        entries = list(info.get("entries") or [])
+        return {"handle": h, "guess_for": item.get("guess_for"), "found": True,
+                "nickname": next((e["channel"] for e in entries if e.get("channel")), None),
+                "videos": [{"video_id": e["id"], "posted_at": e.get("timestamp"), "views": e.get("view_count"),
+                            "music": e.get("ndn_music")} for e in entries if e.get("id")]}
+
+    def close(self):
+        self.ydl.close()
+
+
 class Browser:
     """One headless Chromium for sound pages and profiles."""
     def __init__(self):
@@ -93,9 +139,12 @@ class Browser:
         mid = item["music_id"]
         with self.page.expect_response(lambda r: "/api/music/detail" in r.url, timeout=25000) as resp:
             self.page.goto(f"https://www.tiktok.com/music/x-{mid}", wait_until="domcontentloaded", timeout=60000)
-        info = resp.value.json().get("musicInfo") or {}
+        reply = resp.value.json()
+        if reply.get("statusCode") == SOUND_UNAVAILABLE:  # TikTok's "sound not available" (removed or region-locked)
+            return {"music_id": mid, "payload": {"statusCode": SOUND_UNAVAILABLE}}   # saved without a count: skipped this week
+        info = reply.get("musicInfo") or {}
         if not info.get("stats"):
-            raise RuntimeError("no stats in reply")
+            raise RuntimeError(f"no stats in reply (statusCode {reply.get('statusCode')})")
         return {"music_id": mid, "payload": info}
 
     def profile(self, item):
@@ -185,7 +234,7 @@ def main(argv=None):
 
     started, results, status = time.time(), {}, "ok"
     steps = [s for s in STEPS if s in args.steps.split(",")]
-    browser = Browser() if {"sounds", "profiles"} & set(steps) else None
+    browser = Browser() if {"sounds", "profiles", "artist_sounds"} & set(steps) else None
     try:
         for step in steps:
             try:
@@ -201,6 +250,14 @@ def main(argv=None):
                     results[step] = run_step(feed, step, Comments().fetch, args.limit, 0.5)
                 elif step == "profiles":
                     results[step] = run_step(feed, step, browser.profile, args.limit, 1.0)
+                elif step == "artist_videos":
+                    a = ArtistVideos()
+                    try:
+                        results[step] = run_step(feed, step, a.fetch, args.limit, 1.0)
+                    finally:
+                        a.close()
+                elif step == "artist_sounds":
+                    results[step] = run_step(feed, step, browser.sound, args.limit, 1.0)
             except Exception as e:                         # one step failing doesn't stop the others
                 status = "partial"
                 results[step] = {"error": str(e)[:300]}

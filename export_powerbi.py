@@ -128,15 +128,20 @@ EXPORTS = {
     "fan_upload": f"""
         select artist, fans, asks, asks_for_streaming, latest_ask, {clean('top_ask', 140)} as top_ask
         from mart.fan_upload_request""",
-    # who to invite to Live at The Cozy Cove: score, its parts and the raw numbers behind it (sql/025)
+    # who to invite to Live at The Cozy Cove: score (TikTok first), its parts and the raw numbers behind it (sql/026)
     "invite": """
         select case when count(*) over (partition by artist) > 1 then artist || ' (' || left(spotify_id, 4) || ')'
                     else artist end as artist,
-               status, hit_status, ndn_history, case when best_chart_rank is null then 'no' else 'yes' end as on_chart,
-               status_rank, score, new_hit_hype, new_hit, new_hit_daily_streams, new_hit_released, top_song,
-               top_song_daily_streams, case when top_song_on_ndn then 'yes' else 'no' end as top_song_on_ndn, momentum, local_reach, fan_demand, track_record, size, loyalty,
+               status, hit_status, ndn_history, found_via, case when best_chart_rank is null then 'no' else 'yes' end as on_chart,
+               status_rank, score, tiktok_points, spotify_points, other_points,
+               tt_song_videos, tt_song_growth, tt_follower_growth, track_record, new_hit_hype, momentum, local_reach,
+               fan_demand, size,
+               new_hit, new_hit_found_on, new_hit_tiktok_videos, new_hit_tiktok_growth_4w, new_hit_daily_streams,
+               new_hit_released, top_song, top_song_daily_streams,
+               case when top_song_on_ndn then 'yes' else 'no' end as top_song_on_ndn, top_tiktok_song, top_tiktok_song_videos,
                monthly_listeners, spotify_followers, followers_per_listener, ph_listeners, manila_baguio_listeners,
-               best_chart_rank, weeks_on_chart, tiktok_handle, tiktok_followers, fans_asking, tiktok_asks,
+               best_chart_rank, weeks_on_chart, tiktok_handle, tiktok_found_by, tiktok_followers,
+               tiktok_follower_growth_4w, fans_asking, tiktok_asks,
                ndn_youtube_videos, ndn_tiktok_clips, ndn_tiktok_index, ndn_youtube_index, latest_visit, last_ndn_post,
                cooldown_until
         from mart.invite_candidates""",
