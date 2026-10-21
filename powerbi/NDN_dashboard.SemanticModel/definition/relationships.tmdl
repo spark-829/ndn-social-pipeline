@@ -1,0 +1,23 @@
+relationship dim_video_to_platform
+	fromColumn: dim_video.platform
+	toColumn: dim_platform.platform
+
+relationship account_daily_to_platform
+	fromColumn: account_daily.platform
+	toColumn: dim_platform.platform
+
+relationship platform_daily_to_platform
+	fromColumn: platform_daily.platform
+	toColumn: dim_platform.platform
+
+relationship scorecard_to_platform
+	fromColumn: scorecard.platform
+	toColumn: dim_platform.platform
+
+relationship bench_accounts_to_account
+	fromColumn: bench_accounts.account
+	toColumn: dim_account.account
+
+relationship bench_uploads_to_account
+	fromColumn: bench_uploads.account
+	toColumn: dim_account.account

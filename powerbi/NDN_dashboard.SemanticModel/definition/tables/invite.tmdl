@@ -1,0 +1,345 @@
+/// Who to invite to Live at The Cozy Cove: score 0-100, its six parts and the raw numbers (sql/025).
+table invite
+	lineageTag: f1ebbbac-1284-5517-ad56-570cd722122f
+
+	column artist
+		dataType: string
+		lineageTag: 7127127d-4a5e-5026-b773-5632f45d0e7e
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column status
+		dataType: string
+		lineageTag: 144e2646-d4bc-5b3b-83a2-ee53e8189d40
+		sourceColumn: status
+
+		annotation SummarizationSetBy = User
+
+	column hit_status
+		dataType: string
+		lineageTag: ac2848d8-a6ab-58cf-835e-836821402e7d
+		sourceColumn: hit_status
+
+		annotation SummarizationSetBy = User
+
+	column ndn_history
+		dataType: string
+		lineageTag: 4813555f-644b-5f9c-806f-04399d024d89
+		sourceColumn: ndn_history
+
+		annotation SummarizationSetBy = User
+
+	column on_chart
+		dataType: string
+		lineageTag: 2d7ae0b9-b1c6-523a-bcd2-3104a4f18888
+		sourceColumn: on_chart
+
+		annotation SummarizationSetBy = User
+
+	column status_rank
+		dataType: int64
+		formatString: #,0
+		lineageTag: 510099c6-7eb3-55e5-b32b-98e7eaf96ecf
+		summarizeBy: none
+		sourceColumn: status_rank
+
+		annotation SummarizationSetBy = User
+
+	column score
+		dataType: double
+		formatString: 0.0
+		lineageTag: 67ec8c20-9404-519b-9665-b5297af7570e
+		summarizeBy: none
+		sourceColumn: score
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_hype
+		dataType: int64
+		formatString: #,0
+		lineageTag: cf205eb5-0973-5646-b553-975316b5aab4
+		summarizeBy: none
+		sourceColumn: new_hit_hype
+
+		annotation SummarizationSetBy = User
+
+	column new_hit
+		dataType: string
+		lineageTag: d6a58ea9-23ee-5b6a-a01f-b1307367fd88
+		sourceColumn: new_hit
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_daily_streams
+		dataType: int64
+		formatString: #,0
+		lineageTag: dbd28c60-ce94-59cb-a3ce-5c8b5a815950
+		summarizeBy: none
+		sourceColumn: new_hit_daily_streams
+
+		annotation SummarizationSetBy = User
+
+	column new_hit_released
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 645349e7-161d-5688-8af1-d2632ed6fb1b
+		summarizeBy: none
+		sourceColumn: new_hit_released
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column top_song
+		dataType: string
+		lineageTag: 94d78988-155d-563a-b04d-b22198995333
+		sourceColumn: top_song
+
+		annotation SummarizationSetBy = User
+
+	column top_song_daily_streams
+		dataType: int64
+		formatString: #,0
+		lineageTag: 43afb7ac-fce7-52fd-85e3-fe1627faff0c
+		summarizeBy: none
+		sourceColumn: top_song_daily_streams
+
+		annotation SummarizationSetBy = User
+
+	column top_song_on_ndn
+		dataType: string
+		lineageTag: 68d4c9dd-7a39-580d-9c82-abeb78d5b863
+		sourceColumn: top_song_on_ndn
+
+		annotation SummarizationSetBy = User
+
+	column momentum
+		dataType: int64
+		formatString: #,0
+		lineageTag: d85e3716-3003-58e9-8137-54f876ed6de8
+		summarizeBy: none
+		sourceColumn: momentum
+
+		annotation SummarizationSetBy = User
+
+	column local_reach
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0f11f1f0-d45f-5c85-b178-dfc3f10f8aaa
+		summarizeBy: none
+		sourceColumn: local_reach
+
+		annotation SummarizationSetBy = User
+
+	column fan_demand
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2caa7a8b-accf-5aba-bee0-ee912adf7489
+		summarizeBy: none
+		sourceColumn: fan_demand
+
+		annotation SummarizationSetBy = User
+
+	column track_record
+		dataType: int64
+		formatString: #,0
+		lineageTag: 93f38ac2-4b37-5531-a986-3241087a5f6b
+		summarizeBy: none
+		sourceColumn: track_record
+
+		annotation SummarizationSetBy = User
+
+	column size
+		dataType: int64
+		formatString: #,0
+		lineageTag: cd06292c-91ac-5eeb-8fb3-4c76499e420a
+		summarizeBy: none
+		sourceColumn: size
+
+		annotation SummarizationSetBy = User
+
+	column loyalty
+		dataType: int64
+		formatString: #,0
+		lineageTag: f75d29b3-bfb4-59e1-b847-64260898a95c
+		summarizeBy: none
+		sourceColumn: loyalty
+
+		annotation SummarizationSetBy = User
+
+	column monthly_listeners
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2135b0e4-618f-5407-9278-6b36232e5b21
+		summarizeBy: none
+		sourceColumn: monthly_listeners
+
+		annotation SummarizationSetBy = User
+
+	column spotify_followers
+		dataType: int64
+		formatString: #,0
+		lineageTag: 70f962a7-f63a-57d3-8d43-6f0624b6308e
+		summarizeBy: none
+		sourceColumn: spotify_followers
+
+		annotation SummarizationSetBy = User
+
+	column followers_per_listener
+		dataType: double
+		formatString: 0.00
+		lineageTag: 3cc1ccc2-967d-58ad-b064-1ae9798ee372
+		summarizeBy: none
+		sourceColumn: followers_per_listener
+
+		annotation SummarizationSetBy = User
+
+	column ph_listeners
+		dataType: double
+		formatString: #,0.00
+		lineageTag: f9cbbcb0-445a-5946-aa4f-953bf2c9bf64
+		summarizeBy: none
+		sourceColumn: ph_listeners
+
+		annotation SummarizationSetBy = User
+
+	column manila_baguio_listeners
+		dataType: double
+		formatString: #,0.00
+		lineageTag: a51bf3f6-1455-5303-a1da-8321e8b52b69
+		summarizeBy: none
+		sourceColumn: manila_baguio_listeners
+
+		annotation SummarizationSetBy = User
+
+	column best_chart_rank
+		dataType: int64
+		formatString: #,0
+		lineageTag: da71e4c3-cb0e-50ca-865d-39cc593d1673
+		summarizeBy: none
+		sourceColumn: best_chart_rank
+
+		annotation SummarizationSetBy = User
+
+	column weeks_on_chart
+		dataType: int64
+		formatString: #,0
+		lineageTag: 80159a73-abf8-5629-b150-47c5b4013be2
+		summarizeBy: none
+		sourceColumn: weeks_on_chart
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_handle
+		dataType: string
+		lineageTag: a928ea68-4132-5b63-bd1c-1d2d32e2cb58
+		sourceColumn: tiktok_handle
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_followers
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9613d626-3b40-5cb3-98b3-16e0300f1a71
+		summarizeBy: none
+		sourceColumn: tiktok_followers
+
+		annotation SummarizationSetBy = User
+
+	column fans_asking
+		dataType: int64
+		formatString: #,0
+		lineageTag: da609b5e-cdbe-5da1-adbe-34ff4f123edf
+		summarizeBy: none
+		sourceColumn: fans_asking
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_asks
+		dataType: int64
+		formatString: #,0
+		lineageTag: 633bac35-60c4-5748-9571-dcee55b9f67e
+		summarizeBy: none
+		sourceColumn: tiktok_asks
+
+		annotation SummarizationSetBy = User
+
+	column ndn_youtube_videos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0dbb1360-90fe-5313-b9f6-e52306a7ba61
+		summarizeBy: none
+		sourceColumn: ndn_youtube_videos
+
+		annotation SummarizationSetBy = User
+
+	column ndn_tiktok_clips
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8fee4b86-8866-5855-9bc3-434e4db299b7
+		summarizeBy: none
+		sourceColumn: ndn_tiktok_clips
+
+		annotation SummarizationSetBy = User
+
+	column ndn_tiktok_index
+		dataType: double
+		formatString: 0.00
+		lineageTag: 265942f9-d92b-5365-9134-8e7399d8634d
+		summarizeBy: none
+		sourceColumn: ndn_tiktok_index
+
+		annotation SummarizationSetBy = User
+
+	column ndn_youtube_index
+		dataType: double
+		formatString: 0.00
+		lineageTag: e8f4532d-b75d-5321-b9ec-18b11357f190
+		summarizeBy: none
+		sourceColumn: ndn_youtube_index
+
+		annotation SummarizationSetBy = User
+
+	column latest_visit
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 2d214f8e-a594-5e4b-bb1a-3c8d64a05954
+		summarizeBy: none
+		sourceColumn: latest_visit
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column last_ndn_post
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: a2ec6ee6-e6f6-5cc5-877f-d064fae93fef
+		summarizeBy: none
+		sourceColumn: last_ndn_post
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column cooldown_until
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 95a852d9-b374-551e-a598-4677efedfd7f
+		summarizeBy: none
+		sourceColumn: cooldown_until
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	partition invite = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("invite.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"hit_status", type text}, {"ndn_history", type text}, {"on_chart", type text}, {"status_rank", Int64.Type}, {"score", type number}, {"new_hit_hype", Int64.Type}, {"new_hit", type text}, {"new_hit_daily_streams", Int64.Type}, {"new_hit_released", type date}, {"top_song", type text}, {"top_song_daily_streams", Int64.Type}, {"top_song_on_ndn", type text}, {"momentum", Int64.Type}, {"local_reach", Int64.Type}, {"fan_demand", Int64.Type}, {"track_record", Int64.Type}, {"size", Int64.Type}, {"loyalty", Int64.Type}, {"monthly_listeners", Int64.Type}, {"spotify_followers", Int64.Type}, {"followers_per_listener", type number}, {"ph_listeners", type number}, {"manila_baguio_listeners", type number}, {"best_chart_rank", Int64.Type}, {"weeks_on_chart", Int64.Type}, {"tiktok_handle", type text}, {"tiktok_followers", Int64.Type}, {"fans_asking", Int64.Type}, {"tiktok_asks", Int64.Type}, {"ndn_youtube_videos", Int64.Type}, {"ndn_tiktok_clips", Int64.Type}, {"ndn_tiktok_index", type number}, {"ndn_youtube_index", type number}, {"latest_visit", type date}, {"last_ndn_post", type date}, {"cooldown_until", type date}}, "en-US")
+				in
+				    Typed

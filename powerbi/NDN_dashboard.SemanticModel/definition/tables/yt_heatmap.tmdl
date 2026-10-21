@@ -1,0 +1,77 @@
+/// yt_heatmap
+table yt_heatmap
+	lineageTag: c5c51304-93c2-5db6-a26d-7c9296bc9d2f
+
+	column video_id
+		dataType: string
+		lineageTag: e2d346b7-962b-5ada-8bc2-ed0be59d3a09
+		sourceColumn: video_id
+
+		annotation SummarizationSetBy = User
+
+	column title
+		dataType: string
+		lineageTag: b2334f55-76c1-5eae-9814-1ed8db34f6fd
+		sourceColumn: title
+
+		annotation SummarizationSetBy = User
+
+	column artist
+		dataType: string
+		lineageTag: 892b9493-8cdd-5215-bd8d-1f22d02f299e
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column duration_sec
+		dataType: int64
+		formatString: #,0
+		lineageTag: fda6e9a6-ee5c-5e9b-ad67-e127f7725207
+		summarizeBy: none
+		sourceColumn: duration_sec
+
+		annotation SummarizationSetBy = User
+
+	column peak_sec
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 35a50c57-e3b4-52fe-a436-541563aabd09
+		summarizeBy: none
+		sourceColumn: peak_sec
+
+		annotation SummarizationSetBy = User
+
+	column peak_pct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 9b86fef6-8c4b-52ba-8eed-8b88b3ae15c1
+		summarizeBy: none
+		sourceColumn: peak_pct
+
+		annotation SummarizationSetBy = User
+
+	column peak_band
+		dataType: string
+		lineageTag: 65905894-379a-5725-b361-5319f33c26a1
+		sourceColumn: peak_band
+
+		annotation SummarizationSetBy = User
+
+	column peak_ratio
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d387848a-7236-585c-80c0-e96f0a488c87
+		summarizeBy: none
+		sourceColumn: peak_ratio
+
+		annotation SummarizationSetBy = User
+
+	partition yt_heatmap = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("yt_heatmap.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"video_id", type text}, {"title", type text}, {"artist", type text}, {"duration_sec", Int64.Type}, {"peak_sec", type number}, {"peak_pct", type number}, {"peak_band", type text}, {"peak_ratio", type number}}, "en-US")
+				in
+				    Typed

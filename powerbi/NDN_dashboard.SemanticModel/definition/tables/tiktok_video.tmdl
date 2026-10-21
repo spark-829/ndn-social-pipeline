@@ -1,0 +1,349 @@
+/// One row per TikTok video: performance index (views / median of the 30 posted around it).
+table tiktok_video
+	lineageTag: 96057aff-ed60-52f4-8f76-a61801eaba62
+
+	column video_id
+		dataType: string
+		lineageTag: 0e1ab446-e5e7-5219-a65c-9f954b995f49
+		sourceColumn: video_id
+
+		annotation SummarizationSetBy = User
+
+	column url
+		dataType: string
+		lineageTag: 650c9249-c138-52fd-9cde-91186ecc7666
+		sourceColumn: url
+
+		annotation SummarizationSetBy = User
+
+	column caption
+		dataType: string
+		lineageTag: c4b2c7f8-a746-5ec1-90dc-464b609897c3
+		sourceColumn: caption
+
+		annotation SummarizationSetBy = User
+
+	column published_date_ph
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: cbe537c9-e0e0-507a-bff5-509f4f65a6a4
+		summarizeBy: none
+		sourceColumn: published_date_ph
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column published_month
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 466ec8a1-4b4e-5563-9b87-edd7a5830e49
+		summarizeBy: none
+		sourceColumn: published_month
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column published_year
+		dataType: string
+		lineageTag: ee8991fc-0d2a-56d9-b8ff-5c5e33f8a8d4
+		sourceColumn: published_year
+
+		annotation SummarizationSetBy = User
+
+	column weekday_ph
+		dataType: string
+		lineageTag: dfa0ae07-117e-55bd-8fd4-2558d4e7d10c
+		sortByColumn: weekday_num
+		sourceColumn: weekday_ph
+
+		annotation SummarizationSetBy = User
+
+	column weekday_num
+		dataType: int64
+		formatString: #,0
+		lineageTag: 45c7254f-42d7-5f3a-a6e8-b31e9aa7c835
+		summarizeBy: none
+		sourceColumn: weekday_num
+
+		annotation SummarizationSetBy = User
+
+	column hour_ph
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5e214704-25f9-5c19-a541-b0212e68ca4d
+		summarizeBy: none
+		sourceColumn: hour_ph
+
+		annotation SummarizationSetBy = User
+
+	column time_window
+		dataType: string
+		lineageTag: f95fe746-6a8e-5c46-9a16-b7e327e05e30
+		sourceColumn: time_window
+
+		annotation SummarizationSetBy = User
+
+	column posts_that_day
+		dataType: string
+		lineageTag: 800b9c11-0dd5-539c-854e-080f55cbc999
+		sourceColumn: posts_that_day
+
+		annotation SummarizationSetBy = User
+
+	column duration_sec
+		dataType: int64
+		formatString: #,0
+		lineageTag: a59b6a53-eb0e-5ac4-aab3-5a2a701b3b71
+		summarizeBy: none
+		sourceColumn: duration_sec
+
+		annotation SummarizationSetBy = User
+
+	column length_group
+		dataType: string
+		lineageTag: 048a489b-a140-5732-8156-3cc0451d3431
+		sourceColumn: length_group
+
+		annotation SummarizationSetBy = User
+
+	column views
+		dataType: int64
+		formatString: #,0
+		lineageTag: 34342460-d3b9-5e02-945a-8655ea7323b5
+		summarizeBy: none
+		sourceColumn: views
+
+		annotation SummarizationSetBy = User
+
+	column likes
+		dataType: int64
+		formatString: #,0
+		lineageTag: 341f70d9-524e-5a37-9bff-2eaa0654b4af
+		summarizeBy: none
+		sourceColumn: likes
+
+		annotation SummarizationSetBy = User
+
+	column comments
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9e4167e5-8e1c-55aa-8a7b-3b60363d61d1
+		summarizeBy: none
+		sourceColumn: comments
+
+		annotation SummarizationSetBy = User
+
+	column shares
+		dataType: int64
+		formatString: #,0
+		lineageTag: 003d02c8-0f04-5d35-8fe6-e7f3239451ee
+		summarizeBy: none
+		sourceColumn: shares
+
+		annotation SummarizationSetBy = User
+
+	column saves
+		dataType: int64
+		formatString: #,0
+		lineageTag: aa5748be-10a4-54f6-a19b-92ef0be7256c
+		summarizeBy: none
+		sourceColumn: saves
+
+		annotation SummarizationSetBy = User
+
+	column age_days
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0216ac6a-5475-56b9-ac67-6b50a03d7c5e
+		summarizeBy: none
+		sourceColumn: age_days
+
+		annotation SummarizationSetBy = User
+
+	column age_band
+		dataType: string
+		lineageTag: 5176b152-bd7d-5272-b941-678894a574c8
+		sourceColumn: age_band
+
+		annotation SummarizationSetBy = User
+
+	column is_mature
+		dataType: string
+		lineageTag: e42f0840-08b6-5d78-a22b-272d24f26bbe
+		sourceColumn: is_mature
+
+		annotation SummarizationSetBy = User
+
+	column is_last_30d
+		dataType: string
+		lineageTag: 6d16d018-64ca-5256-8d1d-90e47a4ce6ae
+		sourceColumn: is_last_30d
+
+		annotation SummarizationSetBy = User
+
+	column likes_per_1k
+		dataType: double
+		formatString: 0.0
+		lineageTag: 983414fd-be49-5577-a7c2-7e3c65414068
+		summarizeBy: none
+		sourceColumn: likes_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column comments_per_1k
+		dataType: double
+		formatString: 0.0
+		lineageTag: 5918f951-cc15-58c8-bdf0-a2073a83e1fd
+		summarizeBy: none
+		sourceColumn: comments_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column shares_per_1k
+		dataType: double
+		formatString: 0.0
+		lineageTag: 3e2e660a-80f7-5659-8e1c-128f52de1936
+		summarizeBy: none
+		sourceColumn: shares_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column saves_per_1k
+		dataType: double
+		formatString: 0.0
+		lineageTag: 170a83a5-d73b-51d3-90a6-ddac01dc28b5
+		summarizeBy: none
+		sourceColumn: saves_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column share_save_per_1k
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 244de6ec-1d3f-51e1-8431-dbb7206b550f
+		summarizeBy: none
+		sourceColumn: share_save_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column neighbour_median
+		dataType: double
+		formatString: #,0
+		lineageTag: 4074e643-b576-5968-afb2-f7f051eee8d4
+		summarizeBy: none
+		sourceColumn: neighbour_median
+
+		annotation SummarizationSetBy = User
+
+	column perf_index
+		dataType: double
+		formatString: 0.00
+		lineageTag: 4960156b-26ff-5488-8f74-182d74443941
+		summarizeBy: none
+		sourceColumn: perf_index
+
+		annotation SummarizationSetBy = User
+
+	column index_band
+		dataType: string
+		lineageTag: 1d2d501b-fbdf-5cc8-9dd2-9dd590595a08
+		sourceColumn: index_band
+
+		annotation SummarizationSetBy = User
+
+	column views_gained_7d
+		dataType: int64
+		formatString: #,0
+		lineageTag: 85e6ea63-a588-599e-bdea-9f7cf84ce828
+		summarizeBy: none
+		sourceColumn: views_gained_7d
+
+		annotation SummarizationSetBy = User
+
+	column gained_7d_per_1k
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 6f303feb-7b7f-52cf-87f8-7abd47706ca6
+		summarizeBy: none
+		sourceColumn: gained_7d_per_1k
+
+		annotation SummarizationSetBy = User
+
+	column caption_type
+		dataType: string
+		lineageTag: b159cd56-582d-55b2-ac09-09dca3fe9071
+		sourceColumn: caption_type
+
+		annotation SummarizationSetBy = User
+
+	column asks_question
+		dataType: string
+		lineageTag: 9efc4014-7493-525e-b068-7c14e3f5d4ad
+		sourceColumn: asks_question
+
+		annotation SummarizationSetBy = User
+
+	column n_hashtags
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0bbba608-d6b2-5215-9280-8da8d979b26e
+		summarizeBy: none
+		sourceColumn: n_hashtags
+
+		annotation SummarizationSetBy = User
+
+	column hashtag_group
+		dataType: string
+		lineageTag: f207e41f-b637-5575-bd9f-a2a8b3b54110
+		sourceColumn: hashtag_group
+
+		annotation SummarizationSetBy = User
+
+	column sound_type
+		dataType: string
+		lineageTag: f5f64a90-b5f6-5ff3-be5f-307679bcaa7d
+		sourceColumn: sound_type
+
+		annotation SummarizationSetBy = User
+
+	column song
+		dataType: string
+		lineageTag: 83019bf1-580e-556a-ba48-87e31c862e49
+		sourceColumn: song
+
+		annotation SummarizationSetBy = User
+
+	column artist
+		dataType: string
+		lineageTag: 878b5ce3-b52b-5e5f-a212-1b505e69b396
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column series
+		dataType: string
+		lineageTag: eb76c6a3-7c68-5397-a488-5e29af8e4ea0
+		sourceColumn: series
+
+		annotation SummarizationSetBy = User
+
+	column sound_uses
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2b7d1e56-b3cc-548b-98fb-b34bf6c94ae2
+		summarizeBy: none
+		sourceColumn: sound_uses
+
+		annotation SummarizationSetBy = User
+
+	partition tiktok_video = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("tiktok_video.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"video_id", type text}, {"url", type text}, {"caption", type text}, {"published_date_ph", type date}, {"published_month", type date}, {"published_year", type text}, {"weekday_ph", type text}, {"weekday_num", Int64.Type}, {"hour_ph", Int64.Type}, {"time_window", type text}, {"posts_that_day", type text}, {"duration_sec", Int64.Type}, {"length_group", type text}, {"views", Int64.Type}, {"likes", Int64.Type}, {"comments", Int64.Type}, {"shares", Int64.Type}, {"saves", Int64.Type}, {"age_days", Int64.Type}, {"age_band", type text}, {"is_mature", type text}, {"is_last_30d", type text}, {"likes_per_1k", type number}, {"comments_per_1k", type number}, {"shares_per_1k", type number}, {"saves_per_1k", type number}, {"share_save_per_1k", type number}, {"neighbour_median", type number}, {"perf_index", type number}, {"index_band", type text}, {"views_gained_7d", Int64.Type}, {"gained_7d_per_1k", type number}, {"caption_type", type text}, {"asks_question", type text}, {"n_hashtags", Int64.Type}, {"hashtag_group", type text}, {"sound_type", type text}, {"song", type text}, {"artist", type text}, {"series", type text}, {"sound_uses", Int64.Type}}, "en-US")
+				in
+				    Typed

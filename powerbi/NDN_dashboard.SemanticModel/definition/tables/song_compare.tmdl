@@ -1,0 +1,54 @@
+/// song_compare
+table song_compare
+	lineageTag: f824d77a-3548-5660-b915-43ba50a8aafe
+
+	column song
+		dataType: string
+		lineageTag: fc753082-10e8-54ac-8c2c-acbdafcaf874
+		sourceColumn: song
+
+		annotation SummarizationSetBy = User
+
+	column artist
+		dataType: string
+		lineageTag: 0441e7c7-3d14-5ed5-be0a-bb15564d5377
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column youtube_views
+		dataType: double
+		formatString: #,0.00
+		lineageTag: f4637028-cf55-5a47-94b6-0cf402fa01b1
+		summarizeBy: none
+		sourceColumn: youtube_views
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_views
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 4048785c-1b98-5724-b783-a5fd1b3a7a4f
+		summarizeBy: none
+		sourceColumn: tiktok_views
+
+		annotation SummarizationSetBy = User
+
+	column instagram_likes
+		dataType: double
+		formatString: #,0.00
+		lineageTag: cd1a35bf-add1-5d82-8a51-173115d756d7
+		summarizeBy: none
+		sourceColumn: instagram_likes
+
+		annotation SummarizationSetBy = User
+
+	partition song_compare = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("song_compare.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"song", type text}, {"artist", type text}, {"youtube_views", type number}, {"tiktok_views", type number}, {"instagram_likes", type number}}, "en-US")
+				in
+				    Typed

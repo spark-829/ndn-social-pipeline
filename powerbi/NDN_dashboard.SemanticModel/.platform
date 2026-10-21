@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "NDN_dashboard"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "5ceaa74f-a3dd-582a-a5d4-ae6228d7a15b"
+  }
+}

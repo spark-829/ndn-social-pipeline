@@ -1,0 +1,316 @@
+/// One row per video on every platform, with real per-day measures (latest count / days since upload).
+table dim_video
+	lineageTag: ee1b023e-4d77-59df-983d-7b5179fa2a55
+
+	column platform
+		dataType: string
+		lineageTag: 39736728-1614-50a6-a7c4-152c28269378
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column video_id
+		dataType: string
+		lineageTag: b3e710ea-1244-59a1-bc88-6107eef2f617
+		sourceColumn: video_id
+
+		annotation SummarizationSetBy = User
+
+	column title
+		dataType: string
+		lineageTag: 9a7c4eee-f11e-5fb3-ac8e-cee9e6965b88
+		sourceColumn: title
+
+		annotation SummarizationSetBy = User
+
+	column url
+		dataType: string
+		lineageTag: a986ced0-ed75-5c9c-82ab-852edd69bcce
+		sourceColumn: url
+
+		annotation SummarizationSetBy = User
+
+	column published_ph
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		lineageTag: c26dfd9b-db34-5bee-ba0d-2e130c1deb8c
+		summarizeBy: none
+		sourceColumn: published_ph
+
+		annotation SummarizationSetBy = User
+
+	column published_date_ph
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 05e30db6-7bf5-5e53-be06-236a98a9fe34
+		summarizeBy: none
+		sourceColumn: published_date_ph
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column published_weekday_ph
+		dataType: string
+		lineageTag: 875a8c9c-8cf9-55b9-9ca6-ebea8cc0908e
+		sortByColumn: published_weekday_num
+		sourceColumn: published_weekday_ph
+
+		annotation SummarizationSetBy = User
+
+	column published_weekday_num
+		dataType: int64
+		formatString: #,0
+		lineageTag: 64edc6cf-7426-5208-a6b7-dffb95031317
+		summarizeBy: none
+		sourceColumn: published_weekday_num
+
+		annotation SummarizationSetBy = User
+
+	column published_hour_ph
+		dataType: int64
+		formatString: #,0
+		lineageTag: c06ea55b-39e7-5754-8ee7-a76479d53999
+		summarizeBy: none
+		sourceColumn: published_hour_ph
+
+		annotation SummarizationSetBy = User
+
+	column upload_slot
+		dataType: string
+		lineageTag: b7691ed3-759f-5791-b142-6c9ef5672b33
+		sourceColumn: upload_slot
+
+		annotation SummarizationSetBy = User
+
+	column duration_sec
+		dataType: int64
+		formatString: #,0
+		lineageTag: cca40c3b-b273-5c8c-93f9-ed382c0fa6d8
+		summarizeBy: none
+		sourceColumn: duration_sec
+
+		annotation SummarizationSetBy = User
+
+	column video_format
+		dataType: string
+		lineageTag: 6492b369-327f-5290-bdcd-c137dae4627e
+		sourceColumn: video_format
+
+		annotation SummarizationSetBy = User
+
+	column series
+		dataType: string
+		lineageTag: 461a3fc7-547a-5978-bae1-fd2e9eaae881
+		sourceColumn: series
+
+		annotation SummarizationSetBy = User
+
+	column song
+		dataType: string
+		lineageTag: bfe98acd-b35d-5a02-9e55-0cf6feb566af
+		sourceColumn: song
+
+		annotation SummarizationSetBy = User
+
+	column artist
+		dataType: string
+		lineageTag: 07bf2e31-31ee-52eb-9eaf-59d71cb65f43
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column latest_views
+		dataType: int64
+		formatString: #,0
+		lineageTag: 02698634-08be-5dc8-91bb-088c8bb63f89
+		summarizeBy: none
+		sourceColumn: latest_views
+
+		annotation SummarizationSetBy = User
+
+	column latest_likes
+		dataType: int64
+		formatString: #,0
+		lineageTag: df7a26ca-397c-5bb1-bd28-0182e8cb7d3d
+		summarizeBy: none
+		sourceColumn: latest_likes
+
+		annotation SummarizationSetBy = User
+
+	column latest_comments
+		dataType: int64
+		formatString: #,0
+		lineageTag: af81aaef-e40c-52a1-ae3f-54b4998deedf
+		summarizeBy: none
+		sourceColumn: latest_comments
+
+		annotation SummarizationSetBy = User
+
+	column latest_snapshot
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 84aa9b9b-b493-5df0-83b8-2f40946be1c6
+		summarizeBy: none
+		sourceColumn: latest_snapshot
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column age_days
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9e833a43-bd59-58dd-a47c-4be44f815afd
+		summarizeBy: none
+		sourceColumn: age_days
+
+		annotation SummarizationSetBy = User
+
+	column age_band
+		dataType: string
+		lineageTag: bad30ff9-c346-5c70-a7d3-6a548fbfa46e
+		sourceColumn: age_band
+
+		annotation SummarizationSetBy = User
+
+	column views_per_day
+		dataType: double
+		formatString: #,0
+		lineageTag: 45bed0f5-8d27-558d-a1f9-7b5161eee0de
+		summarizeBy: none
+		sourceColumn: views_per_day
+
+		annotation SummarizationSetBy = User
+
+	column likes_per_day
+		dataType: double
+		formatString: #,0
+		lineageTag: 25d04d92-7c64-5226-8659-0883a95f0c0d
+		summarizeBy: none
+		sourceColumn: likes_per_day
+
+		annotation SummarizationSetBy = User
+
+	column perf_per_day
+		dataType: double
+		formatString: #,0
+		lineageTag: 44d09aaa-c950-5aaa-92bb-9a2d16048327
+		summarizeBy: none
+		sourceColumn: perf_per_day
+
+		annotation SummarizationSetBy = User
+
+	column engagement_rate
+		dataType: double
+		formatString: 0.0%
+		lineageTag: 14da6c71-b6fb-5211-95bd-f9e898dd67ae
+		summarizeBy: none
+		sourceColumn: engagement_rate
+
+		annotation SummarizationSetBy = User
+
+	column vs_series_median
+		dataType: double
+		formatString: 0.0
+		lineageTag: 646a90c7-873f-5163-9ec9-fe1efe2cf59b
+		summarizeBy: none
+		sourceColumn: vs_series_median
+
+		annotation SummarizationSetBy = User
+
+	column views_gained_7d
+		dataType: double
+		formatString: #,0.00
+		lineageTag: c5371724-8941-56ac-bbe8-ba2fc4f0ba95
+		summarizeBy: none
+		sourceColumn: views_gained_7d
+
+		annotation SummarizationSetBy = User
+
+	column likes_gained_7d
+		dataType: double
+		formatString: #,0.00
+		lineageTag: ab77629a-146a-5e80-bbee-bb687d7657f7
+		summarizeBy: none
+		sourceColumn: likes_gained_7d
+
+		annotation SummarizationSetBy = User
+
+	column artist_monthly_listeners
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8a9adc07-5b78-5afa-aaea-7eb9d6b31628
+		summarizeBy: none
+		sourceColumn: artist_monthly_listeners
+
+		annotation SummarizationSetBy = User
+
+	column song_spotify_streams
+		dataType: int64
+		formatString: #,0
+		lineageTag: 37c7c034-09bd-53dd-92ab-0fdc6f069674
+		summarizeBy: none
+		sourceColumn: song_spotify_streams
+
+		annotation SummarizationSetBy = User
+
+	column ig_caption_type
+		dataType: string
+		lineageTag: bca9c978-f451-5086-a786-8e5d0ef75b0b
+		sourceColumn: ig_caption_type
+
+		annotation SummarizationSetBy = User
+
+	column ig_hashtags
+		dataType: int64
+		formatString: #,0
+		lineageTag: a16e89af-c0b9-53f9-86f0-31ca85fe1846
+		summarizeBy: none
+		sourceColumn: ig_hashtags
+
+		annotation SummarizationSetBy = User
+
+	column ig_reposts
+		dataType: int64
+		formatString: #,0
+		lineageTag: 9fd962b1-0c05-5b8c-9305-f264178e24e0
+		summarizeBy: none
+		sourceColumn: ig_reposts
+
+		annotation SummarizationSetBy = User
+
+	column reposts_per_1k_views
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 16655f8f-4ff0-5d1d-9677-372f08ff9286
+		summarizeBy: none
+		sourceColumn: reposts_per_1k_views
+
+		annotation SummarizationSetBy = User
+
+	column comments_per_1k_likes
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 165a569e-5c50-5384-9cea-45917116cc64
+		summarizeBy: none
+		sourceColumn: comments_per_1k_likes
+
+		annotation SummarizationSetBy = User
+
+	column ig_hashtag_group
+		dataType: string
+		lineageTag: c4ebf81a-07d6-560b-a259-f937ef1c698c
+		sourceColumn: ig_hashtag_group
+
+		annotation SummarizationSetBy = User
+
+	partition dim_video = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("dim_video.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"platform", type text}, {"video_id", type text}, {"title", type text}, {"url", type text}, {"published_ph", type datetime}, {"published_date_ph", type date}, {"published_weekday_ph", type text}, {"published_weekday_num", Int64.Type}, {"published_hour_ph", Int64.Type}, {"upload_slot", type text}, {"duration_sec", Int64.Type}, {"video_format", type text}, {"series", type text}, {"song", type text}, {"artist", type text}, {"latest_views", Int64.Type}, {"latest_likes", Int64.Type}, {"latest_comments", Int64.Type}, {"latest_snapshot", type date}, {"age_days", Int64.Type}, {"age_band", type text}, {"views_per_day", type number}, {"likes_per_day", type number}, {"perf_per_day", type number}, {"engagement_rate", type number}, {"vs_series_median", type number}, {"views_gained_7d", type number}, {"likes_gained_7d", type number}, {"artist_monthly_listeners", Int64.Type}, {"song_spotify_streams", Int64.Type}, {"ig_caption_type", type text}, {"ig_hashtags", Int64.Type}, {"ig_reposts", Int64.Type}, {"reposts_per_1k_views", type number}, {"comments_per_1k_likes", type number}, {"ig_hashtag_group", type text}}, "en-US")
+				in
+				    Typed

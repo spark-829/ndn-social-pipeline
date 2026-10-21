@@ -1,0 +1,77 @@
+/// Latest followers per benchmark account and platform, NDN included.
+table bench_accounts
+	lineageTag: 564abde8-4474-53b0-90d4-9dda7d971862
+
+	column account_key
+		dataType: string
+		lineageTag: 3328a192-94ba-55e5-b491-440df9bfb2bf
+		sourceColumn: account_key
+
+		annotation SummarizationSetBy = User
+
+	column account
+		dataType: string
+		lineageTag: 65aa1976-8f23-5b6b-bd97-76ea5f97e927
+		sourceColumn: account
+
+		annotation SummarizationSetBy = User
+
+	column region
+		dataType: string
+		lineageTag: 257a8713-1290-54cd-af9e-618149615b83
+		sourceColumn: region
+
+		annotation SummarizationSetBy = User
+
+	column platform
+		dataType: string
+		lineageTag: 6b2703a1-f33f-52dd-a59d-a22778d4f47b
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column followers
+		dataType: int64
+		formatString: #,0
+		lineageTag: d3105cab-43be-543e-95fb-385572a75f32
+		summarizeBy: none
+		sourceColumn: followers
+
+		annotation SummarizationSetBy = User
+
+	column total_views
+		dataType: int64
+		formatString: #,0
+		lineageTag: c8a09686-7a85-5a72-9403-ac07375def84
+		summarizeBy: none
+		sourceColumn: total_views
+
+		annotation SummarizationSetBy = User
+
+	column total_likes
+		dataType: int64
+		formatString: #,0
+		lineageTag: e35ad71a-1a66-5d4b-bac4-9161081e3c78
+		summarizeBy: none
+		sourceColumn: total_likes
+
+		annotation SummarizationSetBy = User
+
+	column posts
+		dataType: int64
+		formatString: #,0
+		lineageTag: 48a0a749-562f-5bfd-ab99-17d822ef6d77
+		summarizeBy: none
+		sourceColumn: posts
+
+		annotation SummarizationSetBy = User
+
+	partition bench_accounts = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("bench_accounts.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"account_key", type text}, {"account", type text}, {"region", type text}, {"platform", type text}, {"followers", Int64.Type}, {"total_views", Int64.Type}, {"total_likes", Int64.Type}, {"posts", Int64.Type}}, "en-US")
+				in
+				    Typed

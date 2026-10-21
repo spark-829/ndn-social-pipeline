@@ -1,0 +1,65 @@
+/// Views and likes gained per platform per day, summed over videos.
+table platform_daily
+	lineageTag: b9072e3e-00e0-54d9-a6ae-29c047423a31
+
+	column platform
+		dataType: string
+		lineageTag: 1f396c2a-18f1-522a-81e8-e4cd6a42c2c9
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 432843bb-71f4-58c9-be0f-af67a6207568
+		summarizeBy: none
+		sourceColumn: snapshot_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column data_source
+		dataType: string
+		lineageTag: 93de50ac-29ea-5a8e-b336-9e4a70c8d466
+		sourceColumn: data_source
+
+		annotation SummarizationSetBy = User
+
+	column views_gained
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 1d5a0278-65ca-58e9-a38d-ea5cee420d25
+		summarizeBy: none
+		sourceColumn: views_gained
+
+		annotation SummarizationSetBy = User
+
+	column likes_gained
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 2f135032-4840-50cb-b483-5d0a35ac59b1
+		summarizeBy: none
+		sourceColumn: likes_gained
+
+		annotation SummarizationSetBy = User
+
+	column videos
+		dataType: int64
+		formatString: #,0
+		lineageTag: d6b54678-bbf7-54b0-92a2-d6b2c1bd1b70
+		summarizeBy: none
+		sourceColumn: videos
+
+		annotation SummarizationSetBy = User
+
+	partition platform_daily = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("platform_daily.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"platform", type text}, {"snapshot_date", type date}, {"data_source", type text}, {"views_gained", type number}, {"likes_gained", type number}, {"videos", Int64.Type}}, "en-US")
+				in
+				    Typed

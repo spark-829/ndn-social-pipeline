@@ -1,0 +1,27 @@
+/// One row per benchmark account and its region; filters both benchmark tables.
+table dim_account
+	lineageTag: 0eb82ed2-7a45-58cf-ab65-04190480ed3d
+
+	column account
+		dataType: string
+		lineageTag: c5ecfefe-eaae-56b4-bce4-bd200580b366
+		sourceColumn: account
+
+		annotation SummarizationSetBy = User
+
+	column region
+		dataType: string
+		lineageTag: d18902e1-b02a-5f22-8f42-fb3c66af81f8
+		sourceColumn: region
+
+		annotation SummarizationSetBy = User
+
+	partition dim_account = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("dim_account.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"account", type text}, {"region", type text}}, "en-US")
+				in
+				    Typed

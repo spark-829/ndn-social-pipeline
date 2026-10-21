@@ -1,0 +1,16 @@
+/// Folder holding the CSVs from export_powerbi.py. Change this one value to repoint the whole model.
+expression DataFolder = "C:\Users\Spark\Desktop\Data Analyst Portfolio\NDN_Social_Pipeline\powerbi\data"
+	lineageTag: 05aa1445-9047-5fbe-abdf-5f2a9ab7e9a9
+
+/// Loads one CSV from DataFolder (UTF-8, header row).
+expression fnLoadCsv =
+		let
+		    fn = (fileName as text) as table =>
+		        let
+		            Source = Csv.Document(File.Contents(DataFolder & "\" & fileName), [Delimiter = ",", Encoding = 65001, QuoteStyle = QuoteStyle.Csv]),
+		            Promoted = Table.PromoteHeaders(Source, [PromoteAllScalars = true])
+		        in
+		            Promoted
+		in
+		    fn
+	lineageTag: adc2cd47-cebd-58a7-a45f-41a0dd5affdb

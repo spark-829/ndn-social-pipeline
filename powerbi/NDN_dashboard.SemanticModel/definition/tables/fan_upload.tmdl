@@ -1,0 +1,65 @@
+/// Artists whose sessions fans ask NDN to upload or put on streaming.
+table fan_upload
+	lineageTag: 66c26dbc-cab6-59a8-86e7-2069afe167ae
+
+	column artist
+		dataType: string
+		lineageTag: e41b2570-bfba-5af8-99a2-4c120e75c5b0
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column fans
+		dataType: int64
+		formatString: #,0
+		lineageTag: 24d58965-fd60-5ccb-a62b-76ec6261bda1
+		summarizeBy: none
+		sourceColumn: fans
+
+		annotation SummarizationSetBy = User
+
+	column asks
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6acdbce6-b4d3-545c-b734-d6e5504d10b4
+		summarizeBy: none
+		sourceColumn: asks
+
+		annotation SummarizationSetBy = User
+
+	column asks_for_streaming
+		dataType: int64
+		formatString: #,0
+		lineageTag: a4e41195-78fe-5520-8719-87556de83816
+		summarizeBy: none
+		sourceColumn: asks_for_streaming
+
+		annotation SummarizationSetBy = User
+
+	column latest_ask
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 30288cfe-6d9f-5dcb-8fa5-149a7440d6fc
+		summarizeBy: none
+		sourceColumn: latest_ask
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column top_ask
+		dataType: string
+		lineageTag: 09bb112a-03e5-50ae-84cb-bfa72245002e
+		sourceColumn: top_ask
+
+		annotation SummarizationSetBy = User
+
+	partition fan_upload = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("fan_upload.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"fans", Int64.Type}, {"asks", Int64.Type}, {"asks_for_streaming", Int64.Type}, {"latest_ask", type date}, {"top_ask", type text}}, "en-US")
+				in
+				    Typed

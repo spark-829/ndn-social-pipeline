@@ -34,3 +34,37 @@ Rules:
 - The table shows each part as a small bar so the reason is visible, not just the total.
 - Missing: fee and availability (not public). Once NDN shares ticket sales, add a "draw" part and lower Size and Momentum.
 - Check after 8 weeks: do the weights put artists NDN actually booked near the top? If not, adjust and note why here.
+
+## Built 2026-10-21 (`sql/025_invite_score.sql`, view `mart.invite_candidates`)
+- Pool = the 279 artists with a Spotify artist page (mostly NDN performers + 39 PH chart artists); only 10 are new to NDN, so the list leans to past guests. PH chart artists without a Spotify page are not scored yet.
+- Momentum uses the best Spotify PH weekly rank in the last 8 weeks only (1 chart week so far); monthly-listener growth joins after 8 weekly snapshots.
+- Local reach: Metro Manila cities + Baguio count fully, other PH cities half (Spotify top-5 cities only).
+- TikTok: the artist's own TikTok followers (91 matched accounts) and TikTok fan asks are shown beside the score, not weighted in it.
+- Power BI page "Who to invite": top 10 recommended (score + parts as data bars), the raw numbers behind them, and the cooling-down list.
+
+## New-hit rule (Vic 2026-10-22)
+The point of an invite is a live clip of the song people are streaming **now**. So, whatever the score:
+- **Gate:** recommended only if one of the artist's top 5 Spotify songs (daily streams, kworb) is **not on NDN's YouTube** and came out **after their latest NDN visit** (new artists: last 12 months; unknown release date: total ÷ daily streams < 365). Otherwise "Not now" (hit already on NDN, or no new hit since the visit). Cooldown still applies first.
+- **New weights:** new-hit hype 25 (percentile of the new hit's daily streams among artists that have one), momentum 20, local reach 15, fan demand 10, track record 10, size 10, loyalty 10.
+- First result (2026-10-22): 39 recommended; top 3 Le John ("Alanganin"), Rob Deniel ("Nandito Ako", 142k/day), DENȲ ("Alam Ko Na", 348k/day). Cup of Joe, Orange & Lemons: high scores but their hits are already on NDN.
+- Limits: kworb lists songs only for 127 of 279 artists (the rest show "No song stream data"); release dates come from the Deezer catalog (80% of songs matched).
+
+## TikTok-first plan (Vic 2026-10-22, APPROVED incl. weights + GitHub Actions push; build in a fresh session)
+Vic: rank on TikTok first, Spotify second; only real artists' songs that NDN can film (no AI/meme sounds without an artist); check how TikTok converts to YouTube views.
+
+**Evidence on conversion**
+- Own data (347 NDN songs on both platforms, real latest counts): NDN TikTok clip views vs the same song's YouTube session views, log-log r = 0.62 (slope 0.82). Median 7.1 YouTube views per TikTok view; by TikTok tier the median session gets 61k (<10k TikTok), 265k (10k-100k), 1.6M (100k-1M), 8.6M (1M+) YouTube views. Correlation, not proof: a popular song lifts both.
+- Research: TikTok's effect on chart life is stronger for YouTube and Shazam than for Spotify (2026 cross-platform study, ideas.repec.org/p/cue/wpaper/awp-06-2026.html); losing TikTok cut Spotify demand mainly for viral songs (UMG withdrawal, arXiv 2405.14999). Industry claims (TikTok/Luminate: 84% of 2024 Global 200 entries took off on TikTok first) are not independent.
+- Sources ruled out: Tokchart PH chart needs a login and its terms forbid showing the data in a dashboard; TikTok Creative Center songs list is gone (2026-10-19).
+
+**New data (free, our own extractor)**
+1. `extract_tiktok_extras.py --steps profiles`: also keep each artist account's recent videos with their sound (music id, title, author, "original" or catalog). Artists post their own songs, so this finds each song's official TikTok sound. Only catalog sounds credited to the artist count, which drops AI/meme/no-artist sounds.
+2. `sounds` step: weekly "videos using this sound" for those sounds → TikTok trend size + 4-week growth (dances and trends all show up as videos on the sound).
+3. Spotify Viral 50 Philippines (social-driven chart) via the existing Spotify extractor, weekly, as a second pool of candidates.
+Runs in GitHub Actions `weekly.yml` (TikTok blocks the home IP) → needs a push, ask Vic first.
+
+**Proposed weights (gate unchanged: the song must be new and not on NDN's YouTube)**
+TikTok 55: new song's TikTok videos 25 · its 4-week TikTok growth 15 · artist TikTok follower growth 10 · NDN TikTok track record 5.
+Spotify 30: new hit daily streams 15 · PH chart momentum 10 · local reach (Manila + Baguio) 5.
+Other 15: fan requests 10 · size 5.
+Also in that build (Vic 2026-10-22): hover help on every column (source + meaning, as field descriptions + an "i" header tooltip per visual) and plain-language column labels for non-analysts.

@@ -1,0 +1,92 @@
+/// One row per platform per day: followers and totals. data_source = real or synthetic.
+table account_daily
+	lineageTag: d7956461-0835-5877-8a15-8117cc45ddac
+
+	column platform
+		dataType: string
+		lineageTag: 10da67f0-1a7a-55b8-8a37-3b6bce040358
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column snapshot_date
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 13999728-4b4e-5d11-96e8-5987a0becbc6
+		summarizeBy: none
+		sourceColumn: snapshot_date
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column data_source
+		dataType: string
+		lineageTag: 067edb16-f6c2-5689-ae4f-7b9601245d4a
+		sourceColumn: data_source
+
+		annotation SummarizationSetBy = User
+
+	column followers
+		dataType: int64
+		formatString: #,0
+		lineageTag: 10ac0a2f-28c5-5e16-abac-f8bc318505af
+		summarizeBy: none
+		sourceColumn: followers
+
+		annotation SummarizationSetBy = User
+
+	column followers_gained
+		dataType: int64
+		formatString: #,0
+		lineageTag: 120f680e-1369-50de-8d7f-5347c5f5feb6
+		summarizeBy: none
+		sourceColumn: followers_gained
+
+		annotation SummarizationSetBy = User
+
+	column total_views
+		dataType: int64
+		formatString: #,0
+		lineageTag: d2993810-7a60-50d9-a3ea-ffea3af6caa3
+		summarizeBy: none
+		sourceColumn: total_views
+
+		annotation SummarizationSetBy = User
+
+	column views_gained
+		dataType: int64
+		formatString: #,0
+		lineageTag: 983357be-5101-5cb5-8136-2024c85488b6
+		summarizeBy: none
+		sourceColumn: views_gained
+
+		annotation SummarizationSetBy = User
+
+	column video_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5331f5bc-e6f6-5aa7-8dea-bc757078d10c
+		summarizeBy: none
+		sourceColumn: video_count
+
+		annotation SummarizationSetBy = User
+
+	column hearts
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3ddda753-b2f5-5a3e-8a77-ddb2efbcacf8
+		summarizeBy: none
+		sourceColumn: hearts
+
+		annotation SummarizationSetBy = User
+
+	partition account_daily = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("account_daily.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"platform", type text}, {"snapshot_date", type date}, {"data_source", type text}, {"followers", Int64.Type}, {"followers_gained", Int64.Type}, {"total_views", Int64.Type}, {"views_gained", Int64.Type}, {"video_count", Int64.Type}, {"hearts", Int64.Type}}, "en-US")
+				in
+				    Typed

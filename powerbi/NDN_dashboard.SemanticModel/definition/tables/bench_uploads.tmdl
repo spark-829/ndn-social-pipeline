@@ -1,0 +1,61 @@
+/// Uploads of the last 12 months (older than 14 days): count and median views today.
+table bench_uploads
+	lineageTag: 51c77d4b-d778-52d8-97c1-20880b2bf203
+
+	column account
+		dataType: string
+		lineageTag: 040b8859-3888-5d5d-9a93-d004a0c3a3da
+		sourceColumn: account
+
+		annotation SummarizationSetBy = User
+
+	column region
+		dataType: string
+		lineageTag: 7e5bf336-661d-50c0-b544-139dc910882a
+		sourceColumn: region
+
+		annotation SummarizationSetBy = User
+
+	column platform
+		dataType: string
+		lineageTag: 91f82bd9-a0ff-5342-a049-7f6eaacbcae1
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column uploads_12m
+		dataType: int64
+		formatString: #,0
+		lineageTag: 06f3c98f-beab-59a2-867d-64cb6c0ad101
+		summarizeBy: none
+		sourceColumn: uploads_12m
+
+		annotation SummarizationSetBy = User
+
+	column uploads_per_month
+		dataType: double
+		formatString: 0.0
+		lineageTag: 7c5b9e0a-1cb3-5950-9bed-ec52449a1134
+		summarizeBy: none
+		sourceColumn: uploads_per_month
+
+		annotation SummarizationSetBy = User
+
+	column median_views
+		dataType: double
+		formatString: #,0
+		lineageTag: 5b76364b-e19b-5c6b-be5c-26ee9467d940
+		summarizeBy: none
+		sourceColumn: median_views
+
+		annotation SummarizationSetBy = User
+
+	partition bench_uploads = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("bench_uploads.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"account", type text}, {"region", type text}, {"platform", type text}, {"uploads_12m", Int64.Type}, {"uploads_per_month", type number}, {"median_views", type number}}, "en-US")
+				in
+				    Typed

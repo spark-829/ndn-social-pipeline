@@ -1,0 +1,31 @@
+/// The three platforms; filters every per-platform table through relationships.
+table dim_platform
+	lineageTag: e34e5607-061c-55a1-b001-f26213f48643
+
+	column platform
+		dataType: string
+		lineageTag: 375ac006-a456-5839-943b-9dfde96ca95c
+		sortByColumn: sort_order
+		sourceColumn: platform
+
+	column sort_order
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: eb378ea0-26cb-5657-93c2-85c360d0b570
+		summarizeBy: none
+		sourceColumn: sort_order
+
+	column hex_color
+		dataType: string
+		isHidden
+		lineageTag: 75cbf16d-9a6d-576d-9ab0-94f0d6375918
+		sourceColumn: hex_color
+
+	partition dim_platform = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [platform = text, sort_order = Int64.Type, hex_color = text], {{"TikTok", 1, "#00a0d0"}, {"YouTube", 2, "#e8302a"}, {"Instagram", 3, "#d6249f"}})
+				in
+				    Source

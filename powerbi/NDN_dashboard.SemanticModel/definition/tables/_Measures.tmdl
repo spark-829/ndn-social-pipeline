@@ -1,0 +1,970 @@
+/// Holds every DAX measure; the placeholder column is hidden.
+table _Measures
+	lineageTag: a7610168-a129-5d42-9da4-679b27f1bd07
+
+	measure 'TikTok Followers Text' = FORMAT ( CALCULATE ( SUM ( scorecard[followers] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) ), "#,0" )
+		displayFolder: 1 Overview
+		lineageTag: 5758e63b-aaf5-57fb-988b-e2c04f90e682
+
+	/// Follower change over the scorecard window. YouTube rounds subscribers to 3 digits, so small changes show as none.
+	measure 'TikTok Change Text' =
+			VAR c = CALCULATE ( SUM ( scorecard[followers_change] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) )
+			VAR pct = CALCULATE ( SUM ( scorecard[followers_change_pct] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) ) / 100
+			VAR d = CALCULATE ( MAX ( scorecard[window_days] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) )
+			RETURN
+			    IF ( c = 0,
+			        "No visible change in " & d & " days",
+			        IF ( c > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( c ), "#,0" ) & " (" & FORMAT ( ABS ( pct ), "0.0%" ) & ") in " & d & " days" )
+		displayFolder: 1 Overview
+		lineageTag: c249b4b2-7de9-58f7-8b3d-c8b20a623739
+
+	measure 'TikTok Gained Text' =
+			VAR g = CALCULATE ( SUM ( scorecard[metric_gained] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) )
+			VAR m = CALCULATE ( MAX ( scorecard[metric_name] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) )
+			VAR n = CALCULATE ( SUM ( scorecard[posts_in_window] ), KEEPFILTERS ( dim_platform[platform] = "TikTok" ) )
+			RETURN "+" & IF ( ABS ( g ) >= 1000000, FORMAT ( g / 1000000, "0.0" ) & "M", IF ( ABS ( g ) >= 1000, FORMAT ( g / 1000, "0.0" ) & "K", FORMAT ( g, "#,0" ) ) ) & " " & m & " gained · " & n & " new posts"
+		displayFolder: 1 Overview
+		lineageTag: bbf94a2c-e90e-5648-8b5f-37ec10280b2f
+
+	measure 'YouTube Followers Text' = FORMAT ( CALCULATE ( SUM ( scorecard[followers] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) ), "#,0" )
+		displayFolder: 1 Overview
+		lineageTag: 5228acd5-dc39-5ff7-b75b-390bd60082fd
+
+	/// Follower change over the scorecard window. YouTube rounds subscribers to 3 digits, so small changes show as none.
+	measure 'YouTube Change Text' =
+			VAR c = CALCULATE ( SUM ( scorecard[followers_change] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+			VAR pct = CALCULATE ( SUM ( scorecard[followers_change_pct] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) ) / 100
+			VAR d = CALCULATE ( MAX ( scorecard[window_days] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+			RETURN
+			    IF ( c = 0,
+			        "No visible change in " & d & " days",
+			        IF ( c > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( c ), "#,0" ) & " (" & FORMAT ( ABS ( pct ), "0.0%" ) & ") in " & d & " days" )
+		displayFolder: 1 Overview
+		lineageTag: 08517809-75c5-50a3-a269-6a86d1e14c73
+
+	measure 'YouTube Gained Text' =
+			VAR g = CALCULATE ( SUM ( scorecard[metric_gained] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+			VAR m = CALCULATE ( MAX ( scorecard[metric_name] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+			VAR n = CALCULATE ( SUM ( scorecard[posts_in_window] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+			RETURN "+" & IF ( ABS ( g ) >= 1000000, FORMAT ( g / 1000000, "0.0" ) & "M", IF ( ABS ( g ) >= 1000, FORMAT ( g / 1000, "0.0" ) & "K", FORMAT ( g, "#,0" ) ) ) & " " & m & " gained · " & n & " new posts"
+		displayFolder: 1 Overview
+		lineageTag: f7807a9e-f679-5c9c-a275-25a1d2936de8
+
+	measure 'Instagram Followers Text' = FORMAT ( CALCULATE ( SUM ( scorecard[followers] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) ), "#,0" )
+		displayFolder: 1 Overview
+		lineageTag: b3b01978-3ffc-54de-a653-187c1bcc7ff4
+
+	/// Follower change over the scorecard window. YouTube rounds subscribers to 3 digits, so small changes show as none.
+	measure 'Instagram Change Text' =
+			VAR c = CALCULATE ( SUM ( scorecard[followers_change] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+			VAR pct = CALCULATE ( SUM ( scorecard[followers_change_pct] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) ) / 100
+			VAR d = CALCULATE ( MAX ( scorecard[window_days] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+			RETURN
+			    IF ( c = 0,
+			        "No visible change in " & d & " days",
+			        IF ( c > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( c ), "#,0" ) & " (" & FORMAT ( ABS ( pct ), "0.0%" ) & ") in " & d & " days" )
+		displayFolder: 1 Overview
+		lineageTag: d91cad90-cb88-55e2-b585-510838f23e71
+
+	measure 'Instagram Gained Text' =
+			VAR g = CALCULATE ( SUM ( scorecard[metric_gained] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+			VAR m = CALCULATE ( MAX ( scorecard[metric_name] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+			VAR n = CALCULATE ( SUM ( scorecard[posts_in_window] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+			RETURN "+" & IF ( ABS ( g ) >= 1000000, FORMAT ( g / 1000000, "0.0" ) & "M", IF ( ABS ( g ) >= 1000, FORMAT ( g / 1000, "0.0" ) & "K", FORMAT ( g, "#,0" ) ) ) & " " & m & " gained · " & n & " new posts"
+		displayFolder: 1 Overview
+		lineageTag: b4458f9a-db97-5043-b287-6da90b626d68
+
+	/// Followers vs the first real snapshot in the selected dates, per platform, so the three sizes share one axis.
+	measure 'Follower Growth %' =
+			VAR cur = CALCULATE ( SUM ( account_daily[followers] ), KEEPFILTERS ( account_daily[data_source] = "real" ) )
+			VAR firstDay = CALCULATE ( MIN ( account_daily[snapshot_date] ), ALLSELECTED ( account_daily[snapshot_date] ), account_daily[data_source] = "real" )
+			VAR base = CALCULATE ( SUM ( account_daily[followers] ), account_daily[snapshot_date] = firstDay, account_daily[data_source] = "real" )
+			RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( cur, base ) - 1 )
+		formatString: 0.0%
+		displayFolder: 1 Overview
+		lineageTag: 868965ad-42b3-5cd7-8b02-a390cb1abbca
+
+	measure 'Total Followers Text' = FORMAT ( SUM ( scorecard[followers] ), "#,0" ) & " followers on TikTok, YouTube and Instagram"
+		displayFolder: 1 Overview
+		lineageTag: e578547a-3c7e-5008-803d-f51666331793
+
+	measure 'As Of Text' = "Data as of " & FORMAT ( MAX ( scorecard[as_of] ), "d mmm yyyy" ) & " · daily snapshots at 9 am PH"
+		displayFolder: 1 Overview
+		lineageTag: 377864e2-4ba4-541c-8829-43c26a9cfa61
+
+	measure 'Insight Headline' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "summary_headline" )
+		displayFolder: 1 Overview
+		lineageTag: 6c0b5679-a92f-59af-89b6-727d2d0662c2
+
+	measure 'Insight Action 1' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "action_1" )
+		displayFolder: 1 Overview
+		lineageTag: ab735b44-90a9-5bcc-9be5-fb8ef965c0e5
+
+	measure 'Insight Action 2' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "action_2" )
+		displayFolder: 1 Overview
+		lineageTag: c3ff94fb-3b04-5263-9717-d7a95a2e091f
+
+	measure 'Insight Action 3' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "action_3" )
+		displayFolder: 1 Overview
+		lineageTag: 4d13d9b6-b35c-59f7-b3a9-3a848861570e
+
+	measure 'Insight Audience' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "audience_headline" )
+		displayFolder: 1 Overview
+		lineageTag: 6ec47282-2c35-5c47-b9a1-9738578a5e4e
+
+	measure 'Insight Sessions' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "sessions_headline" )
+		displayFolder: 1 Overview
+		lineageTag: 943f7f53-581a-5fdc-b2ee-b9d130e1049b
+
+	measure 'Insight Uploads' = CALCULATE ( MAX ( insights[sentence] ), insights[slot] = "upload_headline" )
+		displayFolder: 1 Overview
+		lineageTag: 4c9ca2e5-b391-5aa2-adf2-65ca03aeac9b
+
+	measure 'Insights Note' = "Written " & FORMAT ( MAX ( insights[as_of] ), "d mmm yyyy" ) & " at 3 pm PH by a Claude routine, from that day's numbers only"
+		displayFolder: 1 Overview
+		lineageTag: 1f48c9af-c587-551e-ae2f-1e4bc94719c4
+
+	measure 'Best Post Gained' = SUM ( scorecard[best_post_gained] )
+		formatString: #,0
+		displayFolder: 1 Overview
+		lineageTag: 1c261f0f-261a-5db2-bec1-2a0256d69e7a
+
+	measure 'TikTok videos' = COUNTROWS ( tiktok_video )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: 56a74a96-860f-53d2-ad49-8550b301508d
+
+	measure 'Median views per TikTok' = MEDIAN ( tiktok_video[views] )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: e5957b99-7671-5985-bc4b-423d41b19051
+
+	/// Median performance index: views / median views of the 30 NDN TikToks posted around it. 1.00 = typical.
+	measure 'Median Index' = MEDIAN ( tiktok_video[perf_index] )
+		formatString: 0.00
+		displayFolder: 2 TikTok
+		lineageTag: 2e58ae3c-b1ee-53f4-98eb-6a076161349d
+
+	/// Share of TikToks with at least twice the views of the typical post around them.
+	measure 'Breakouts, all time' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( tiktok_video[perf_index] >= 2 ) ),
+			    CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( NOT ISBLANK ( tiktok_video[perf_index] ) ) ) )
+		formatString: 0%
+		displayFolder: 2 TikTok
+		lineageTag: 3958cecf-0dfd-5bb1-9d48-56724d969c93
+
+	measure 'Breakouts, last 30 days' = CALCULATE ( [Breakouts, all time], KEEPFILTERS ( tiktok_video[is_last_30d] = "yes" ) )
+		formatString: 0%
+		displayFolder: 2 TikTok
+		lineageTag: 32485aa8-45dd-5a4b-9e89-3482a84c7f09
+
+	measure 'TikTok Views 30d' = CALCULATE ( SUM ( tiktok_video[views] ), KEEPFILTERS ( tiktok_video[is_last_30d] = "yes" ) )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: 78a0ac01-ca5b-5397-815c-303d35b54ead
+
+	measure 'TikTok Index 30d' = CALCULATE ( MAX ( tiktok_video[perf_index] ), KEEPFILTERS ( tiktok_video[is_last_30d] = "yes" ) )
+		formatString: 0.00
+		displayFolder: 2 TikTok
+		lineageTag: 65e0383f-d04a-50af-a835-93f3668194fe
+
+	measure 'YouTube videos' = CALCULATE ( COUNTROWS ( dim_video ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: a48bee7b-ff70-5d8d-9eb4-dfe8c58723ae
+
+	/// Median of latest views / days since upload.
+	measure 'YouTube Median Views/Day' = CALCULATE ( MEDIAN ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: a3f72124-138b-5161-bc68-7d420769df88
+
+	measure 'Median views/day, full sessions' = CALCULATE ( MEDIAN ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[video_format] = "Full video" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 7b1c1160-8746-526c-ae54-95c86662fd99
+
+	measure 'Median views/day, Shorts' = CALCULATE ( MEDIAN ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[video_format] = "Short (<=60 s)" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 696f0c1a-f1d3-5c87-918a-aad654a819e0
+
+	measure 'YouTube views gained, last 7 days' = CALCULATE ( SUM ( scorecard[metric_gained] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 4c90eb6e-becc-522e-bc17-979e9770b406
+
+	measure 'YouTube Views Gained Real' = CALCULATE ( SUM ( platform_daily[views_gained] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( platform_daily[data_source] = "real" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 07986726-ef82-580e-8c88-99f060e4503f
+
+	measure 'YouTube Views/Day 90d' = CALCULATE ( SUM ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[age_days] <= 90 ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: b521e881-40ce-59d3-84a1-67244e2e6877
+
+	measure 'YouTube vs Series 90d' = CALCULATE ( MAX ( dim_video[vs_series_median] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[age_days] <= 90 ) )
+		formatString: 0.0
+		displayFolder: 3 YouTube
+		lineageTag: 2a03ac35-b77b-5efc-ba6c-7df58838f7d1
+
+	measure 'YouTube Artist Views/Day' = CALCULATE ( SUM ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: f837817c-d8a7-5a9e-904d-17d24484e72f
+
+	measure 'YouTube Artist Views/Day Top 10' =
+			VAR r = RANKX ( FILTER ( ALLSELECTED ( dim_video[artist] ), NOT ISBLANK ( dim_video[artist] ) ), [YouTube Artist Views/Day] )
+			RETURN IF ( NOT ISBLANK ( SELECTEDVALUE ( dim_video[artist] ) ) && r <= 10, [YouTube Artist Views/Day] )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 06ca905a-40ff-52b5-9579-2cd69dbef3b8
+
+	measure 'Instagram posts' = CALCULATE ( COUNTROWS ( dim_video ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: d8e5aa69-8b9a-5e74-9509-21250f086bf7
+
+	measure 'Median likes/day, all posts' = CALCULATE ( MEDIAN ( dim_video[likes_per_day] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: 0c7e624e-1619-5195-8fad-171c499eeabd
+
+	measure 'Median views/day, Reels' = CALCULATE ( MEDIAN ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( dim_video[video_format] = "Instagram Reel" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: 05c7c71a-af3e-528a-a8de-3f635af66da4
+
+	measure 'Instagram likes gained, last 6 days' = CALCULATE ( SUM ( scorecard[metric_gained] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: fbdcf2bd-6f5b-59d9-a205-cfb0107a9827
+
+	measure 'Instagram Likes Gained Real' = CALCULATE ( SUM ( platform_daily[likes_gained] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( platform_daily[data_source] = "real" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: ccf63bc2-de89-522f-9f15-f1f8cf45cd15
+
+	measure 'Instagram Likes/Day 90d' = CALCULATE ( SUM ( dim_video[likes_per_day] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( dim_video[age_days] <= 90 ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: 2c188233-0ba7-5588-aee4-e113539c4c68
+
+	measure 'Instagram Views/Day 90d' = CALCULATE ( SUM ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( dim_video[age_days] <= 90 ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: b896648b-a2f4-5a06-aad3-2d030c1a6fd7
+
+	measure 'Breakout share' =
+			DIVIDE (
+			    CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( tiktok_video[perf_index] >= 2 ) ),
+			    CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( NOT ISBLANK ( tiktok_video[perf_index] ) ) ) )
+		formatString: 0%
+		displayFolder: 2 TikTok
+		lineageTag: 8d0c4195-a00c-56dd-9667-c91f962b1c51
+
+	measure 'Median shares+saves per 1k' = MEDIAN ( tiktok_video[share_save_per_1k] )
+		formatString: 0.0
+		displayFolder: 2 TikTok
+		lineageTag: 281f718d-fff6-58d1-a0ea-be367d89dfd7
+
+	measure 'Median comments per 1k' = MEDIAN ( tiktok_video[comments_per_1k] )
+		formatString: 0.0
+		displayFolder: 2 TikTok
+		lineageTag: a1cdb797-24a7-5c64-a6d1-797b2be49e7f
+
+	measure 'Median 7-day views gained' = MEDIAN ( tiktok_video[views_gained_7d] )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: b9326dfd-f879-5a25-b82a-06c1ed79a36a
+
+	/// Views gained in the last 7 days per 1,000 views so far, videos older than 30 days.
+	measure 'Median 7-day gain per 1k, older posts' = CALCULATE ( MEDIAN ( tiktok_video[gained_7d_per_1k] ), KEEPFILTERS ( tiktok_video[age_days] > 30 ) )
+		formatString: 0.00
+		displayFolder: 2 TikTok
+		lineageTag: 794edbaa-6457-5af8-a9fa-537bf25a0c68
+
+	/// Videos by anyone on TikTok that use the sound of an NDN post (sound page count, latest week).
+	measure 'Videos made with NDN sounds' = SUM ( tiktok_video[sound_uses] )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: d83e3f42-5dc9-54fb-98eb-49b613d32199
+
+	measure 'Shares+saves per 1k' = MAX ( tiktok_video[share_save_per_1k] )
+		formatString: 0.0
+		displayFolder: 2 TikTok
+		lineageTag: 42bee670-a7b7-51c4-8ef0-fe9cef97c4f2
+
+	measure 'Sound uses' = SUM ( tiktok_video[sound_uses] )
+		formatString: #,0
+		displayFolder: 2 TikTok
+		lineageTag: ea4c81c8-8218-51cb-8f54-10919de4b7e8
+
+	measure 'TikTok Artist Index Top 10' =
+			VAR r = RANKX ( FILTER ( ALLSELECTED ( tiktok_video[artist] ),
+			            NOT ISBLANK ( tiktok_video[artist] ) && CALCULATE ( COUNTROWS ( tiktok_video ) ) >= 3 ), [Median Index] )
+			RETURN IF ( NOT ISBLANK ( SELECTEDVALUE ( tiktok_video[artist] ) ) && COUNTROWS ( tiktok_video ) >= 3 && r <= 10, [Median Index] )
+		formatString: 0.00
+		displayFolder: 2 TikTok
+		lineageTag: bc959bf6-66d7-57f5-9011-d97f6fe28cf8
+
+	/// Median (likes + comments) / views.
+	measure 'YouTube engagement rate' = CALCULATE ( MEDIAN ( dim_video[engagement_rate] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: 0.00%
+		displayFolder: 3 YouTube
+		lineageTag: 2f6f5c82-5df0-52c7-9e19-032480c4611c
+
+	measure 'YouTube median 7-day gain' = CALCULATE ( MEDIAN ( dim_video[views_gained_7d] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 2e86140d-1134-5629-9624-450e59532bd6
+
+	measure 'YouTube 7-day gain, older sessions' = CALCULATE ( SUM ( dim_video[views_gained_7d] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[age_days] >= 365 ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: d952893f-6f38-5d8a-80be-3259de3586ca
+
+	measure 'YouTube views per day' = CALCULATE ( SUM ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[video_format] = "Full video" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 13825b0f-a9a2-54c9-bb61-0d2d111d877d
+
+	measure 'YouTube artist listeners' = CALCULATE ( MAX ( dim_video[artist_monthly_listeners] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[video_format] = "Full video" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 0541a73c-d938-5260-9d7c-db98f97a98de
+
+	measure 'YouTube song Spotify streams' = CALCULATE ( MAX ( dim_video[song_spotify_streams] ), KEEPFILTERS ( dim_platform[platform] = "YouTube" ), KEEPFILTERS ( dim_video[video_format] = "Full video" ) )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: 9a764730-80eb-52d8-93fd-83c3e2c41c46
+
+	measure 'Sessions' = COUNTROWS ( yt_heatmap )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: c3458f24-568a-5e9c-b585-b44d7f1b5af8
+
+	measure 'Searches' = COUNTROWS ( yt_search )
+		formatString: #,0
+		displayFolder: 3 YouTube
+		lineageTag: fc1726c5-2867-5a6b-8944-7524c1820bb1
+
+	measure 'Reel views per day' = CALCULATE ( SUM ( dim_video[views_per_day] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( dim_video[video_format] = "Instagram Reel" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: a81676c0-8fde-5472-a706-eed4c671cf94
+
+	measure 'Reel artist listeners' = CALCULATE ( MAX ( dim_video[artist_monthly_listeners] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ), KEEPFILTERS ( dim_video[video_format] = "Instagram Reel" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: dfbf00be-2cd0-5899-bd45-9a2c83c47ff3
+
+	measure 'Median reposts per 1k views' = CALCULATE ( MEDIAN ( dim_video[reposts_per_1k_views] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: 0.00
+		displayFolder: 4 Instagram
+		lineageTag: 63d57f1a-1dd9-5782-abae-00baa5af9b05
+
+	measure 'Median comments per 1k likes' = CALCULATE ( MEDIAN ( dim_video[comments_per_1k_likes] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: 0.0
+		displayFolder: 4 Instagram
+		lineageTag: f4f7ede2-7666-5841-b6ef-1a153d44894f
+
+	measure 'Instagram median 7-day likes gained' = CALCULATE ( MEDIAN ( dim_video[likes_gained_7d] ), KEEPFILTERS ( dim_platform[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: d48dd19a-8b12-5a11-b524-f0d91b80e07b
+
+	measure 'Song YouTube views' = SUM ( song_compare[youtube_views] )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: 11fce13e-2f7a-5cfe-bf98-4ac22a1e1fa8
+
+	measure 'Song Instagram likes' = SUM ( song_compare[instagram_likes] )
+		formatString: #,0
+		displayFolder: 4 Instagram
+		lineageTag: 8a59f4b1-dffc-50cb-90ec-2ac5968f9f29
+
+	measure 'Followers TikTok' = CALCULATE ( SUM ( bench_accounts[followers] ), KEEPFILTERS ( bench_accounts[platform] = "TikTok" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: 03d49f39-c8e6-57e1-8393-c5b3c7e1563e
+
+	measure 'Median Views TikTok' = CALCULATE ( SUM ( bench_uploads[median_views] ), KEEPFILTERS ( bench_uploads[platform] = "TikTok" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: 7d654936-66ae-5267-88ec-18f97c97c60c
+
+	measure 'Uploads/Month TikTok' = CALCULATE ( SUM ( bench_uploads[uploads_per_month] ), KEEPFILTERS ( bench_uploads[platform] = "TikTok" ) )
+		formatString: 0.0
+		displayFolder: 5 Benchmarks
+		lineageTag: 9bbeabc7-09f3-5962-a456-bc6df5c59828
+
+	measure 'Followers YouTube' = CALCULATE ( SUM ( bench_accounts[followers] ), KEEPFILTERS ( bench_accounts[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: 99f42363-983f-5117-80ca-a52a6efd4f78
+
+	measure 'Median Views YouTube' = CALCULATE ( SUM ( bench_uploads[median_views] ), KEEPFILTERS ( bench_uploads[platform] = "YouTube" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: e1780295-9882-5012-99f0-966555ac1a59
+
+	measure 'Uploads/Month YouTube' = CALCULATE ( SUM ( bench_uploads[uploads_per_month] ), KEEPFILTERS ( bench_uploads[platform] = "YouTube" ) )
+		formatString: 0.0
+		displayFolder: 5 Benchmarks
+		lineageTag: 10cce693-3cc8-5993-876a-8192e26385b2
+
+	measure 'Followers Instagram' = CALCULATE ( SUM ( bench_accounts[followers] ), KEEPFILTERS ( bench_accounts[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: 67c8eba3-dd2a-54e5-b0d1-39575eb793dd
+
+	measure 'Median Views Instagram' = CALCULATE ( SUM ( bench_uploads[median_views] ), KEEPFILTERS ( bench_uploads[platform] = "Instagram" ) )
+		formatString: #,0
+		displayFolder: 5 Benchmarks
+		lineageTag: a6c9036e-f863-50c2-9fb2-062283afdd73
+
+	measure 'Uploads/Month Instagram' = CALCULATE ( SUM ( bench_uploads[uploads_per_month] ), KEEPFILTERS ( bench_uploads[platform] = "Instagram" ) )
+		formatString: 0.0
+		displayFolder: 5 Benchmarks
+		lineageTag: 25714f41-5526-5c41-86fa-e69a18a9fc5b
+
+	measure 'Is NDN Account' = IF ( SELECTEDVALUE ( bench_accounts[region] ) = "ndn", 1, 0 )
+		formatString: 0
+		displayFolder: 5 Benchmarks
+		lineageTag: edd0c5b3-b828-5936-8924-f16c66036502
+
+	measure 'Is NDN Uploads' = IF ( SELECTEDVALUE ( bench_uploads[region] ) = "ndn", 1, 0 )
+		formatString: 0
+		displayFolder: 5 Benchmarks
+		lineageTag: 64706dec-7a89-5400-9e9f-4f76b75cf9c0
+
+	measure 'Artists fans ask for' = COUNTROWS ( fan_demand )
+		formatString: #,0
+		displayFolder: 7 Community
+		lineageTag: dac52ffc-e5c1-5f26-b03f-f53f59c2b60d
+
+	measure 'Never on NDN' = CALCULATE ( COUNTROWS ( fan_demand ), KEEPFILTERS ( fan_demand[status] = "Never on NDN" ) )
+		formatString: #,0
+		displayFolder: 7 Community
+		lineageTag: b646fbfe-b6db-5e3c-a83c-a47242bdb84b
+
+	measure 'Artists with upload requests' = COUNTROWS ( fan_upload )
+		formatString: #,0
+		displayFolder: 7 Community
+		lineageTag: 7b373b8a-f5ec-5b36-9a63-aea4dc1ccfa4
+
+	measure 'Fans Asking' = SUM ( fan_demand[fans] )
+		formatString: #,0
+		displayFolder: 7 Community
+		lineageTag: 2ca9818f-3d01-5446-9a13-974e320c73de
+
+	measure 'Fans Asking Top 15' =
+			VAR r = RANKX ( ALLSELECTED ( fan_demand[artist] ), [Fans Asking] )
+			RETURN IF ( r <= 15, [Fans Asking] )
+		formatString: #,0
+		displayFolder: 7 Community
+		lineageTag: 043b5d02-961c-59cb-9090-be4a6c60a4d2
+
+	measure 'Is Never Played' = IF ( SELECTEDVALUE ( fan_demand[status] ) = "Never on NDN", 1, 0 )
+		formatString: 0
+		displayFolder: 7 Community
+		lineageTag: fee0a3ec-995a-59f2-852f-0ee69b50185c
+
+	measure 'Inv Score Raw' = CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Recommend" ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: e1c30327-246f-5fa8-8b78-311d324a7628
+
+	measure 'Inv Rank Raw' =
+			IF ( NOT ISBLANK ( [Inv Score Raw] ),
+			    RANKX ( FILTER ( ALLSELECTED ( invite[artist] ), NOT ISBLANK ( [Inv Score Raw] ) ), [Inv Score Raw] ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 3dfe5316-f508-5a45-a244-515a1c81fcca
+
+	measure 'Inv Rank' = IF ( [Inv Rank Raw] <= 10, [Inv Rank Raw] )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: ce00720e-7cd9-556b-84ee-b2270d637496
+
+	measure 'Inv score' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 4865c1f5-c92c-51ea-a131-47a4be535258
+
+	measure 'Inv new_hit_hype' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: d2f304fe-3fb3-5023-982f-9f482a98d184
+
+	measure 'Inv new_hit_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 74ae8e42-b9d0-584a-adb2-ad18fadfccf3
+
+	measure 'Inv new_hit_released' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: daa41d8c-49bf-5a67-80c5-210ab3481589
+
+	measure 'Inv top_song_daily_streams' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 0dba82e3-7a33-5ca2-b7f2-98f31d42e9f9
+
+	measure 'Inv momentum' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: fcedae20-2ef8-5708-9f7c-0b34c8cbb155
+
+	measure 'Inv local_reach' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[local_reach] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 1d8a921d-e1f4-56d5-ac03-bf2b6182190d
+
+	measure 'Inv fan_demand' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[fan_demand] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: a1bebcee-82b3-512c-830e-e2b13b545ef3
+
+	measure 'Inv track_record' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: aa2872f0-39bb-5d11-939f-90941436daf4
+
+	measure 'Inv size' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 2eed0536-46ac-5271-a2e4-d6f89e7ef4df
+
+	measure 'Inv loyalty' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 8ec800bc-ea34-5a90-889b-eea50533ab5c
+
+	measure 'Inv monthly_listeners' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 81c8aab4-6658-586c-a3c4-44cd68666f29
+
+	measure 'Inv spotify_followers' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_followers] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: d9f887a9-216d-5067-95fe-a9de378c0348
+
+	measure 'Inv manila_baguio_listeners' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[manila_baguio_listeners] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 0718536f-7e08-5e5e-bad5-a31bb02d872f
+
+	measure 'Inv best_chart_rank' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MIN ( invite[best_chart_rank] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 14730ee1-883e-5b0f-8b01-4c560c0fd86e
+
+	measure 'Inv weeks_on_chart' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[weeks_on_chart] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: a86c9ab9-ed38-50b7-9e12-354d41e6e680
+
+	measure 'Inv tiktok_followers' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_followers] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 70ddc59d-af59-5bd4-bff9-627577395e61
+
+	measure 'Inv tiktok_asks' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 53cbd9cc-6c4d-522a-8950-b744d21b514c
+
+	measure 'Inv fans_asking' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[fans_asking] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 1454fc98-d226-556d-a3b1-d7327046f8e7
+
+	measure 'Inv ndn_youtube_videos' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_youtube_videos] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 5c34e856-ad93-53f2-b2db-cc41cc7e1d8d
+
+	measure 'Inv ndn_tiktok_clips' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_tiktok_clips] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 4207ca82-5d46-5abc-8f54-c22986505314
+
+	measure 'Inv last_ndn_post' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[last_ndn_post] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: a3536090-aa06-5a78-a7ba-3b5f29c7c542
+
+	measure 'Inv cooldown_until' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( MAX ( invite[cooldown_until] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 8c381067-428e-59ac-a1c4-980c5ca80962
+
+	measure 'Inv ndn_history' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[ndn_history] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: ffaf36d9-863b-5868-b222-a3d17a5e8696
+
+	measure 'Inv new_hit' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: f7aaf9b3-ebb9-517d-a2c6-c60687de5612
+
+	measure 'Inv top_song' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: d1043333-311d-530e-b769-d9ce3b74ac13
+
+	measure 'Inv top_song_on_ndn' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song_on_ndn] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 63ff9032-041e-54cb-a6c0-a15fd8911e95
+
+	measure 'Inv hit_status' = IF ( [Inv Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Recommend" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 961861ed-c435-56ce-a896-e77ec53ef767
+
+	measure 'Not Score Raw' = CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Not now" ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: e52617a9-68e4-50ad-a948-5516ced11667
+
+	measure 'Not Rank Raw' =
+			IF ( NOT ISBLANK ( [Not Score Raw] ),
+			    RANKX ( FILTER ( ALLSELECTED ( invite[artist] ), NOT ISBLANK ( [Not Score Raw] ) ), [Not Score Raw] ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 96ac0b38-6714-5d45-a3ed-b3013a1c483c
+
+	measure 'Not Rank' = IF ( [Not Rank Raw] <= 10, [Not Rank Raw] )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: b34034d9-9ea5-532a-a3e9-53484ca523d2
+
+	measure 'Not score' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 15260a33-ec6f-5419-b87e-b6f8368d47f0
+
+	measure 'Not new_hit_hype' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 0e6ec647-b20c-5156-bd51-215bf1976203
+
+	measure 'Not new_hit_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 20945601-7e18-5ec1-9881-485abbda6f5b
+
+	measure 'Not new_hit_released' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: e9af1c89-0c41-5f43-89c7-8de9a3bef37e
+
+	measure 'Not top_song_daily_streams' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 67b12951-c4e7-5c2b-97d1-67282827973f
+
+	measure 'Not momentum' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 67cc7e76-03a4-5cc4-9771-cfe95e15b0a4
+
+	measure 'Not local_reach' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[local_reach] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 7fa5aa30-cbaf-5732-bc43-a9fafd2a45df
+
+	measure 'Not fan_demand' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[fan_demand] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 3e08eeea-a6ed-511d-9a6b-ad0d43bc522c
+
+	measure 'Not track_record' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: c7f65220-ac68-5098-ba77-d148e3360e83
+
+	measure 'Not size' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 8b127915-97c8-53d2-9771-cbdcc67ad955
+
+	measure 'Not loyalty' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 5bfc2dec-971e-53d8-9e62-efb734fb3ce5
+
+	measure 'Not monthly_listeners' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: c12aed7c-f6c1-53da-995c-063e74affd28
+
+	measure 'Not spotify_followers' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_followers] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 8cc814fe-30f5-5d46-bc8c-9dd5df2f551c
+
+	measure 'Not manila_baguio_listeners' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[manila_baguio_listeners] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: d5a62cc4-caca-5092-966f-a8d9c284d09a
+
+	measure 'Not best_chart_rank' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MIN ( invite[best_chart_rank] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 9bf2f142-e404-5511-9c0e-72f5411a8f60
+
+	measure 'Not weeks_on_chart' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[weeks_on_chart] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: d3bdfc8b-690d-5778-a50d-c9f81d0b87ae
+
+	measure 'Not tiktok_followers' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_followers] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 418edaf8-951d-5300-8fc4-c5c920a809f6
+
+	measure 'Not tiktok_asks' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 074e304e-8f34-524e-8199-ab2b697bba62
+
+	measure 'Not fans_asking' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[fans_asking] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 4b931d76-26e0-5853-9e37-7e9b0e628ce4
+
+	measure 'Not ndn_youtube_videos' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_youtube_videos] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: f1e30223-2011-530c-896b-d200f11c5dbc
+
+	measure 'Not ndn_tiktok_clips' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_tiktok_clips] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 3cd1e58f-e692-5386-8162-0d1aa96b6ec5
+
+	measure 'Not last_ndn_post' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[last_ndn_post] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 39774d81-1430-5724-b7e5-2be6c11fe964
+
+	measure 'Not cooldown_until' = IF ( [Not Rank Raw] <= 10, CALCULATE ( MAX ( invite[cooldown_until] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 35310678-dc28-57b0-ad0d-045267124b95
+
+	measure 'Not ndn_history' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[ndn_history] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 99acd904-f418-5b52-918f-f762ccdb80f3
+
+	measure 'Not new_hit' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: a938bf4c-431d-5c49-b9ec-4f37c9241ad4
+
+	measure 'Not top_song' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 3a8d20bb-c10b-53f8-b476-6f17e9930ec7
+
+	measure 'Not top_song_on_ndn' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song_on_ndn] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 68f022b0-ed81-50dd-a57f-254ad97a28fb
+
+	measure 'Not hit_status' = IF ( [Not Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Not now" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 10ef02aa-0fb1-5a04-9684-d18ca9a6265d
+
+	measure 'Cool Score Raw' = CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Cooling down" ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: e1bf5a4b-e637-5cc5-9165-1d55d3abcd16
+
+	measure 'Cool Rank Raw' =
+			IF ( NOT ISBLANK ( [Cool Score Raw] ),
+			    RANKX ( FILTER ( ALLSELECTED ( invite[artist] ), NOT ISBLANK ( [Cool Score Raw] ) ), [Cool Score Raw] ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: d7230a24-01c4-57d8-aa5f-2dc03705f0a9
+
+	measure 'Cool Rank' = IF ( [Cool Rank Raw] <= 10, [Cool Rank Raw] )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 360c36a5-880d-5e19-9d30-af73a5966969
+
+	measure 'Cool score' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[score] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0.0
+		displayFolder: 2 Invite
+		lineageTag: 2abb3c19-31f2-5a49-868e-85607d27c298
+
+	measure 'Cool new_hit_hype' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_hype] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 20088741-d138-5f8c-98fd-da88b0279716
+
+	measure 'Cool new_hit_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[new_hit_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 9a083ee9-f282-5eb8-9a36-fb11513237ec
+
+	measure 'Cool new_hit_released' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[new_hit_released] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 48168cbe-880e-5a8d-8ac4-96a79b863c9d
+
+	measure 'Cool top_song_daily_streams' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[top_song_daily_streams] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 7c69b936-f705-526f-8726-3471cfaf2e67
+
+	measure 'Cool momentum' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[momentum] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 6a4752b1-1414-58bc-9c53-c50b62f9cfe1
+
+	measure 'Cool local_reach' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[local_reach] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 1ddd5992-81d1-53b8-a28a-986f1e3a739f
+
+	measure 'Cool fan_demand' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[fan_demand] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 479981ba-02dc-55ec-8711-264acd0a026a
+
+	measure 'Cool track_record' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[track_record] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: afe3ef06-6402-5cb9-96bf-5223a55a1708
+
+	measure 'Cool size' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[size] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: da00c6fe-35ae-5b76-bf73-8615ff8355e9
+
+	measure 'Cool loyalty' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[loyalty] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: d93ecc2f-7df1-52f3-8d6f-82eda475dd70
+
+	measure 'Cool monthly_listeners' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[monthly_listeners] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 0dcb7cfd-f26e-50c1-8aac-54aa9a84f7f8
+
+	measure 'Cool spotify_followers' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[spotify_followers] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: fc10ee15-97c1-578e-9cc8-d37016cb3a53
+
+	measure 'Cool manila_baguio_listeners' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[manila_baguio_listeners] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: bcd113d8-7b64-525d-b47d-d5e1b4d7cb30
+
+	measure 'Cool best_chart_rank' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MIN ( invite[best_chart_rank] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: 9188147f-62d6-5435-bbde-8e1a42c03d98
+
+	measure 'Cool weeks_on_chart' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[weeks_on_chart] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: 0
+		displayFolder: 2 Invite
+		lineageTag: ed67798b-78c3-5260-99d5-cb0dfa384455
+
+	measure 'Cool tiktok_followers' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_followers] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 960ed969-c0f7-5743-ab97-3a52baac882e
+
+	measure 'Cool tiktok_asks' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[tiktok_asks] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: bcd81707-ebf2-5230-ba7d-8f440e451e9f
+
+	measure 'Cool fans_asking' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[fans_asking] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 8e45e426-90b2-5a14-8f8c-53ef23439047
+
+	measure 'Cool ndn_youtube_videos' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_youtube_videos] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 3025be14-2b59-5d35-b031-37d5d8823da2
+
+	measure 'Cool ndn_tiktok_clips' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SUM ( invite[ndn_tiktok_clips] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: b7d6d0f9-7ef2-50f2-9a84-18ee7e577334
+
+	measure 'Cool last_ndn_post' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[last_ndn_post] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: 29d9a512-6982-5000-9d22-7b260cd62d5e
+
+	measure 'Cool cooldown_until' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( MAX ( invite[cooldown_until] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		formatString: yyyy-mm-dd
+		displayFolder: 2 Invite
+		lineageTag: b540ade7-2867-5177-8786-3040be2a68f2
+
+	measure 'Cool ndn_history' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[ndn_history] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: ad14cea6-1062-56b3-9329-f158a25bdeb6
+
+	measure 'Cool new_hit' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[new_hit] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 99de7939-be26-566b-bfcf-a22df9430bfa
+
+	measure 'Cool top_song' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 0371766f-bf11-59c0-a56e-268c6e40ebfe
+
+	measure 'Cool top_song_on_ndn' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[top_song_on_ndn] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 797d3418-4721-5d31-8bf7-82e722b3f68c
+
+	measure 'Cool hit_status' = IF ( [Cool Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[hit_status] ), KEEPFILTERS ( invite[status] = "Cooling down" ) ) )
+		displayFolder: 2 Invite
+		lineageTag: 330ff7d0-7129-5786-972b-1ef1755837c2
+
+	measure 'Artists scored' = COUNTROWS ( invite )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 59d27c05-2de2-5e70-9559-a9df1a823d56
+
+	measure 'Recommended now' = CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Recommend" ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 84a21b53-53ad-5ee7-8d8c-4eb1c2128f84
+
+	/// Good artists whose current hit is already on NDN's YouTube, or who have no new hit since their last visit.
+	measure 'Not now' = CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Not now" ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 1022d124-af62-5abb-91fe-b8a3742e2adf
+
+	/// Played for NDN in the last 10 months, so not recommended again yet.
+	measure 'Cooling down now' = CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Cooling down" ) )
+		formatString: #,0
+		displayFolder: 2 Invite
+		lineageTag: 33a452a7-090d-5afd-8607-96b17a2df50c
+
+	column placeholder
+		dataType: int64
+		isHidden
+		formatString: 0
+		lineageTag: 8f490794-1439-5cdc-a840-aee0487c1f63
+		summarizeBy: none
+		sourceColumn: placeholder
+
+		annotation SummarizationSetBy = User
+
+	partition _Measures = m
+		mode: import
+		source =
+				let
+				    Source = #table(type table [placeholder = Int64.Type], {{1}})
+				in
+				    Source

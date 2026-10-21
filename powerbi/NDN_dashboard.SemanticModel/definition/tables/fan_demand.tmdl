@@ -1,0 +1,110 @@
+/// Distinct fans asking NDN for an artist in YouTube + TikTok comments, last 12 months.
+table fan_demand
+	lineageTag: 4021d2ed-60da-57ec-83f8-edc90d1f224c
+
+	column artist
+		dataType: string
+		lineageTag: 9941135a-0cc2-5865-b332-0d12c721bf1e
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	column status
+		dataType: string
+		lineageTag: cf2d9d33-edf5-5c15-95cf-0c1fd24cb0c8
+		sourceColumn: status
+
+		annotation SummarizationSetBy = User
+
+	column fans
+		dataType: int64
+		formatString: #,0
+		lineageTag: 62a7c5d9-f520-5136-883b-34d08f8f16a4
+		summarizeBy: none
+		sourceColumn: fans
+
+		annotation SummarizationSetBy = User
+
+	column invite_fans
+		dataType: int64
+		formatString: #,0
+		lineageTag: 06811451-cf56-591c-9dc2-c49dffbf63a2
+		summarizeBy: none
+		sourceColumn: invite_fans
+
+		annotation SummarizationSetBy = User
+
+	column more_fans
+		dataType: int64
+		formatString: #,0
+		lineageTag: 0033ec2a-85b8-5202-8c66-83254ae91f6a
+		summarizeBy: none
+		sourceColumn: more_fans
+
+		annotation SummarizationSetBy = User
+
+	column youtube_asks
+		dataType: int64
+		formatString: #,0
+		lineageTag: b03f04fd-f51f-5f96-b65f-f9a751f0f929
+		summarizeBy: none
+		sourceColumn: youtube_asks
+
+		annotation SummarizationSetBy = User
+
+	column tiktok_asks
+		dataType: int64
+		formatString: #,0
+		lineageTag: 742016a3-2b94-5b06-b444-d4eaeb4660d9
+		summarizeBy: none
+		sourceColumn: tiktok_asks
+
+		annotation SummarizationSetBy = User
+
+	column fans_per_1000_comments
+		dataType: double
+		formatString: 0.00
+		lineageTag: c4a7a1dc-bc8f-5331-8605-0901db809ab8
+		summarizeBy: none
+		sourceColumn: fans_per_1000_comments
+
+		annotation SummarizationSetBy = User
+
+	column latest_ask
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 07e5455f-9dd2-5a67-a0c4-fe1a97f0ae9c
+		summarizeBy: none
+		sourceColumn: latest_ask
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column last_ndn_post
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 7bc22b26-97a2-5194-88b7-9835ae5ea387
+		summarizeBy: none
+		sourceColumn: last_ndn_post
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column cooling_down
+		dataType: string
+		lineageTag: b9956734-cded-5e2c-b4bb-41397e3a0afd
+		sourceColumn: cooling_down
+
+		annotation SummarizationSetBy = User
+
+	partition fan_demand = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("fan_demand.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"fans", Int64.Type}, {"invite_fans", Int64.Type}, {"more_fans", Int64.Type}, {"youtube_asks", Int64.Type}, {"tiktok_asks", Int64.Type}, {"fans_per_1000_comments", type number}, {"latest_ask", type date}, {"last_ndn_post", type date}, {"cooling_down", type text}}, "en-US")
+				in
+				    Typed

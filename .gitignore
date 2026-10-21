@@ -8,5 +8,12 @@ logs/
 tableau/
 # Tableau Desktop/Public log
 hyperd.log
+# Power BI Desktop's local cache and settings (powerbi/data/ is covered by data/ above)
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
 # one-off edit scripts
 sql/_e.py
+# downloaded Microsoft schemas used by powerbi/tools/validate_pbir.py
+powerbi/tools/schema_cache/
+# Supabase CLI local cache
+supabase/.temp/

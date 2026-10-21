@@ -1,0 +1,115 @@
+/// One row per platform: followers, change over the window, best post.
+table scorecard
+	lineageTag: b27247db-01d4-5d72-a662-9b5409f62143
+
+	column platform
+		dataType: string
+		lineageTag: 58e25e6a-c903-5ca3-9494-8f01b136e415
+		sourceColumn: platform
+
+		annotation SummarizationSetBy = User
+
+	column as_of
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: dd796528-5f30-5cf9-8d81-88fe5e65500a
+		summarizeBy: none
+		sourceColumn: as_of
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	column window_days
+		dataType: int64
+		formatString: #,0
+		lineageTag: 065185cc-d369-5230-9a23-3ba90a79e39f
+		summarizeBy: none
+		sourceColumn: window_days
+
+		annotation SummarizationSetBy = User
+
+	column metric_name
+		dataType: string
+		lineageTag: 48ee9f00-d9af-5959-906d-3017c9dd39b1
+		sourceColumn: metric_name
+
+		annotation SummarizationSetBy = User
+
+	column followers
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5997a76d-81fa-5477-b178-79eac7a370bd
+		summarizeBy: none
+		sourceColumn: followers
+
+		annotation SummarizationSetBy = User
+
+	column followers_change
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8aac53c0-bb2d-5d27-846e-15bf39d62aab
+		summarizeBy: none
+		sourceColumn: followers_change
+
+		annotation SummarizationSetBy = User
+
+	column followers_change_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: c4a768c1-9ca2-59ae-b734-0b8b0338388a
+		summarizeBy: none
+		sourceColumn: followers_change_pct
+
+		annotation SummarizationSetBy = User
+
+	column metric_gained
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 3804a18d-33f4-5fbc-84b7-d674f5e782a7
+		summarizeBy: none
+		sourceColumn: metric_gained
+
+		annotation SummarizationSetBy = User
+
+	column posts_in_window
+		dataType: int64
+		formatString: #,0
+		lineageTag: 72c6114d-e182-5715-9745-a0f23a1dc28b
+		summarizeBy: none
+		sourceColumn: posts_in_window
+
+		annotation SummarizationSetBy = User
+
+	column best_post
+		dataType: string
+		lineageTag: 71ed71c7-18cf-58ed-9a70-2cdb5c77aea5
+		sourceColumn: best_post
+
+		annotation SummarizationSetBy = User
+
+	column best_post_url
+		dataType: string
+		lineageTag: a809d851-df46-59ee-9564-483c31888fe7
+		sourceColumn: best_post_url
+
+		annotation SummarizationSetBy = User
+
+	column best_post_gained
+		dataType: int64
+		formatString: #,0
+		lineageTag: 28b35e51-401f-5f52-91f9-03f5d7c89744
+		summarizeBy: none
+		sourceColumn: best_post_gained
+
+		annotation SummarizationSetBy = User
+
+	partition scorecard = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("scorecard.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"platform", type text}, {"as_of", type date}, {"window_days", Int64.Type}, {"metric_name", type text}, {"followers", Int64.Type}, {"followers_change", Int64.Type}, {"followers_change_pct", type number}, {"metric_gained", type number}, {"posts_in_window", Int64.Type}, {"best_post", type text}, {"best_post_url", type text}, {"best_post_gained", Int64.Type}}, "en-US")
+				in
+				    Typed

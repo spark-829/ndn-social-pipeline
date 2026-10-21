@@ -1,0 +1,52 @@
+/// yt_trending
+table yt_trending
+	lineageTag: bd7010ac-014e-5562-ac70-4dc7d2f128f0
+
+	column rank
+		dataType: int64
+		formatString: #,0
+		lineageTag: dea1184c-1587-534c-b7e7-378ad37e8d03
+		summarizeBy: none
+		sourceColumn: rank
+
+		annotation SummarizationSetBy = User
+
+	column title
+		dataType: string
+		lineageTag: 16800cad-c244-53e1-b023-6fa6bbc0c8ce
+		sourceColumn: title
+
+		annotation SummarizationSetBy = User
+
+	column channel_title
+		dataType: string
+		lineageTag: 550814bf-7cd4-52c1-a0f6-89d06db3e5be
+		sourceColumn: channel_title
+
+		annotation SummarizationSetBy = User
+
+	column views
+		dataType: int64
+		formatString: #,0
+		lineageTag: c67e4f3f-cf6e-5ce8-b6fb-663d5baad047
+		summarizeBy: none
+		sourceColumn: views
+
+		annotation SummarizationSetBy = User
+
+	column is_ndn
+		dataType: string
+		lineageTag: a358a446-6df1-5b9e-bdf9-1ed2d74a37e9
+		sourceColumn: is_ndn
+
+		annotation SummarizationSetBy = User
+
+	partition yt_trending = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("yt_trending.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"rank", Int64.Type}, {"title", type text}, {"channel_title", type text}, {"views", Int64.Type}, {"is_ndn", type text}}, "en-US")
+				in
+				    Typed

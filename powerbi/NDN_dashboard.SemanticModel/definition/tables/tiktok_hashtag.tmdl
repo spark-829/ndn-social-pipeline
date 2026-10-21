@@ -1,0 +1,56 @@
+/// Hashtags used on 10 or more TikTok videos.
+table tiktok_hashtag
+	lineageTag: 6769aa5b-f6d6-574d-9721-2acb259523e7
+
+	column hashtag
+		dataType: string
+		lineageTag: 300c0914-6851-5771-90d1-8e2275bc175a
+		sourceColumn: hashtag
+
+		annotation SummarizationSetBy = User
+
+	column videos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 7e04a563-4012-5b0e-90a6-ba01f5e8eeeb
+		summarizeBy: none
+		sourceColumn: videos
+
+		annotation SummarizationSetBy = User
+
+	column median_index
+		dataType: double
+		formatString: 0.00
+		lineageTag: eb82c728-16a0-56df-a1e1-2fb5bebbb21a
+		summarizeBy: none
+		sourceColumn: median_index
+
+		annotation SummarizationSetBy = User
+
+	column breakout_pct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 96df793f-ca48-5d1e-bc7d-17a69e4caa70
+		summarizeBy: none
+		sourceColumn: breakout_pct
+
+		annotation SummarizationSetBy = User
+
+	column median_views
+		dataType: double
+		formatString: #,0
+		lineageTag: 4ae83bf0-7567-5fde-a563-06b23aac5db9
+		summarizeBy: none
+		sourceColumn: median_views
+
+		annotation SummarizationSetBy = User
+
+	partition tiktok_hashtag = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("tiktok_hashtag.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"hashtag", type text}, {"videos", Int64.Type}, {"median_index", type number}, {"breakout_pct", type number}, {"median_views", type number}}, "en-US")
+				in
+				    Typed
