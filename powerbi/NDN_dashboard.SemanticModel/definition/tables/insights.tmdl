@@ -2,6 +2,7 @@
 table insights
 	lineageTag: 924c959f-cc47-50d8-9e2d-448eb796728e
 
+	/// Day the sentences were written.
 	column as_of
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -13,6 +14,7 @@ table insights
 
 		annotation SummarizationSetBy = User
 
+	/// Which line of the Overview the sentence fills.
 	column slot
 		dataType: string
 		lineageTag: ead82219-759c-5207-ad07-59c0688110c5
@@ -20,6 +22,7 @@ table insights
 
 		annotation SummarizationSetBy = User
 
+	/// Only used to order the sentences.
 	column sort_order
 		dataType: int64
 		formatString: #,0
@@ -29,6 +32,7 @@ table insights
 
 		annotation SummarizationSetBy = User
 
+	/// Written at 3 pm PH by a Claude routine from that day's numbers only.
 	column sentence
 		dataType: string
 		lineageTag: 6e566e69-393a-5402-9f7e-928f462a4586

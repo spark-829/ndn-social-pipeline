@@ -58,7 +58,7 @@
               },
               "queryRef": "_Measures.Inv score",
               "nativeQueryRef": "Inv score",
-              "displayName": "Score"
+              "displayName": "Invite score"
             },
             {
               "field": {
@@ -118,7 +118,7 @@
               },
               "queryRef": "_Measures.Inv tt_song_videos",
               "nativeQueryRef": "Inv tt_song_videos",
-              "displayName": "TikTok videos using the song 25%"
+              "displayName": "TikTok videos using the new song 25%"
             },
             {
               "field": {
@@ -133,7 +133,7 @@
               },
               "queryRef": "_Measures.Inv tt_song_growth",
               "nativeQueryRef": "Inv tt_song_growth",
-              "displayName": "Their 4-week growth 15%"
+              "displayName": "Growth of those videos 15%"
             },
             {
               "field": {
@@ -148,7 +148,7 @@
               },
               "queryRef": "_Measures.Inv tt_follower_growth",
               "nativeQueryRef": "Inv tt_follower_growth",
-              "displayName": "Artist TikTok follower growth 10%"
+              "displayName": "Artist's TikTok follower growth 10%"
             },
             {
               "field": {
@@ -163,7 +163,7 @@
               },
               "queryRef": "_Measures.Inv track_record",
               "nativeQueryRef": "Inv track_record",
-              "displayName": "NDN TikTok record 5%"
+              "displayName": "How their NDN posts did 5%"
             },
             {
               "field": {
@@ -178,7 +178,7 @@
               },
               "queryRef": "_Measures.Inv new_hit_hype",
               "nativeQueryRef": "Inv new_hit_hype",
-              "displayName": "Song's Spotify streams 15%"
+              "displayName": "New song's Spotify plays 15%"
             },
             {
               "field": {
@@ -193,7 +193,7 @@
               },
               "queryRef": "_Measures.Inv momentum",
               "nativeQueryRef": "Inv momentum",
-              "displayName": "PH chart 10%"
+              "displayName": "Spotify PH chart 10%"
             },
             {
               "field": {
@@ -208,7 +208,7 @@
               },
               "queryRef": "_Measures.Inv local_reach",
               "nativeQueryRef": "Inv local_reach",
-              "displayName": "Manila + Baguio 5%"
+              "displayName": "Listeners in Manila + Baguio 5%"
             },
             {
               "field": {
@@ -238,7 +238,7 @@
               },
               "queryRef": "_Measures.Inv size",
               "nativeQueryRef": "Inv size",
-              "displayName": "Size 5%"
+              "displayName": "Artist size 5%"
             }
           ]
         }
@@ -852,6 +852,144 @@
             "show": {
               "expr": {
                 "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "foreground": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#c9b99a'"
+                    }
+                  }
+                }
+              }
+            },
+            "border": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "showTooltipButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showFocusModeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showVisualInformationButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPinButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showOptionsMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFilterRestatementButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopyVisualImageButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSeeDataLayoutToggleButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCommentButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPersonalizeVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSmartNarrativeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSetAlertButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFollowVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopilotSummaryButton": {
+              "expr": {
+                "Literal": {
                   "Value": "false"
                 }
               }
@@ -865,7 +1003,7 @@
             "altText": {
               "expr": {
                 "Literal": {
-                  "Value": "'Top 10 to invite: the score and its parts, TikTok first'"
+                  "Value": "'Who to invite: top 10, the score and its parts, TikTok first'"
                 }
               }
             }
@@ -885,7 +1023,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Top 10 to invite: the score and its parts, TikTok first'"
+                  "Value": "'Who to invite: top 10, the score and its parts, TikTok first'"
                 }
               }
             },
@@ -948,7 +1086,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Only artists with a NEW SONG not on NDN''s YouTube yet (out after their last NDN visit). Parts are percentiles 0-100 among all candidates, weighted as shown; no data = 0'"
+                  "Value": "'Artists of the OPM top 30 (Spotify Top 50 PH + Viral Hits PH + Billboard PH Hot 100) who never played for NDN (any release date counts). Each part is 0-100: 100 = best of all artists checked, 50 = middle; % = its weight; no data = 0'"
                 }
               }
             },
@@ -981,6 +1119,62 @@
               "expr": {
                 "Literal": {
                   "Value": "'left'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeaderTooltip": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'#: Place by invite score among the artists the page filters leave (1 = best).\nArtist: Spotify artist name; 4 letters of the Spotify ID are added when two artists share a name.\nInvite score: The nine parts added up with their weights: TikTok 55, Spotify 30, other 15. Each part scores 0-100 against all artists checked (100 = top, 50 = middle, no data = 0). Higher = better to invite now.\nTikTok points (of 55): The four TikTok parts after weighting.\nSpotify points (of 30): The three Spotify parts after weighting.\nOther points (of 15): Fan requests and artist size after weighting.\nTikTok videos using the new song 25%: All TikTok videos using the new song (its official sound plus versions found by searching its title on TikTok every 3 days), as a 0-100 score against all artists checked. Weight 25%.\nGrowth of those videos 15%: How fast those videos grew over 4 weeks, as a 0-100 score against all artists checked. Weight 15%. 0 for everyone until the second weekly count (Mon 26 Oct 2026).\nArtist''s TikTok follower growth 10%: Follower growth of the artist''s TikTok over 4 weeks (public profile, weekly), as a 0-100 score against all artists checked. Weight 10%.\nHow their NDN posts did 5%: How the artist''s past NDN TikToks and YouTube sessions did compared with NDN''s usual, as a 0-100 score against all artists checked. New artists get 50. Weight 5%.\nNew song''s Spotify plays 15%: Daily Spotify plays of the new song (kworb.net), as a 0-100 score against all artists checked. Weight 15%.\nSpotify PH chart 10%: Best place on Spotify''s Philippines weekly chart in the last 8 weeks, as a 0-100 score against all artists checked. Weight 10%.\nListeners in Manila + Baguio 5%: Spotify listeners in Metro Manila and Baguio (half credit for the rest of the Philippines), from the artist''s top 5 cities, as a 0-100 score against all artists checked. Weight 5%.\nFan requests 10%: Fans asking for the artist in NDN comments per 1,000 comments, as a 0-100 score against all artists checked. Weight 10%.\nArtist size 5%: Spotify monthly listeners, as a 0-100 score against all artists checked. Weight 5%.'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "titleFontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#f3e9d2'"
+                    }
+                  }
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2b261d'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }

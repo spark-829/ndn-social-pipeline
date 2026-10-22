@@ -2,6 +2,7 @@
 table tiktok_video
 	lineageTag: 96057aff-ed60-52f4-8f76-a61801eaba62
 
+	/// TikTok's own ID for the video.
 	column video_id
 		dataType: string
 		lineageTag: 0e1ab446-e5e7-5219-a65c-9f954b995f49
@@ -9,6 +10,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Web address of the TikTok.
 	column url
 		dataType: string
 		lineageTag: 650c9249-c138-52fd-9cde-91186ecc7666
@@ -16,6 +18,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// The TikTok caption, cut to 90 characters.
 	column caption
 		dataType: string
 		lineageTag: c4b2c7f8-a746-5ec1-90dc-464b609897c3
@@ -23,6 +26,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Day the TikTok went up, Philippine time.
 	column published_date_ph
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -34,6 +38,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Month the TikTok went up.
 	column published_month
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -45,6 +50,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Year the TikTok went up.
 	column published_year
 		dataType: string
 		lineageTag: ee8991fc-0d2a-56d9-b8ff-5c5e33f8a8d4
@@ -52,6 +58,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the week the TikTok went up, Philippine time.
 	column weekday_ph
 		dataType: string
 		lineageTag: dfa0ae07-117e-55bd-8fd4-2558d4e7d10c
@@ -60,6 +67,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Only used to put the weekdays in order.
 	column weekday_num
 		dataType: int64
 		formatString: #,0
@@ -69,6 +77,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Hour of the day the TikTok went up (0-23), Philippine time.
 	column hour_ph
 		dataType: int64
 		formatString: #,0
@@ -78,6 +87,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// When it went up, PH time: morning 5-11, afternoon 12-16, evening 17-21, late night 22-4.
 	column time_window
 		dataType: string
 		lineageTag: f95fe746-6a8e-5c46-9a16-b7e327e05e30
@@ -85,6 +95,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// How many TikToks NDN posted that same day (4+ = four or more).
 	column posts_that_day
 		dataType: string
 		lineageTag: 800b9c11-0dd5-539c-854e-080f55cbc999
@@ -92,6 +103,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Video length from TikTok.
 	column duration_sec
 		dataType: int64
 		formatString: #,0
@@ -101,6 +113,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Video length: under 15 s, 15-30 s, 31-60 s, over 60 s.
 	column length_group
 		dataType: string
 		lineageTag: 048a489b-a140-5732-8156-3cc0451d3431
@@ -108,6 +121,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views at the latest daily public count, 9 am PH.
 	column views
 		dataType: int64
 		formatString: #,0
@@ -117,6 +131,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Likes at the latest daily public count, 9 am PH.
 	column likes
 		dataType: int64
 		formatString: #,0
@@ -126,6 +141,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Comments at the latest daily public count, 9 am PH.
 	column comments
 		dataType: int64
 		formatString: #,0
@@ -135,6 +151,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Shares at the latest daily public count, 9 am PH.
 	column shares
 		dataType: int64
 		formatString: #,0
@@ -144,6 +161,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Saves (bookmarks) at the latest daily public count, 9 am PH.
 	column saves
 		dataType: int64
 		formatString: #,0
@@ -153,6 +171,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Days between posting and the latest count.
 	column age_days
 		dataType: int64
 		formatString: #,0
@@ -162,6 +181,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// How old the video is: under 30 days, 1-3 months, 3-12 months, 1-2 years, over 2 years.
 	column age_band
 		dataType: string
 		lineageTag: 5176b152-bd7d-5272-b941-678894a574c8
@@ -169,6 +189,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// yes = online for 14 days or more, so its views have mostly settled.
 	column is_mature
 		dataType: string
 		lineageTag: e42f0840-08b6-5d78-a22b-272d24f26bbe
@@ -176,6 +197,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// yes = went up in the 30 days before the latest count.
 	column is_last_30d
 		dataType: string
 		lineageTag: 6d16d018-64ca-5256-8d1d-90e47a4ce6ae
@@ -183,6 +205,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Likes ÷ views × 1,000.
 	column likes_per_1k
 		dataType: double
 		formatString: 0.0
@@ -192,6 +215,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Comments ÷ views × 1,000.
 	column comments_per_1k
 		dataType: double
 		formatString: 0.0
@@ -201,6 +225,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Shares ÷ views × 1,000.
 	column shares_per_1k
 		dataType: double
 		formatString: 0.0
@@ -210,6 +235,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Saves ÷ views × 1,000.
 	column saves_per_1k
 		dataType: double
 		formatString: 0.0
@@ -219,6 +245,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// (Shares + saves) ÷ views × 1,000. TikTok reads shares and saves as strong signs that people value a video, so they help it travel.
 	column share_save_per_1k
 		dataType: double
 		formatString: #,0.00
@@ -228,6 +255,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Middle views of the 30 NDN TikToks posted closest in time to this one.
 	column neighbour_median
 		dataType: double
 		formatString: #,0
@@ -237,6 +265,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views ÷ the usual views of the 30 NDN TikToks posted around it. 1.0 = usual, 2.0 = twice (a breakout). Comparing with nearby posts keeps old and new videos fair.
 	column perf_index
 		dataType: double
 		formatString: 0.00
@@ -246,6 +275,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Breakout (2x the usual or more), above usual (1-2x) or below usual.
 	column index_band
 		dataType: string
 		lineageTag: 1d2d501b-fbdf-5cc8-9dd2-9dd590595a08
@@ -253,6 +283,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views added over the last 7 daily counts.
 	column views_gained_7d
 		dataType: int64
 		formatString: #,0
@@ -262,6 +293,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views gained in the last 7 days ÷ views so far × 1,000. Higher = still being found.
 	column gained_7d_per_1k
 		dataType: double
 		formatString: #,0.00
@@ -271,6 +303,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// What the clip is, read from the caption: Premiere teaser, out now / stream, event / tickets, song clip with the title, or other talk.
 	column caption_type
 		dataType: string
 		lineageTag: b159cd56-582d-55b2-ac09-09dca3fe9071
@@ -278,6 +311,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// yes = the caption asks viewers something.
 	column asks_question
 		dataType: string
 		lineageTag: 9efc4014-7493-525e-b068-7c14e3f5d4ad
@@ -285,6 +319,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Number of hashtags in the caption.
 	column n_hashtags
 		dataType: int64
 		formatString: #,0
@@ -294,6 +329,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Hashtags in the caption, grouped: 0, 1-3, 4-5, 6 or more.
 	column hashtag_group
 		dataType: string
 		lineageTag: f207e41f-b637-5575-bd9f-a2a8b3b54110
@@ -301,6 +337,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// 'Original sound' = NDN's own audio from the session; 'Named track' = the official song from TikTok's music library.
 	column sound_type
 		dataType: string
 		lineageTag: f5f64a90-b5f6-5ff3-be5f-307679bcaa7d
@@ -308,6 +345,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Song in the clip, read from the caption.
 	column song
 		dataType: string
 		lineageTag: 83019bf1-580e-556a-ba48-87e31c862e49
@@ -315,6 +353,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Artist in the clip, read from the caption.
 	column artist
 		dataType: string
 		lineageTag: 878b5ce3-b52b-5e5f-a212-1b505e69b396
@@ -322,6 +361,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// The NDN show the clip comes from.
 	column series
 		dataType: string
 		lineageTag: eb76c6a3-7c68-5397-a488-5e29af8e4ea0
@@ -329,6 +369,7 @@ table tiktok_video
 
 		annotation SummarizationSetBy = User
 
+	/// Videos by anyone on TikTok made with this post's NDN sound (number on the sound page, latest weekly count).
 	column sound_uses
 		dataType: int64
 		formatString: #,0

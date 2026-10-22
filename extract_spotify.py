@@ -164,7 +164,10 @@ class Spotify:
                                "name": t.get("name"),
                                "artists": [{"id": a["uri"].split(":")[-1], "name": a["profile"]["name"]}
                                            for a in (t.get("artists") or {}).get("items", [])],
-                               "added_at": (it.get("addedAt") or {}).get("isoString")})
+                               "added_at": (it.get("addedAt") or {}).get("isoString"),
+                               # sql/035: the release (album date) and Spotify's own total plays, for the pace part
+                               "released": (((t.get("albumOfTrack") or {}).get("date") or {}).get("isoString") or "")[:10] or None,
+                               "playcount": t.get("playcount")})
         return {"playlist_id": playlist_id, "payload": {**meta, "total": total, "tracks": tracks}}
 
     def close(self):

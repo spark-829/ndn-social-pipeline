@@ -28,7 +28,8 @@
               },
               "queryRef": "fan_demand.status",
               "nativeQueryRef": "status",
-              "active": true
+              "active": true,
+              "displayName": "Status"
             }
           ]
         }

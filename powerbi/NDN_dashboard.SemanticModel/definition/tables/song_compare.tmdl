@@ -2,6 +2,7 @@
 table song_compare
 	lineageTag: f824d77a-3548-5660-b915-43ba50a8aafe
 
+	/// Song filmed by NDN, matched across platforms by its name.
 	column song
 		dataType: string
 		lineageTag: fc753082-10e8-54ac-8c2c-acbdafcaf874
@@ -9,6 +10,7 @@ table song_compare
 
 		annotation SummarizationSetBy = User
 
+	/// Artist of the song.
 	column artist
 		dataType: string
 		lineageTag: 0441e7c7-3d14-5ed5-be0a-bb15564d5377
@@ -16,6 +18,7 @@ table song_compare
 
 		annotation SummarizationSetBy = User
 
+	/// Views of NDN's YouTube video(s) of the song, latest daily public count, 9 am PH.
 	column youtube_views
 		dataType: double
 		formatString: #,0.00
@@ -25,6 +28,7 @@ table song_compare
 
 		annotation SummarizationSetBy = User
 
+	/// Views of NDN's TikToks of the song, latest daily public count, 9 am PH.
 	column tiktok_views
 		dataType: double
 		formatString: #,0.00
@@ -34,6 +38,7 @@ table song_compare
 
 		annotation SummarizationSetBy = User
 
+	/// Likes on NDN's Instagram posts of the song, latest daily public count, 9 am PH.
 	column instagram_likes
 		dataType: double
 		formatString: #,0.00

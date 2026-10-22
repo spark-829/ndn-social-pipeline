@@ -2,6 +2,7 @@
 table fan_upload
 	lineageTag: 66c26dbc-cab6-59a8-86e7-2069afe167ae
 
+	/// Artist whose filmed NDN session fans want posted or released.
 	column artist
 		dataType: string
 		lineageTag: e41b2570-bfba-5af8-99a2-4c120e75c5b0
@@ -9,6 +10,7 @@ table fan_upload
 
 		annotation SummarizationSetBy = User
 
+	/// Different people asking, YouTube + TikTok comments.
 	column fans
 		dataType: int64
 		formatString: #,0
@@ -18,6 +20,7 @@ table fan_upload
 
 		annotation SummarizationSetBy = User
 
+	/// Comments asking NDN to upload the session or put it on streaming.
 	column asks
 		dataType: int64
 		formatString: #,0
@@ -27,6 +30,7 @@ table fan_upload
 
 		annotation SummarizationSetBy = User
 
+	/// Of those, comments asking for it on Spotify or other streaming apps.
 	column asks_for_streaming
 		dataType: int64
 		formatString: #,0
@@ -36,6 +40,7 @@ table fan_upload
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the most recent such comment.
 	column latest_ask
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -47,6 +52,7 @@ table fan_upload
 
 		annotation SummarizationSetBy = User
 
+	/// One real comment, cut to 140 characters.
 	column top_ask
 		dataType: string
 		lineageTag: 09bb112a-03e5-50ae-84cb-bfa72245002e

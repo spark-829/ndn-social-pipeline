@@ -28,7 +28,8 @@
               },
               "queryRef": "invite.ndn_history",
               "nativeQueryRef": "ndn_history",
-              "active": true
+              "active": true,
+              "displayName": "NDN history"
             }
           ]
         }

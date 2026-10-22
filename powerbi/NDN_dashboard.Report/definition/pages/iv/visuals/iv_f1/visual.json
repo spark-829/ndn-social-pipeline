@@ -28,7 +28,8 @@
               },
               "queryRef": "invite.found_via",
               "nativeQueryRef": "found_via",
-              "active": true
+              "active": true,
+              "displayName": "Found via"
             }
           ]
         }

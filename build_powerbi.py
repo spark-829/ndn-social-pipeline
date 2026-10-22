@@ -10,6 +10,10 @@ visual.json, the same idea as build_tableau_workbook.py. Desktop only opens the 
 Every page has its own filter row and a Reset button ("Clear all slicers" acts on that page only); slicers are not
 synced, so a filter never reaches another page.
 
+Names and hover help live in powerbi_labels.py: every column and measure gets a plain name and one line saying what it
+means and where it comes from (model description + the "?" in the corner of each chart, table and tile). The build
+stops if a field has no help there.
+
 Rebuilding replaces the pages and the model, so edits made by hand in Desktop are lost: make lasting changes here.
 Close Power BI Desktop before rebuilding (Desktop writes its in-memory copy back on save).
 
@@ -19,6 +23,8 @@ import json
 import shutil
 import uuid
 from pathlib import Path
+
+from powerbi_labels import lookup
 
 BASE = Path(__file__).resolve().parent
 PBI = BASE / "powerbi"
@@ -82,9 +88,16 @@ TABLE_NOTES = {
     "fan_upload": "Artists whose sessions fans ask NDN to upload or put on streaming.",
     "bench_accounts": "Latest followers per benchmark account and platform, NDN included.",
     "bench_uploads": "Uploads of the last 12 months (older than 14 days): count and median views today.",
-    "invite": "Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026).",
+    "invite": "Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026, sql/028).",
+    "invite_top30": "The OPM top 30 of Top 50 PH + Viral Hits PH + Billboard PH Hot 100, with TikTok videos per song (sql/029).",
     "dim_account": "One row per benchmark account and its region; filters both benchmark tables.",
 }
+
+
+def doc(key: str) -> list[str]:
+    """The field's plain-language help as a TMDL description (hover in the Fields pane)."""
+    found = lookup(key)
+    return [f"\t/// {found[1]}"] if found else []
 
 
 def m_block(lines: list[str]) -> str:
@@ -96,7 +109,7 @@ def csv_table(name: str, cols: list) -> str:
     out = [f"/// {TABLE_NOTES.get(name, name)}", f"table {name}", f"\tlineageTag: {tag(name)}", ""]
     for col, pg in cols:
         dt = PG_TO_TMDL[pg]
-        out += [f"\tcolumn {col}", f"\t\tdataType: {dt}"]
+        out += [*doc(f"{name}.{col}"), f"\tcolumn {col}", f"\t\tdataType: {dt}"]
         if pg == "date":
             out.append("\t\tformatString: yyyy-mm-dd")
         elif pg == "timestamp":
@@ -104,6 +117,8 @@ def csv_table(name: str, cols: list) -> str:
         elif dt in ("int64", "double"):
             out.append(f"\t\tformatString: {FORMATS.get(col, '#,0' if dt == 'int64' else '#,0.00')}")
         out += [f"\t\tlineageTag: {tag(name, col)}"]
+        if col.endswith("_link"):
+            out.append("\t\tdataCategory: WebUrl")         # tables show it as a clickable link
         if dt != "string":
             out.append("\t\tsummarizeBy: none")
         if (name, col) in SORT_BY:
@@ -128,11 +143,11 @@ def platform_table() -> str:
     return "\n".join([
         "/// The three platforms; filters every per-platform table through relationships.",
         "table dim_platform", f"\tlineageTag: {tag('dim_platform')}", "",
-        "\tcolumn platform", "\t\tdataType: string", f"\t\tlineageTag: {tag('dim_platform', 'platform')}",
+        *doc("dim_platform.platform"), "\tcolumn platform", "\t\tdataType: string", f"\t\tlineageTag: {tag('dim_platform', 'platform')}",
         "\t\tsortByColumn: sort_order", "\t\tsourceColumn: platform", "",
-        "\tcolumn sort_order", "\t\tdataType: int64", "\t\tisHidden", "\t\tformatString: 0",
+        *doc("dim_platform.sort_order"), "\tcolumn sort_order", "\t\tdataType: int64", "\t\tisHidden", "\t\tformatString: 0",
         f"\t\tlineageTag: {tag('dim_platform', 'sort_order')}", "\t\tsummarizeBy: none", "\t\tsourceColumn: sort_order", "",
-        "\tcolumn hex_color", "\t\tdataType: string", "\t\tisHidden", f"\t\tlineageTag: {tag('dim_platform', 'hex_color')}",
+        *doc("dim_platform.hex_color"), "\tcolumn hex_color", "\t\tdataType: string", "\t\tisHidden", f"\t\tlineageTag: {tag('dim_platform', 'hex_color')}",
         "\t\tsourceColumn: hex_color", "",
         "\tpartition dim_platform = m", "\t\tmode: import", "\t\tsource =", m_block([
             "let",
@@ -141,11 +156,11 @@ def platform_table() -> str:
             "    Source"]), ""])
 
 
-MEASURES: list[tuple] = []          # (folder, name, dax, format or None, description)
+MEASURES: list[tuple] = []          # (folder, name, dax, format or None); descriptions come from powerbi_labels.py
 
 
-def measure(folder, name, dax, fmt=None, desc=None):
-    MEASURES.append((folder, name, dax.strip(), fmt, desc))
+def measure(folder, name, dax, fmt=None):
+    MEASURES.append((folder, name, dax.strip(), fmt))
 
 
 def on(p):        # filter to one platform through dim_platform
@@ -170,8 +185,7 @@ VAR d = CALCULATE ( MAX ( scorecard[window_days] ), {on(p)} )
 RETURN
     IF ( c = 0,
         "No visible change in " & d & " days",
-        IF ( c > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( c ), "#,0" ) & " (" & FORMAT ( ABS ( pct ), "0.0%" ) & ") in " & d & " days" )""",
-                desc="Follower change over the scorecard window. YouTube rounds subscribers to 3 digits, so small changes show as none.")
+        IF ( c > 0, "▲ ", "▼ " ) & FORMAT ( ABS ( c ), "#,0" ) & " (" & FORMAT ( ABS ( pct ), "0.0%" ) & ") in " & d & " days" )""")
         measure("1 Overview", f"{p} Gained Text", f"""
 VAR g = CALCULATE ( SUM ( scorecard[metric_gained] ), {on(p)} )
 VAR m = CALCULATE ( MAX ( scorecard[metric_name] ), {on(p)} )
@@ -181,12 +195,11 @@ RETURN "+" & {compact('g')} & " " & m & " gained · " & n & " new posts" """)
 VAR cur = CALCULATE ( SUM ( account_daily[followers] ), KEEPFILTERS ( account_daily[data_source] = "real" ) )
 VAR firstDay = CALCULATE ( MIN ( account_daily[snapshot_date] ), ALLSELECTED ( account_daily[snapshot_date] ), account_daily[data_source] = "real" )
 VAR base = CALCULATE ( SUM ( account_daily[followers] ), account_daily[snapshot_date] = firstDay, account_daily[data_source] = "real" )
-RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( cur, base ) - 1 )""", "0.0%",
-            "Followers vs the first real snapshot in the selected dates, per platform, so the three sizes share one axis.")
+RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( cur, base ) - 1 )""", "0.0%")
     measure("1 Overview", "Total Followers Text",
             'FORMAT ( SUM ( scorecard[followers] ), "#,0" ) & " followers on TikTok, YouTube and Instagram"')
     measure("1 Overview", "As Of Text",
-            '"Data as of " & FORMAT ( MAX ( scorecard[as_of] ), "d mmm yyyy" ) & " · daily snapshots at 9 am PH"')
+            '"Data as of " & FORMAT ( MAX ( scorecard[as_of] ), "d mmm yyyy" ) & " · counted daily at 9 am PH · hover a chart and point at its ? for what each number means"')
     for slot, label in [("summary_headline", "Headline"), ("action_1", "Action 1"), ("action_2", "Action 2"),
                         ("action_3", "Action 3"), ("audience_headline", "Audience"),
                         ("sessions_headline", "Sessions"), ("upload_headline", "Uploads")]:
@@ -198,13 +211,12 @@ RETURN IF ( NOT ISBLANK ( cur ), DIVIDE ( cur, base ) - 1 )""", "0.0%",
     # TikTok
     measure("2 TikTok", "TikTok videos", "COUNTROWS ( tiktok_video )", "#,0")
     measure("2 TikTok", "Median views per TikTok", "MEDIAN ( tiktok_video[views] )", "#,0")
-    measure("2 TikTok", "Median Index", "MEDIAN ( tiktok_video[perf_index] )", "0.00",
-            "Median performance index: views / median views of the 30 NDN TikToks posted around it. 1.00 = typical.")
+    measure("2 TikTok", "Median Index", "MEDIAN ( tiktok_video[perf_index] )", "0.00")
     measure("2 TikTok", "Breakouts, all time", """
 DIVIDE (
     CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( tiktok_video[perf_index] >= 2 ) ),
     CALCULATE ( COUNTROWS ( tiktok_video ), KEEPFILTERS ( NOT ISBLANK ( tiktok_video[perf_index] ) ) ) )""",
-            "0%", "Share of TikToks with at least twice the views of the typical post around them.")
+            "0%")
     measure("2 TikTok", "Breakouts, last 30 days",
             'CALCULATE ( [Breakouts, all time], KEEPFILTERS ( tiktok_video[is_last_30d] = "yes" ) )', "0%")
     measure("2 TikTok", "TikTok Views 30d",
@@ -215,8 +227,7 @@ DIVIDE (
     # YouTube and Instagram: real per-day measures from dim_video
     yt, ig = on("YouTube"), on("Instagram")
     measure("3 YouTube", "YouTube videos", f"CALCULATE ( COUNTROWS ( dim_video ), {yt} )", "#,0")
-    measure("3 YouTube", "YouTube Median Views/Day", f"CALCULATE ( MEDIAN ( dim_video[views_per_day] ), {yt} )", "#,0",
-            "Median of latest views / days since upload.")
+    measure("3 YouTube", "YouTube Median Views/Day", f"CALCULATE ( MEDIAN ( dim_video[views_per_day] ), {yt} )", "#,0")
     measure("3 YouTube", "Median views/day, full sessions",
             f'CALCULATE ( MEDIAN ( dim_video[views_per_day] ), {yt}, KEEPFILTERS ( dim_video[video_format] = "Full video" ) )', "#,0")
     measure("3 YouTube", "Median views/day, Shorts",
@@ -256,10 +267,8 @@ DIVIDE (
     measure(tt, "Median comments per 1k", "MEDIAN ( tiktok_video[comments_per_1k] )", "0.0")
     measure(tt, "Median 7-day views gained", "MEDIAN ( tiktok_video[views_gained_7d] )", "#,0")
     measure(tt, "Median 7-day gain per 1k, older posts",
-            "CALCULATE ( MEDIAN ( tiktok_video[gained_7d_per_1k] ), KEEPFILTERS ( tiktok_video[age_days] > 30 ) )", "0.00",
-            "Views gained in the last 7 days per 1,000 views so far, videos older than 30 days.")
-    measure(tt, "Videos made with NDN sounds", "SUM ( tiktok_video[sound_uses] )", "#,0",
-            "Videos by anyone on TikTok that use the sound of an NDN post (sound page count, latest week).")
+            "CALCULATE ( MEDIAN ( tiktok_video[gained_7d_per_1k] ), KEEPFILTERS ( tiktok_video[age_days] > 30 ) )", "0.00")
+    measure(tt, "Videos made with NDN sounds", "SUM ( tiktok_video[sound_uses] )", "#,0")
     measure(tt, "Shares+saves per 1k", "MAX ( tiktok_video[share_save_per_1k] )", "0.0")
     measure(tt, "Sound uses", "SUM ( tiktok_video[sound_uses] )", "#,0")
     measure(tt, "TikTok Artist Index Top 10", """
@@ -269,8 +278,7 @@ RETURN IF ( NOT ISBLANK ( SELECTEDVALUE ( tiktok_video[artist] ) ) && COUNTROWS 
             "0.00")
     yt3 = "3 YouTube"
     full = 'KEEPFILTERS ( dim_video[video_format] = "Full video" )'
-    measure(yt3, "YouTube engagement rate", f"CALCULATE ( MEDIAN ( dim_video[engagement_rate] ), {yt} )", "0.00%",
-            "Median (likes + comments) / views.")
+    measure(yt3, "YouTube engagement rate", f"CALCULATE ( MEDIAN ( dim_video[engagement_rate] ), {yt} )", "0.00%")
     measure(yt3, "YouTube median 7-day gain", f"CALCULATE ( MEDIAN ( dim_video[views_gained_7d] ), {yt} )", "#,0")
     measure(yt3, "YouTube 7-day gain, older sessions",
             f"CALCULATE ( SUM ( dim_video[views_gained_7d] ), {yt}, KEEPFILTERS ( dim_video[age_days] >= 365 ) )", "#,0")
@@ -312,7 +320,7 @@ RETURN IF ( r <= 15, [Fans Asking] )""", "#,0")
     measure("7 Community", "Is Never Played", 'IF ( SELECTEDVALUE ( fan_demand[status] ) = "Never on NDN", 1, 0 )', "0")
 
     # Invite: rank inside whatever the page filters leave, so the top 10 follows the filters
-    for status, pre in [("Recommend", "Inv"), ("Not now", "Not"), ("Cooling down", "Cool")]:
+    for status, pre in [("Recommend", "Inv"), ("Post or boost", "Pob")]:      # sql/031: two groups
         keep = f'KEEPFILTERS ( invite[status] = "{status}" )'
         measure("2 Invite", f"{pre} Score Raw", f"CALCULATE ( SUM ( invite[score] ), {keep} )", "0.0")
         measure("2 Invite", f"{pre} Rank Raw", f"""
@@ -326,22 +334,23 @@ IF ( NOT ISBLANK ( [{pre} Score Raw] ),
             measure("2 Invite", f"{pre} {c}",
                     f"IF ( [{pre} Rank Raw] <= 10, CALCULATE ( SELECTEDVALUE ( invite[{c}] ), {keep} ) )")
     measure("2 Invite", "Artists scored", "COUNTROWS ( invite )", "#,0")
-    measure("2 Invite", "Recommended now", 'CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Recommend" ) )', "#,0")
-    measure("2 Invite", "Not now", 'CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Not now" ) )', "#,0",
-            "Good artists whose current hit is already on NDN's YouTube, or who have no new hit since their last visit.")
-    measure("2 Invite", "Cooling down now",
-            'CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Cooling down" ) )', "#,0",
-            "Played for NDN in the last 10 months, so not recommended again yet.")
+    measure("2 Invite", "To invite", 'CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Recommend" ) )', "#,0")
+    measure("2 Invite", "To post or boost",
+            'CALCULATE ( COUNTROWS ( invite ), KEEPFILTERS ( invite[status] = "Post or boost" ) )', "#,0")
+    measure("2 Invite", "Hot songs NDN has",
+            'CALCULATE ( COUNTROWS ( invite_top30 ), KEEPFILTERS ( invite_top30[on_ndn] = "yes" ) )', "#,0")
 
 
 # invite columns shown in the tables: (column, DAX aggregate, format)
 INVITE_TEXT = ["ndn_history", "found_via", "new_hit", "new_hit_found_on", "top_song", "top_song_on_ndn",
-               "top_tiktok_song", "hit_status", "tiktok_handle"]
+               "top_tiktok_song", "hit_status", "tiktok_handle", "action", "ndn_video_title"]
 INVITE_COLUMNS = [("score", "SUM", "0.0"), ("tiktok_points", "SUM", "0.0"), ("spotify_points", "SUM", "0.0"),
                   ("other_points", "SUM", "0.0"), ("tt_song_videos", "SUM", "0"), ("tt_song_growth", "SUM", "0"),
                   ("tt_follower_growth", "SUM", "0"), ("track_record", "SUM", "0"), ("new_hit_hype", "SUM", "0"),
                   ("momentum", "SUM", "0"), ("local_reach", "SUM", "0"), ("fan_demand", "SUM", "0"), ("size", "SUM", "0"),
                   ("new_hit_tiktok_videos", "SUM", "#,0"), ("new_hit_tiktok_growth_4w", "SUM", "+0%;-0%;0%"),
+                  ("new_hit_tiktok_added_7d", "SUM", "#,0"), ("new_hit_top30_rank", "MIN", "0"),
+                  ("new_hit_top30_points", "SUM", "0"), ("ndn_video_views", "SUM", "#,0"),
                   ("new_hit_daily_streams", "SUM", "#,0"), ("new_hit_released", "MAX", "yyyy-mm-dd"),
                   ("top_song_daily_streams", "SUM", "#,0"), ("top_tiktok_song_videos", "SUM", "#,0"),
                   ("monthly_listeners", "SUM", "#,0"), ("spotify_followers", "SUM", "#,0"),
@@ -355,9 +364,8 @@ INVITE_COLUMNS = [("score", "SUM", "0.0"), ("tiktok_points", "SUM", "0.0"), ("sp
 def measures_table() -> str:
     out = ["/// Holds every DAX measure; the placeholder column is hidden.", "table _Measures",
            f"\tlineageTag: {tag('_Measures')}", ""]
-    for folder, name, dax, fmt, desc in MEASURES:
-        if desc:
-            out.append(f"\t/// {desc}")
+    for folder, name, dax, fmt in MEASURES:
+        out += doc(name)
         lines = dax.splitlines()
         if len(lines) == 1:
             out.append(f"\tmeasure '{name}' = {lines[0]}")
@@ -457,12 +465,20 @@ def meas(prop):
     return {"Measure": {"Expression": {"SourceRef": {"Entity": "_Measures"}}, "Property": prop}}
 
 
+def key(field) -> str:
+    """'table.column' for a column, the bare name for a measure (the keys of powerbi_labels.py)."""
+    if "Measure" in field:
+        return field["Measure"]["Property"]
+    return f'{field["Column"]["Expression"]["SourceRef"]["Entity"]}.{field["Column"]["Property"]}'
+
+
 def proj(field, active=False, label=None):
     kind = "Column" if "Column" in field else "Measure"
     ent, prop = field[kind]["Expression"]["SourceRef"]["Entity"], field[kind]["Property"]
     p = {"field": field, "queryRef": f"{ent}.{prop}", "nativeQueryRef": prop}
     if active:
         p["active"] = True
+    label = label or (lookup(key(field)) or (None,))[0]
     if label:
         p["displayName"] = label
     return p
@@ -485,6 +501,31 @@ def frame(title=None, subtitle=None, bg=True, border=True, alt="", pad=None):
     if pad is not None:
         o["padding"] = props(top=n(pad), left=n(pad), right=n(pad), bottom=n(pad))
     return o
+
+
+def help_text(query) -> str:
+    """One line per field the visual shows: its plain name, then what it means and where it comes from."""
+    lines = []
+    for role in query.values():
+        for p in role["projections"]:
+            name, about = lookup(key(p["field"]))
+            line = f'{p.get("displayName") or name or p["nativeQueryRef"]}: {about}'
+            if line not in lines:
+                lines.append(line)
+    return "\n".join(lines)
+
+
+def help_header(text):
+    """The visual's corner header with only the "?" button (plus focus mode); hovering "?" shows the text."""
+    off = ["showVisualInformationButton", "showPinButton", "showOptionsMenu", "showFilterRestatementButton",
+           "showCopyVisualImageButton", "showSeeDataLayoutToggleButton", "showCommentButton",
+           "showPersonalizeVisualButton", "showSmartNarrativeButton", "showSetAlertButton", "showFollowVisualButton",
+           "showCopilotSummaryButton"]
+    return {"visualHeader": props(show=b(True), background=color(CARD), foreground=color(INK2), border=color(CARD),
+                                  transparency=n(0), showTooltipButton=b(True), showFocusModeButton=b(True),
+                                  **{o: b(False) for o in off}),
+            "visualHeaderTooltip": props(text=s(text), fontSize=n(10), fontFamily=s("Segoe UI"),
+                                         titleFontColor=color(INK), background=color(GRID), transparency=n(0))}
 
 
 def cases(measure_name, rules):
@@ -516,7 +557,9 @@ class Page:
         self.height = height + SHIFT
         self.visuals, self.z = [], 1000
 
-    def add(self, key, vtype, x, y, w, h, query=None, objects=None, vco=None, sort=None, extra=None, absolute=False):
+    def add(self, key, vtype, x, y, w, h, query=None, objects=None, vco=None, sort=None, extra=None, absolute=False,
+            tip=None):
+        """tip: True = a "?" in the corner explaining every field shown; a string = that text instead."""
         if not absolute and y >= 110:
             y += SHIFT
         name = f"{self.pid}_{key}"
@@ -528,6 +571,8 @@ class Page:
         if objects:
             v["objects"] = objects
         v["visualContainerObjects"] = vco or frame(bg=False, border=False)
+        if tip:
+            v["visualContainerObjects"].update(help_header(tip if isinstance(tip, str) else help_text(query)))
         v["drillFilterOtherVisuals"] = True
         self.visuals.append({"$schema": VC_SCHEMA, "name": name,
                              "position": {"x": x, "y": y, "z": self.z, "height": h, "width": w, "tabOrder": self.z},
@@ -548,16 +593,16 @@ class Page:
                       "dropShadow": props(show=b(False)), "visualHeader": props(show=b(False))})
 
     def card(self, key, x, y, w, h, m, size=12, ink=INK, font="Segoe UI", wrap=False, label=False, boxed=False,
-             alt="", absolute=False):
+             alt="", absolute=False, tip=None):
         objects = {"labels": props(color=color(ink), fontSize=n(size), fontFamily=s(font)),
                    "categoryLabels": props(show=b(label), color=color(INK3), fontSize=n(9), fontFamily=s("Segoe UI")),
                    "wordWrap": props(show=b(wrap))}
         vco = frame(bg=boxed, border=boxed, alt=alt or m, pad=0 if not boxed else None)
         self.add(key, "card", x, y, w, h, query={"Values": {"projections": [proj(meas(m))]}}, objects=objects,
-                 vco=vco, absolute=absolute)
+                 vco=vco, absolute=absolute, tip=tip)
 
     def kpi(self, key, x, y, w, m):
-        self.card(key, x, y, w, 90, m, size=22, font="Segoe UI Semibold", label=True, boxed=True)
+        self.card(key, x, y, w, 90, m, size=22, font="Segoe UI Semibold", label=True, boxed=True, tip=True)
 
     def bars(self, key, vtype, x, y, w, h, cat, m, title, subtitle, fill, sort_by_value=True):
         objects = {
@@ -571,7 +616,7 @@ class Page:
         sort = [{"field": meas(m), "direction": "Descending"}] if sort_by_value else [{"field": cat, "direction": "Ascending"}]
         self.add(key, vtype, x, y, w, h,
                  query={"Category": {"projections": [proj(cat, active=True)]}, "Y": {"projections": [proj(meas(m))]}},
-                 objects=objects, vco=frame(title, subtitle), sort=sort)
+                 objects=objects, vco=frame(title, subtitle), sort=sort, tip=True)
 
     def line(self, key, x, y, w, h, cat, m, title, subtitle, hexv=None, series=None, series_colors=None):
         objects = {
@@ -592,7 +637,7 @@ class Page:
         else:
             objects["dataPoint"] = props(defaultColor=color(hexv))
         self.add(key, "lineChart", x, y, w, h, query=query, objects=objects, vco=frame(title, subtitle),
-                 sort=[{"field": cat, "direction": "Ascending"}])
+                 sort=[{"field": cat, "direction": "Ascending"}], tip=True)
 
     def table(self, key, x, y, w, h, fields, title, subtitle, sort_field, direction="Descending", bars=()):
         """bars: measure names drawn as data bars behind their numbers (the score parts on the Invite page)."""
@@ -605,7 +650,7 @@ class Page:
                  "selector": {"metadata": f"_Measures.{m}"}} for i, m in enumerate(bars)]}
         self.add(key, "tableEx", x, y, w, h,
                  query={"Values": {"projections": [proj(f, label=lab) for f, lab in fields]}}, objects=objects,
-                 vco=frame(title, subtitle), sort=[{"field": sort_field, "direction": direction}])
+                 vco=frame(title, subtitle), sort=[{"field": sort_field, "direction": direction}], tip=True)
 
     def scatter(self, key, x, y, w, h, cat, mx, my, title, subtitle, hexv):
         """One dot per item; both axes log scale because views and listeners span 1,000x."""
@@ -617,7 +662,7 @@ class Page:
                                gridlineColor=color(GRID)),
             "legend": props(show=b(False)),
             "dataPoint": one_fill(hexv)}
-        self.add(key, "scatterChart", x, y, w, h, objects=objects, vco=frame(title, subtitle),
+        self.add(key, "scatterChart", x, y, w, h, objects=objects, vco=frame(title, subtitle), tip=True,
                  query={"Category": {"projections": [proj(cat, active=True)]},
                         "X": {"projections": [proj(meas(mx))]}, "Y": {"projections": [proj(meas(my))]}})
 
@@ -690,24 +735,26 @@ def overview() -> Page:
         pg.text(f"tile_{p}", x, y, w, 150, [
             [(p.upper(), {"fontWeight": "bold", "fontSize": "10pt", "color": hexv})],
             [(notes[p], {"fontSize": "8pt", "color": INK3})]], bg=True, border=True)
-        pg.card(f"val_{p}", x + 12, y + 46, w - 24, 42, f"{p} Followers Text", size=24, font="Segoe UI Semibold")
+        pg.card(f"val_{p}", x + 12, y + 46, w - 24, 42, f"{p} Followers Text", size=24, font="Segoe UI Semibold",
+                tip="\n".join(lookup(f"{p} {m} Text")[1] for m in ("Followers", "Change", "Gained")))
         pg.card(f"chg_{p}", x + 12, y + 92, w - 24, 22, f"{p} Change Text", size=10, ink=INK2)
         pg.card(f"gain_{p}", x + 12, y + 116, w - 24, 22, f"{p} Gained Text", size=10, ink=INK3)
     pg.line("growth", 30, 282, 1010, 300, col("account_daily", "snapshot_date"), "Follower Growth %",
             "Grow: which channel is gaining followers fastest?",
-            "Growth since the first real snapshot in the selected dates. % keeps the three sizes on one axis",
+            "Followers gained since the first day in the chosen dates, as a %, so small and big channels compare fairly",
             series=col("dim_platform", "platform"), series_colors=PLATFORMS)
     pg.table("best", 1060, 282, 510, 300,
              [(col("scorecard", "platform"), "Platform"), (meas("Best Post Gained"), "Gained"),
               (col("scorecard", "best_post"), "Best post")],
              "Best post this week on each platform",
-             "Views gained over the scorecard window (likes on Instagram)", meas("Best Post Gained"))
+             "Views gained over about the last week (likes on Instagram)", meas("Best Post Gained"))
     y0 = 602
     pg.text("ins_box", 30, y0, 1540, 440, [
         [("What the numbers say today", {"fontWeight": "bold", "fontSize": "13pt", "color": GOLD,
                                          "fontFamily": TITLE_FONT})]], bg=True, border=True)
     pg.card("ins_note", 42, y0 + 36, 1516, 20, "Insights Note", size=9, ink=INK3)
-    pg.card("ins_head", 42, y0 + 62, 1516, 50, "Insight Headline", size=13, font="Segoe UI Semibold", wrap=True)
+    pg.card("ins_head", 42, y0 + 62, 1516, 50, "Insight Headline", size=13, font="Segoe UI Semibold", wrap=True,
+            tip=True)
     for i, lab in enumerate(["Action 1", "Action 2", "Action 3", "Audience", "Sessions", "Uploads"]):
         pg.card(f"ins_{i}", 42, y0 + 120 + i * 52, 1516, 46, f"Insight {lab}", size=10,
                 ink=INK if lab.startswith("Action") else INK2, wrap=True)
@@ -716,52 +763,62 @@ def overview() -> Page:
 
 
 def invite() -> Page:
-    pg = Page("iv", "Invite", 1302 + 56)
+    pg = Page("iv", "Invite", 1722 + 56)
     pg.header("Who to invite", "Which artists should NDN invite to Live at The Cozy Cove next, and why?")
     pg.filters([(col("invite", "ndn_history"), "NDN history", "Dropdown"),
                 (col("invite", "found_via"), "Found via", "Dropdown"),
                 (col("invite", "on_chart"), "On the Spotify PH chart (8 weeks)", "Dropdown")])
-    for i, ((x, w), m) in enumerate(zip(grid(4), ["Artists scored", "Recommended now", "Not now", "Cooling down now"])):
+    for i, ((x, w), m) in enumerate(zip(grid(4), ["Artists scored", "To invite", "To post or boost", "Hot songs NDN has"])):
         pg.kpi(f"k{i}", x, 112, w, m)
-    parts = [("score", "Score"), ("tiktok_points", "TikTok points (of 55)"), ("spotify_points", "Spotify points (of 30)"),
-             ("other_points", "Other points (of 15)"),
-             ("tt_song_videos", "TikTok videos using the song 25%"), ("tt_song_growth", "Their 4-week growth 15%"),
-             ("tt_follower_growth", "Artist TikTok follower growth 10%"), ("track_record", "NDN TikTok record 5%"),
-             ("new_hit_hype", "Song's Spotify streams 15%"), ("momentum", "PH chart 10%"),
-             ("local_reach", "Manila + Baguio 5%"), ("fan_demand", "Fan requests 10%"), ("size", "Size 5%")]
+    parts = [("score", "Invite score"), ("tiktok_points", "TikTok points (of 55)"),
+             ("spotify_points", "Spotify points (of 30)"), ("other_points", "Other points (of 15)"),
+             ("tt_song_videos", "TikTok videos using the new song 25%"), ("tt_song_growth", "Growth of those videos 15%"),
+             ("tt_follower_growth", "Artist's TikTok follower growth 10%"),
+             ("track_record", "How their NDN posts did 5%"), ("new_hit_hype", "New song's Spotify plays 15%"),
+             ("momentum", "Spotify PH chart 10%"), ("local_reach", "Listeners in Manila + Baguio 5%"),
+             ("fan_demand", "Fan requests 10%"), ("size", "Artist size 5%")]
     art = (col("invite", "artist"), "Artist")
     pg.table("top10", 30, 222, 1540, 360,
              [(meas("Inv Rank"), "#"), art, *[(meas(f"Inv {c}"), lab) for c, lab in parts]],
-             "Top 10 to invite: the score and its parts, TikTok first",
-             "Only artists with a NEW SONG not on NDN's YouTube yet (out after their last NDN visit). Parts are percentiles "
-             "0-100 among all candidates, weighted as shown; no data = 0", meas("Inv Rank"), "Ascending",
+             "Who to invite: top 10, the score and its parts, TikTok first",
+             "Artists of the OPM top 30 (Spotify Top 50 PH + Viral Hits PH + Billboard PH Hot 100) who never played for NDN "
+             "(any release date counts). Each part is 0-100: "
+             "100 = best of all artists checked, 50 = middle; % = its weight; no data = 0", meas("Inv Rank"), "Ascending",
              bars=[f"Inv {c}" for c, _ in parts[4:]])
     pg.table("why", 30, 602, 1540, 360,
              [(meas("Inv Rank"), "#"), art, (meas("Inv new_hit"), "New song to film"),
               (meas("Inv new_hit_found_on"), "Found on"),
+              (meas("Inv new_hit_top30_rank"), "OPM top 30 place"), (meas("Inv new_hit_top30_points"), "List points"),
               (meas("Inv new_hit_tiktok_videos"), "TikTok videos using it"),
               (meas("Inv new_hit_tiktok_growth_4w"), "Change in 4 weeks"),
-              (meas("Inv new_hit_daily_streams"), "Spotify streams/day"), (meas("Inv new_hit_released"), "Out since"),
+              (meas("Inv new_hit_daily_streams"), "Spotify plays per day"), (meas("Inv new_hit_released"), "Out since"),
               (meas("Inv tiktok_handle"), "Artist TikTok"), (meas("Inv tiktok_followers"), "TikTok followers"),
-              (meas("Inv best_chart_rank"), "Best PH chart rank"), (meas("Inv fans_asking"), "Fans asking NDN"),
+              (meas("Inv best_chart_rank"), "Best spot on Spotify PH chart"), (meas("Inv fans_asking"), "Fans asking NDN"),
               (meas("Inv found_via"), "Found via"), (meas("Inv last_ndn_post"), "Last NDN post")],
              "The numbers behind the top 10: the song to film and why it is hot now",
-             "TikTok: the artist's own released songs in their latest 30 videos, 'videos using this sound' weekly. "
-             "Spotify: daily streams (kworb), PH weekly chart. Fan requests from NDN comments",
+             "TikTok: the song's official sound plus versions found by searching its title on TikTok every 3 days (fan "
+             "uploads from the sheet NDN fan sounds too). Spotify: plays per day and the PH weekly chart. Fans: NDN comments",
              meas("Inv Rank"), "Ascending")
-    (x1, w1), (x2, w2) = grid(2)
-    pg.table("notnow", x1, 982, w1, 320,
-             [(meas("Not Rank"), "#"), art, (meas("Not score"), "Score"), (meas("Not hit_status"), "Why not now"),
-              (meas("Not top_tiktok_song"), "Top TikTok song"), (meas("Not top_song"), "Top Spotify song"),
-              (meas("Not top_song_daily_streams"), "Streams/day")],
-             "High score, but not now: no new song to film",
-             "Their current hit is already on NDN's YouTube, or nothing new since their last visit", meas("Not Rank"),
-             "Ascending")
-    pg.table("cool", x2, 982, w2, 320,
-             [(meas("Cool Rank"), "#"), art, (meas("Cool score"), "Score"), (meas("Cool cooldown_until"), "Invite after"),
-              (meas("Cool new_hit"), "New hit"), (meas("Cool fans_asking"), "Fans asking")],
-             "Strong artists cooling down",
-             "Played for NDN in the last 10 months; invite again after the date shown", meas("Cool Rank"), "Ascending")
+    tr = "invite_top30"
+    pg.table("trend", 30, 982, 1540, 400,
+             [(col(tr, "rank"), "#"), (col(tr, "song"), "Song"), (col(tr, "artist"), "Artist"),
+              (col(tr, "points"), "List points"), (col(tr, "top50_pos"), "Top 50 PH"), (col(tr, "viral_pos"), "Viral Hits PH"),
+              (col(tr, "billboard_pos"), "Billboard PH Hot 100"), (col(tr, "tiktok_videos"), "TikTok videos so far"),
+              (col(tr, "growth_4w"), "Change in 4 weeks"), (col(tr, "sounds_kept"), "Sounds counted"),
+              (col(tr, "top_sound"), "Biggest sound"), (col(tr, "top_sound_link"), "Open it"), (col(tr, "to_do"), "To do")],
+             "The OPM top 30 right now, and how much TikTok uses them",
+             "Points: Spotify Top 50 PH #1 = 100 ... #50 = 2; Viral Hits PH and Billboard PH Hot 100 #1 = 100 ... #100 = 1; "
+             "added up over the three lists. TikTok: each title searched on TikTok every 3 days, videos summed over the "
+             "song's sounds", col(tr, "rank"), "Ascending")
+    pg.table("pob", 30, 1402, 1540, 320,
+             [(meas("Pob Rank"), "#"), art, (meas("Pob new_hit"), "Hot song"), (meas("Pob action"), "What to do"),
+              (meas("Pob new_hit_top30_rank"), "OPM top 30 place"), (meas("Pob new_hit_tiktok_videos"), "TikTok videos"),
+              (meas("Pob ndn_video_title"), "NDN video to boost"), (meas("Pob ndn_video_views"), "Its views"),
+              (meas("Pob last_ndn_post"), "Last NDN post"), (meas("Pob cooldown_until"), "Invite again after"),
+              (meas("Pob score"), "Score")],
+             "Post or boost: hot songs NDN already has, or bands that played for NDN",
+             "NDN has the song on YouTube: boost that video now. The band played before but not this song: post their "
+             "clips or film this song with them (after the date shown)", meas("Pob Rank"), "Ascending")
     pg.footer()
     return pg
 
@@ -776,7 +833,7 @@ def tiktok() -> Page:
     for i, ((x, w), m) in enumerate(zip(grid(4), ["TikTok videos", "Breakouts, all time", "Breakouts, last 30 days",
                                    "Videos made with NDN sounds"])):
         pg.kpi(f"k{i}", x, 112, w, m)
-    idx = "Median performance index (views ÷ median of the 30 NDN TikToks posted around it). 1.00 = typical; gold beats it"
+    idx = "The middle video's views compared with NDN's usual at the time: 1.0 = usual, 2.0 = double. Gold = better"
     gold = cases("Median Index", [(2, 1, HI), (3, 1, LO)])
     tv = lambda c: col("tiktok_video", c)
     y = 222
@@ -784,7 +841,7 @@ def tiktok() -> Page:
             "Q1 Attract: how often does a video break out, and is it getting more frequent?",
             "Share of the month's TikToks with 2x the views of the posts around them", one_fill(cyan), sort_by_value=False)
     pg.bars("q14", "clusteredColumnChart", 1060, y, 510, 320, tv("published_year"), "Median views per TikTok",
-            "Q14: is a 10k-view video today worth a 10k one in 2023?", "Median views per TikTok by year posted",
+            "Q14: is a 10k-view video today worth a 10k one in 2023?", "Usual views per TikTok (the middle video), by year posted",
             one_fill(cyan), sort_by_value=False)
     y += ROW
     for (x, w), (key, vt, c, title) in zip(grid(3), [
@@ -795,9 +852,9 @@ def tiktok() -> Page:
     y += ROW
     g3 = grid(3)
     pg.bars("q4", "clusteredBarChart", g3[0][0], y, g3[0][1], 320, tv("caption_type"), "Median shares+saves per 1k",
-            "Q4 Engage: which clips get shared and saved most?", "Median shares + saves per 1,000 views", one_fill(cyan))
+            "Q4 Engage: which clips get shared and saved most?", "Shares + saves for every 1,000 views (middle video)", one_fill(cyan))
     pg.bars("q5", "clusteredColumnChart", g3[1][0], y, g3[1][1], 320, tv("asks_question"), "Median comments per 1k",
-            "Q5 Engage: does asking a question start conversations?", "Median comments per 1,000 views; caption asks a question?",
+            "Q5 Engage: does asking a question start conversations?", "Comments for every 1,000 views (middle video): does the caption ask a question?",
             one_fill(cyan), sort_by_value=False)
     pg.bars("q15", "clusteredColumnChart", g3[2][0], y, g3[2][1], 320, tv("hashtag_group"), "Median Index",
             "Q15: do hashtags help?", idx, gold, sort_by_value=False)
@@ -809,18 +866,18 @@ def tiktok() -> Page:
         pg.bars(key, "clusteredColumnChart", x, y, w, 320, tv(c), "Median Index", title, idx, gold, sort_by_value=False)
     y += ROW
     pg.bars("q10", "clusteredColumnChart", g3[0][0], y, g3[0][1], 320, tv("age_band"), "Median 7-day views gained",
-            "Q10 Last: how long do videos keep earning views?", "Median views gained in the last 7 days, by video age",
+            "Q10 Last: how long do videos keep earning views?", "Views the middle video gained in the last 7 days, by how old it is",
             one_fill(cyan), sort_by_value=False)
     pg.bars("q8", "clusteredBarChart", g3[1][0], y, g3[1][1], 320, tv("caption_type"),
             "Median 7-day gain per 1k, older posts", "Q8: do captions that name the song keep earning longer?",
             "Views gained in the last 7 days per 1,000 views so far, videos older than 30 days", one_fill(cyan))
     pg.bars("q6a", "clusteredBarChart", g3[2][0], y, g3[2][1], 320, tv("artist"), "TikTok Artist Index Top 10",
-            "Q6 Relevance: which artists beat NDN's average?", "Top 10 artists with 3+ clips, median index", gold)
+            "Q6 Relevance: which artists beat NDN's average?", "Top 10 artists with 3+ clips: views compared with usual (1.0 = usual)", gold)
     y += ROW
     (x1, w1), (x2, w2) = grid(2)
     pg.table("q4t", x1, y, w1, 320,
-             [(tv("caption"), "Caption"), (tv("published_date_ph"), "Posted"), (meas("Shares+saves per 1k"), "Shares+saves per 1k"),
-              (meas("TikTok Index 30d"), "Index (last 30 days)")],
+             [(tv("caption"), "Caption"), (tv("published_date_ph"), "Posted"), (meas("Shares+saves per 1k"), "Shares + saves per 1,000 views"),
+              (meas("TikTok Index 30d"), "Views compared with usual")],
              "Q4: the most shared and saved TikToks", "Per 1,000 views; what they have in common is the lesson",
              meas("Shares+saves per 1k"))
     pg.table("q12", x2, y, w2, 320,
@@ -830,17 +887,18 @@ def tiktok() -> Page:
     y += ROW
     pg.table("q15t", x1, y, w1, 320,
              [(col("tiktok_hashtag", "hashtag"), "Hashtag"), (col("tiktok_hashtag", "videos"), "Videos"),
-              (col("tiktok_hashtag", "median_index"), "Median index"), (col("tiktok_hashtag", "breakout_pct"), "Breakout %")],
-             "Q15: which hashtags ride with the best posts?", "Hashtags on 10+ videos, all time. Correlation, not cause",
+              (col("tiktok_hashtag", "median_index"), "Views compared with usual"),
+              (col("tiktok_hashtag", "breakout_pct"), "Share that broke out")],
+             "Q15: which hashtags ride with the best posts?", "Hashtags on 10+ videos, all time. These tags sit on good posts; that doesn't prove the tag caused it",
              col("tiktok_hashtag", "median_index"))
     pg.table("top30", x2, y, w2, 320,
              [(tv("caption"), "Caption"), (tv("published_date_ph"), "Posted"),
-              (meas("TikTok Views 30d"), "Views"), (meas("TikTok Index 30d"), "Index")],
+              (meas("TikTok Views 30d"), "Views"), (meas("TikTok Index 30d"), "Views compared with usual")],
              "Q1: which TikToks of the last 30 days beat the posts around them?",
-             "Sorted by performance index; 2.00 or more = breakout", meas("TikTok Index 30d"))
+             "Best first. 2.0 or more = twice the usual views (a breakout)", meas("TikTok Index 30d"))
     y += ROW
     pg.note("na", 30, y, 1540, 130, "Not answerable yet", [
-        ("Q2 day-1 takeoff, Q13 TikTok before Spotify:", "need a few weeks of real daily snapshots (started 13 Oct 2026)."),
+        ("Q2 day-1 takeoff, Q13 TikTok before Spotify:", "need a few weeks of real daily counts (started 13 Oct 2026)."),
         ("Q9 followers per video:", "TikTok doesn't publish it; needs NDN's TikTok Studio (Phase 2)."),
         ("Q16 joining trends:", "the PH trend lists started 19 Oct; compare after 4+ weeks.   "
                                 "Q17 what to post next week: see the Overview actions.")])
@@ -858,14 +916,14 @@ def youtube() -> Page:
     for i, ((x, w), m) in enumerate(zip(grid(4), ["YouTube videos", "Median views/day, full sessions", "Median views/day, Shorts",
                                    "YouTube views gained, last 7 days"])):
         pg.kpi(f"k{i}", x, 112, w, m)
-    vpd = "Median views per day (latest views ÷ days since upload)"
+    vpd = "Usual views per day: views so far ÷ days online, middle video"
     dv = lambda c: col("dim_video", c)
     y = 222
     pg.table("q1", 30, y, 1010, 320,
              [(dv("title"), "Video"), (dv("published_date_ph"), "Uploaded"),
-              (meas("YouTube Views/Day 90d"), "Views per day"), (meas("YouTube vs Series 90d"), "vs series median")],
+              (meas("YouTube Views/Day 90d"), "Views per day"), (meas("YouTube vs Series 90d"), "Compared with its series")],
              "Q1 Attract: which new sessions are taking off?",
-             "Uploads of the last 90 days. vs series median: 2.0 = twice a typical video of the same series",
+             "Uploads of the last 90 days. 2.0 = twice as good as a usual video of the same series",
              meas("YouTube Views/Day 90d"))
     pg.scatter("q1s", 1060, y, 510, 320, dv("title"), "YouTube artist listeners", "YouTube views per day",
                "Q1: allowing for how big the artist is", "Full sessions: views/day vs the artist's Spotify monthly "
@@ -883,15 +941,15 @@ def youtube() -> Page:
     y += ROW
     pg.bars("q3", "clusteredColumnChart", g3[0][0], y, g3[0][1], 320, col("yt_heatmap", "peak_band"), "Sessions",
             "Q3 Retain: which moment do viewers replay most?",
-            "Sessions by where their 'most replayed' peak sits (% into the video)", one_fill(red), sort_by_value=False)
+            "Number of sessions, by where YouTube's 'most replayed' peak sits (how far into the video)", one_fill(red), sort_by_value=False)
     pg.bars("q4", "clusteredBarChart", g3[1][0], y, g3[1][1], 320, dv("series"), "YouTube engagement rate",
-            "Q4 Engage: what makes viewers like and comment?", "Median (likes + comments) ÷ views, by series", one_fill(red))
+            "Q4 Engage: what makes viewers like and comment?", "Likes + comments for every 100 views (middle video), by series", one_fill(red))
     pg.scatter("q5", g3[2][0], y, g3[2][1], 320, dv("title"), "YouTube song Spotify streams", "YouTube views per day",
                "Q5 Relevance: does the song choice decide the views?",
                "Session views/day vs the studio song's Spotify streams", red)
     y += ROW
     pg.bars("q8", "clusteredColumnChart", 30, y, 500, 320, dv("age_band"), "YouTube median 7-day gain",
-            "Q8 Last: how long do sessions keep earning?", "Median views gained in the last 7 days, by video age",
+            "Q8 Last: how long do sessions keep earning?", "Views the middle video gained in the last 7 days, by how old it is",
             one_fill(red), sort_by_value=False)
     pg.table("q8t", 550, y, 1020, 320,
              [(dv("title"), "Video"), (dv("published_date_ph"), "Uploaded"),
@@ -903,9 +961,9 @@ def youtube() -> Page:
             "Q7 Search: when people search a filmed song, where does NDN rank?",
             "90 YouTube searches (song + artist), latest Monday", one_fill(red), sort_by_value=False)
     pg.table("q7t", 550, y, 1020, 320,
-             [(col("yt_search", "query"), "Search"), (col("yt_search", "ndn_best_rank"), "NDN rank"),
+             [(col("yt_search", "query"), "Search"), (col("yt_search", "ndn_best_rank"), "NDN's place in results"),
               (col("yt_search", "first_channel"), "Ranked first"), (col("yt_search", "reason"), "Why searched")],
-             "Q7: who beats NDN on its own songs?", "Lowest NDN rank first", col("yt_search", "ndn_best_rank"))
+             "Q7: who beats NDN on its own songs?", "Searches where NDN shows lowest come first", col("yt_search", "ndn_best_rank"))
     y += ROW
     (x1, w1), (x2, w2) = grid(2)
     pg.table("q11", x1, y, w1, 320,
@@ -916,7 +974,7 @@ def youtube() -> Page:
              col("yt_trending", "rank"), "Ascending")
     pg.line("last", x2, y, w2, 320, col("platform_daily", "snapshot_date"), "YouTube Views Gained Real",
             "Last: how many views does the whole channel gain each day?",
-            "Sum over all videos, real snapshots only (filters don't apply)", red)
+            "All videos added up, from the real daily counts (filters don't apply)", red)
     y += ROW
     pg.bars("artists", "clusteredBarChart", g3[0][0], y, g3[0][1], 320, dv("artist"),
             "YouTube Artist Views/Day Top 10", "Q5: which artists bring the most daily views?",
@@ -926,7 +984,7 @@ def youtube() -> Page:
     pg.note("na", g3[2][0], y, g3[2][1], 320, "Not answerable yet", [
         ("Q2 Shorts → full sessions:", "traffic sources are private (YouTube Studio, Phase 2)."),
         ("Q9 does a new session wake old ones:", "needs 4+ weeks of daily history."),
-        ("Q12 Spotify lift (flagship):", "kworb weekly streams before vs after a session; first read after 4-8 weeks."),
+        ("Q12 Spotify lift (flagship):", "Spotify weekly plays (kworb) before vs after a session; first read after 4-8 weeks."),
         ("Q13 invite score:", "track record on the Who to invite page."),
         ("Q14 next week:", "see the Overview actions.")])
     pg.footer()
@@ -942,7 +1000,7 @@ def instagram() -> Page:
     for i, ((x, w), m) in enumerate(zip(grid(4), ["Instagram posts", "Median likes/day, all posts", "Median views/day, Reels",
                                    "Instagram likes gained, last 6 days"])):
         pg.kpi(f"k{i}", x, 112, w, m)
-    lpd = "Median likes per day (latest likes ÷ days since posting)"
+    lpd = "Usual likes per day: likes so far ÷ days online, middle post"
     dv = lambda c: col("dim_video", c)
     (x1, w1), (x2, w2) = grid(2)
     y = 222
@@ -964,20 +1022,20 @@ def instagram() -> Page:
             "Q11 Habits: teaser before the Premiere or 'now streaming' after?", lpd, one_fill(pink))
     y += ROW
     pg.bars("q4", "clusteredBarChart", g3[0][0], y, g3[0][1], 320, dv("ig_caption_type"), "Median reposts per 1k views",
-            "Q4 Engage: which Reels get passed on?", "Median reposts per 1,000 views (shares and saves are private)",
+            "Q4 Engage: which Reels get passed on?", "Reposts for every 1,000 views, middle Reel (shares and saves are private)",
             one_fill(pink))
     pg.bars("q5", "clusteredBarChart", g3[1][0], y, g3[1][1], 320, dv("ig_caption_type"), "Median comments per 1k likes",
-            "Q5 Engage: which posts start conversations?", "Median comments per 1,000 likes", one_fill(pink))
+            "Q5 Engage: which posts start conversations?", "Comments for every 1,000 likes (middle post)", one_fill(pink))
     pg.bars("q8", "clusteredColumnChart", g3[2][0], y, g3[2][1], 320, dv("ig_hashtag_group"), "Median likes/day, all posts",
             "Q8 Search: do hashtags help?", lpd, one_fill(pink), sort_by_value=False)
     y += ROW
     pg.bars("q10", "clusteredColumnChart", g3[0][0], y, g3[0][1], 320, dv("age_band"), "Instagram median 7-day likes gained",
-            "Q10 Last: how fast do posts fade?", "Median likes gained in the last 7 days, by post age",
+            "Q10 Last: how fast do posts fade?", "Likes the middle post gained in the last 7 days, by how old it is",
             one_fill(pink), sort_by_value=False)
     pg.bars("q11d", "clusteredColumnChart", g3[1][0], y, g3[1][1], 320, dv("published_weekday_ph"),
             "Median likes/day, all posts", "Q11 Habits: does the weekday matter?", lpd, one_fill(pink), sort_by_value=False)
     pg.line("last", g3[2][0], y, g3[2][1], 320, col("platform_daily", "snapshot_date"), "Instagram Likes Gained Real",
-            "Last: likes gained each day", "All posts, real snapshots from 15 Oct 2026 (filters don't apply)", pink)
+            "Last: likes gained each day", "All posts, real daily counts from 15 Oct 2026 (filters don't apply)", pink)
     y += ROW
     pg.scatter("q6", 30, y, 1010, 320, col("song_compare", "song"), "Song YouTube views", "Song Instagram likes",
                "Q6 Relevance: does Instagram reward the same songs as YouTube?",
@@ -985,7 +1043,7 @@ def instagram() -> Page:
     pg.note("na", 1060, y, 510, 320, "Not answerable yet", [
         ("Q3 opening moment and length:", "Instagram doesn't publish Reel length or watch time (Phase 2)."),
         ("Q9 Reels that bring followers:", "private (Instagram Insights, Phase 2)."),
-        ("Q12 Spotify lift:", "kworb weekly streams around a push; first read after 4-8 weeks."),
+        ("Q12 Spotify lift:", "Spotify weekly plays (kworb) around a push; first read after 4-8 weeks."),
         ("Q13 invite score:", "see the Who to invite page."),
         ("Q14 next week:", "see the Overview actions.")])
     pg.footer()
@@ -998,9 +1056,9 @@ def benchmarks() -> Page:
     pg.filters([(col("dim_account", "region"), "Region", "Dropdown"),
                 (col("dim_account", "account"), "Account", "Dropdown")])
     rows = [("fol", "bench_accounts", "Followers {p}", "Is NDN Account", "{p}: followers",
-             "Latest snapshot. Gold = Nine Degrees North"),
-            ("med", "bench_uploads", "Median Views {p}", "Is NDN Uploads", "{p}: median views per upload",
-             "Uploads of the last 12 months (older than 14 days), views today"),
+             "Latest daily count. Gold = Nine Degrees North"),
+            ("med", "bench_uploads", "Median Views {p}", "Is NDN Uploads", "{p}: usual views per upload",
+             "Middle upload of the last 12 months (not the last 14 days), views today"),
             ("upl", "bench_uploads", "Uploads/Month {p}", "Is NDN Uploads", "{p}: uploads per month",
              "Average over the last 12 months")]
     for r, (key, tbl, mfmt, flag, tfmt, sub) in enumerate(rows):
@@ -1021,11 +1079,11 @@ def community() -> Page:
         pg.kpi(f"k{i}", 30 + i * 523, 112, 494, m)
     pg.bars("top", "clusteredBarChart", 30, 222, 620, 420, col("fan_demand", "artist"), "Fans Asking Top 15",
             "Which artists do fans ask NDN for most?",
-            "Distinct fans in YouTube + TikTok comments, last 12 months. Gold = never on NDN",
+            "Different people asking in YouTube + TikTok comments, last 12 months. Gold = never on NDN",
             cases("Is Never Played", [(0, 1, HI), (0, 0, LO)]))
     pg.table("demand", 670, 222, 900, 420,
              [(col("fan_demand", "artist"), "Artist"), (col("fan_demand", "status"), "Status"),
-              (meas("Fans Asking"), "Fans"), (col("fan_demand", "youtube_asks"), "YouTube asks"),
+              (meas("Fans Asking"), "Fans asking"), (col("fan_demand", "youtube_asks"), "YouTube asks"),
               (col("fan_demand", "tiktok_asks"), "TikTok asks"), (col("fan_demand", "latest_ask"), "Latest ask"),
               (col("fan_demand", "cooling_down"), "Cooling down")],
              "Every artist fans asked for",
@@ -1122,8 +1180,9 @@ def _mk(path: Path) -> Path:
     return path
 
 
-def check(pages: list[Page]) -> None:
-    """The two mistakes that cost the most last time: duplicate visual names and measures that don't exist."""
+def check(pages: list[Page], schema: dict) -> None:
+    """The two mistakes that cost the most last time (duplicate visual names, measures that don't exist), plus any
+    column or measure without plain-language help."""
     names = [v["name"] for p in pages for v in p.visuals]
     dupes = {x for x in names if names.count(x) > 1}
     assert not dupes, f"duplicate visual names: {dupes}"
@@ -1136,13 +1195,17 @@ def check(pages: list[Page]) -> None:
                 used.add(part.split('"')[0])
     missing = used - known
     assert not missing, f"visuals use unknown measures: {missing}"
+    fields = [f"dim_platform.{c}" for c in ("platform", "sort_order", "hex_color")]
+    fields += [f"{t}.{c}" for t, cols in schema.items() for c, _ in cols] + [m[1] for m in MEASURES]
+    no_help = [f for f in fields if not lookup(f)]
+    assert not no_help, f"add plain-language help to powerbi_labels.py for: {no_help}"
 
 
 def main() -> None:
     schema = json.loads((DATA / "_schema.json").read_text(encoding="utf-8"))
     build_model(schema)
     pages = [overview(), invite(), tiktok(), youtube(), instagram(), benchmarks(), community()]
-    check(pages)
+    check(pages, schema)
     build_report(pages)
     write_json(PBI / f"{NAME}.pbip", {
         "$schema": f"{SCHEMA}/pbip/pbipProperties/1.0.0/schema.json", "version": "1.0",

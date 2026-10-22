@@ -2,6 +2,7 @@
 table fan_demand
 	lineageTag: 4021d2ed-60da-57ec-83f8-edc90d1f224c
 
+	/// Artist named in comments asking NDN to feature them.
 	column artist
 		dataType: string
 		lineageTag: 9941135a-0cc2-5865-b332-0d12c721bf1e
@@ -9,6 +10,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// 'Never on NDN' = not filmed by NDN yet; 'Played for NDN' = filmed before.
 	column status
 		dataType: string
 		lineageTag: cf2d9d33-edf5-5c15-95cf-0c1fd24cb0c8
@@ -16,6 +18,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Different people asking for this artist in NDN's YouTube and TikTok comments, last 12 months. One person asking 5 times counts once.
 	column fans
 		dataType: int64
 		formatString: #,0
@@ -25,6 +28,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// People asking NDN to invite the artist or pair them with another.
 	column invite_fans
 		dataType: int64
 		formatString: #,0
@@ -34,6 +38,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// People asking for another song or an upload by this artist.
 	column more_fans
 		dataType: int64
 		formatString: #,0
@@ -43,6 +48,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Comments on NDN's YouTube asking for this artist (one person can ask more than once). Comments are read every week.
 	column youtube_asks
 		dataType: int64
 		formatString: #,0
@@ -52,6 +58,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Comments on NDN's TikTok asking for this artist. Read every week.
 	column tiktok_asks
 		dataType: int64
 		formatString: #,0
@@ -61,6 +68,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Fans asking ÷ all NDN comments read × 1,000, so it stays fair as comments grow.
 	column fans_per_1000_comments
 		dataType: double
 		formatString: 0.00
@@ -70,6 +78,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the most recent comment asking for them.
 	column latest_ask
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -81,6 +90,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// Latest NDN post featuring this artist.
 	column last_ndn_post
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -92,6 +102,7 @@ table fan_demand
 
 		annotation SummarizationSetBy = User
 
+	/// yes = played for NDN in the last 10 months, so not suggested again yet.
 	column cooling_down
 		dataType: string
 		lineageTag: b9956734-cded-5e2c-b4bb-41397e3a0afd

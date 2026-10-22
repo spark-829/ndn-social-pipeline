@@ -2,6 +2,7 @@
 table tiktok_hashtag
 	lineageTag: 6769aa5b-f6d6-574d-9721-2acb259523e7
 
+	/// A hashtag NDN used on 10 or more TikToks.
 	column hashtag
 		dataType: string
 		lineageTag: 300c0914-6851-5771-90d1-8e2275bc175a
@@ -9,6 +10,7 @@ table tiktok_hashtag
 
 		annotation SummarizationSetBy = User
 
+	/// NDN TikToks with this hashtag.
 	column videos
 		dataType: int64
 		formatString: #,0
@@ -18,6 +20,7 @@ table tiktok_hashtag
 
 		annotation SummarizationSetBy = User
 
+	/// The middle video with this tag: views ÷ usual views of the posts around it. 1.0 = usual.
 	column median_index
 		dataType: double
 		formatString: 0.00
@@ -27,6 +30,7 @@ table tiktok_hashtag
 
 		annotation SummarizationSetBy = User
 
+	/// % of these videos with twice the usual views or more.
 	column breakout_pct
 		dataType: double
 		formatString: #,0.00
@@ -36,6 +40,7 @@ table tiktok_hashtag
 
 		annotation SummarizationSetBy = User
 
+	/// Middle views of these videos: half got more, half fewer.
 	column median_views
 		dataType: double
 		formatString: #,0

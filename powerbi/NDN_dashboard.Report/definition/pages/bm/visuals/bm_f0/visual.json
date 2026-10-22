@@ -28,7 +28,8 @@
               },
               "queryRef": "dim_account.region",
               "nativeQueryRef": "region",
-              "active": true
+              "active": true,
+              "displayName": "Region"
             }
           ]
         }

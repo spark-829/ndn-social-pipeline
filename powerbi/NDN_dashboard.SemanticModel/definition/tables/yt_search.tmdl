@@ -2,6 +2,7 @@
 table yt_search
 	lineageTag: 5cd0354b-611a-5205-87f2-b703fe13ffe4
 
+	/// Song + artist typed into YouTube search, as a fan would (90 searches every Monday).
 	column query
 		dataType: string
 		lineageTag: 7e575f82-5e0c-57af-be4c-1b91c118b729
@@ -9,6 +10,7 @@ table yt_search
 
 		annotation SummarizationSetBy = User
 
+	/// newest = a recent NDN session; top_week = one of the week's most-watched sessions.
 	column reason
 		dataType: string
 		lineageTag: ad8ad68e-6764-5141-a4cd-78c39a0cef4a
@@ -16,6 +18,7 @@ table yt_search
 
 		annotation SummarizationSetBy = User
 
+	/// Where this exact NDN session shows in the results (1 = top). Empty = not found.
 	column target_rank
 		dataType: int64
 		formatString: #,0
@@ -25,6 +28,7 @@ table yt_search
 
 		annotation SummarizationSetBy = User
 
+	/// Best place of any NDN video in the results (1 = top). Empty = no NDN video found.
 	column ndn_best_rank
 		dataType: int64
 		formatString: #,0
@@ -34,6 +38,7 @@ table yt_search
 
 		annotation SummarizationSetBy = User
 
+	/// Channel of the first result.
 	column first_channel
 		dataType: string
 		lineageTag: 0c4c3c59-7be0-503e-83df-81537db30397
@@ -41,6 +46,7 @@ table yt_search
 
 		annotation SummarizationSetBy = User
 
+	/// Grouped: first, top 3, 4-10, below 10 or missing.
 	column rank_band
 		dataType: string
 		lineageTag: c97b53f1-f3c8-539c-b6fa-bdaafe7ca38e

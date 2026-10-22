@@ -28,7 +28,8 @@
               },
               "queryRef": "dim_video.video_format",
               "nativeQueryRef": "video_format",
-              "active": true
+              "active": true,
+              "displayName": "Format"
             }
           ]
         }

@@ -2,6 +2,7 @@
 table scorecard
 	lineageTag: b27247db-01d4-5d72-a662-9b5409f62143
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 58e25e6a-c903-5ca3-9494-8f01b136e415
@@ -9,6 +10,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the latest real daily count.
 	column as_of
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -20,6 +22,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// How many days the change covers (about a week).
 	column window_days
 		dataType: int64
 		formatString: #,0
@@ -29,6 +32,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// 'views', or 'likes' for Instagram (photos have no public views).
 	column metric_name
 		dataType: string
 		lineageTag: 48ee9f00-d9af-5959-906d-3017c9dd39b1
@@ -36,6 +40,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Followers at the latest daily public count, 9 am PH.
 	column followers
 		dataType: int64
 		formatString: #,0
@@ -45,6 +50,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Followers now minus followers at the start of those days.
 	column followers_change
 		dataType: int64
 		formatString: #,0
@@ -54,6 +60,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Follower change ÷ followers at the start × 100.
 	column followers_change_pct
 		dataType: double
 		formatString: 0.00
@@ -63,6 +70,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Added up over all posts in those days.
 	column metric_gained
 		dataType: double
 		formatString: #,0.00
@@ -72,6 +80,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Posts that went up in those days.
 	column posts_in_window
 		dataType: int64
 		formatString: #,0
@@ -81,6 +90,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// The post that gained the most views (likes on Instagram) in those days.
 	column best_post
 		dataType: string
 		lineageTag: 71ed71c7-18cf-58ed-9a70-2cdb5c77aea5
@@ -88,6 +98,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Web address of the best post.
 	column best_post_url
 		dataType: string
 		lineageTag: a809d851-df46-59ee-9564-483c31888fe7
@@ -95,6 +106,7 @@ table scorecard
 
 		annotation SummarizationSetBy = User
 
+	/// Views (likes on Instagram) the best post gained in those days.
 	column best_post_gained
 		dataType: int64
 		formatString: #,0

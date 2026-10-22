@@ -176,19 +176,26 @@ async function catalog(a: Account, platform: string, day: string, log: Record<st
 
 // Artists' own Instagram (sql/024): followers + posts for up to `limit` artists not fetched in 6 days.
 // Business Discovery only sees Business/Creator accounts; others are saved as found = false.
+// sql/033: also the bio + website (TikTok links, staging.artist_tiktok_from_ig); OPM top-30 artists never asked for
+// a bio go first, even inside the 6 days ('' = asked, none).
 async function artistIg(day: string, limit: number, log: Record<string, unknown>) {
   const due = await sql<{ spotify_id: string; username: string }[]>`
     select a.spotify_id, a.username from staging.artist_instagram a
     where not exists (select 1 from raw.artist_instagram_weekly w
                       where w.spotify_id = a.spotify_id and w.snapshot_date > ${day}::date - 6)
-    order by a.spotify_id limit ${limit}`;
+       or (a.spotify_id in (select spotify_id from staging.invite_top30)
+           and not exists (select 1 from raw.artist_instagram_weekly w
+                           where w.spotify_id = a.spotify_id and (w.bio is not null or w.snapshot_date = ${day}::date)))
+    order by (a.spotify_id in (select spotify_id from staging.invite_top30)) desc, a.spotify_id limit ${limit}`;
   let found = 0, missing = 0;
   for (const a of due) {
     try {
-      const bd = await ig(a.username, "followers_count,media_count");
-      await sql`insert into raw.artist_instagram_weekly (snapshot_date, spotify_id, username, found, followers, posts)
-        values (${day}, ${a.spotify_id}, ${a.username}, true, ${num(bd.followers_count)}, ${num(bd.media_count)})
-        on conflict (snapshot_date, spotify_id) do nothing`;
+      const bd = await ig(a.username, "followers_count,media_count,biography,website");
+      await sql`insert into raw.artist_instagram_weekly (snapshot_date, spotify_id, username, found, followers, posts, bio, website)
+        values (${day}, ${a.spotify_id}, ${a.username}, true, ${num(bd.followers_count)}, ${num(bd.media_count)},
+                ${bd.biography ?? ""}, ${bd.website ?? null})
+        on conflict (snapshot_date, spotify_id) do update set found = true, followers = excluded.followers,
+          posts = excluded.posts, bio = excluded.bio, website = excluded.website, error = null`;
       found++;
     } catch (e) {
       const msg = String(e).slice(0, 200);

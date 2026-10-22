@@ -28,7 +28,8 @@
               },
               "queryRef": "account_daily.snapshot_date",
               "nativeQueryRef": "snapshot_date",
-              "active": true
+              "active": true,
+              "displayName": "Day"
             }
           ]
         }

@@ -143,8 +143,17 @@ EXPORTS = {
                best_chart_rank, weeks_on_chart, tiktok_handle, tiktok_found_by, tiktok_followers,
                tiktok_follower_growth_4w, fans_asking, tiktok_asks,
                ndn_youtube_videos, ndn_tiktok_clips, ndn_tiktok_index, ndn_youtube_index, latest_visit, last_ndn_post,
-               cooldown_until
+               cooldown_until, new_hit_tiktok_added_7d, tt_song_basis, new_hit_top30_rank, new_hit_top30_points,
+               new_hit_top50_pos, new_hit_viral_pos, new_hit_billboard_pos,
+               case when new_hit_on_ndn then 'yes' else 'no' end as new_hit_on_ndn, action,
+               ndn_video_title, ndn_video_link, ndn_video_views
         from mart.invite_candidates""",
+    # the OPM top 30 of Top 50 PH + Viral Hits PH + Billboard PH Hot 100, with TikTok videos per song (sql/029)
+    "invite_top30": """
+        select rank, song, artist, points, top50_pos, viral_pos, billboard_pos, tiktok_videos, videos_added_7d,
+               growth_4w, sounds_kept, fan_sounds_kept, sounds_unchecked, top_sound, top_sound_link, to_do, counted_on,
+               case when on_ndn then 'yes' else 'no' end as on_ndn, invite_group
+        from mart.invite_top30_tiktok""",
     # YouTube Q3: where in the session viewers replay most (yt-dlp "most replayed", weekly)
     "yt_heatmap": """
         select h.video_id, v.title, v.artist, h.duration_sec, h.peak_sec,

@@ -28,7 +28,8 @@
               },
               "queryRef": "invite.on_chart",
               "nativeQueryRef": "on_chart",
-              "active": true
+              "active": true,
+              "displayName": "On the Spotify PH chart"
             }
           ]
         }

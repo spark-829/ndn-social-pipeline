@@ -2,6 +2,7 @@
 table yt_trending
 	lineageTag: bd7010ac-014e-5562-ac70-4dc7d2f128f0
 
+	/// Place on YouTube's Philippines trending music list, latest day (read 9:10 am PH).
 	column rank
 		dataType: int64
 		formatString: #,0
@@ -11,6 +12,7 @@ table yt_trending
 
 		annotation SummarizationSetBy = User
 
+	/// Video title, cut to 90 characters.
 	column title
 		dataType: string
 		lineageTag: 16800cad-c244-53e1-b023-6fa6bbc0c8ce
@@ -18,6 +20,7 @@ table yt_trending
 
 		annotation SummarizationSetBy = User
 
+	/// Channel that posted it.
 	column channel_title
 		dataType: string
 		lineageTag: 550814bf-7cd4-52c1-a0f6-89d06db3e5be
@@ -25,6 +28,7 @@ table yt_trending
 
 		annotation SummarizationSetBy = User
 
+	/// Views when the list was read.
 	column views
 		dataType: int64
 		formatString: #,0
@@ -34,6 +38,7 @@ table yt_trending
 
 		annotation SummarizationSetBy = User
 
+	/// yes = an NDN video.
 	column is_ndn
 		dataType: string
 		lineageTag: a358a446-6df1-5b9e-bdf9-1ed2d74a37e9

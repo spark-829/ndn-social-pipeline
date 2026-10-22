@@ -19,6 +19,7 @@ ref table insights
 ref table fan_demand
 ref table fan_upload
 ref table invite
+ref table invite_top30
 ref table yt_heatmap
 ref table yt_search
 ref table yt_trending

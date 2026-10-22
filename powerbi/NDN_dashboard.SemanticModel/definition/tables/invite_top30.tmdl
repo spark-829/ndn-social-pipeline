@@ -1,0 +1,192 @@
+/// The OPM top 30 of Top 50 PH + Viral Hits PH + Billboard PH Hot 100, with TikTok videos per song (sql/029).
+table invite_top30
+	lineageTag: 1e9921e7-154f-578b-bf83-40643c9a971f
+
+	/// Place in the OPM top 30 by list points (1 = most).
+	column rank
+		dataType: int64
+		formatString: #,0
+		lineageTag: ea0c45e6-6ede-5949-8767-2e7fcb9b2e7e
+		summarizeBy: none
+		sourceColumn: rank
+
+		annotation SummarizationSetBy = User
+
+	/// OPM song on Spotify's Top 50 - Philippines, Viral Hits Philippines or the Billboard Philippines Hot 100 playlist (weekly).
+	column song
+		dataType: string
+		lineageTag: d65c9588-a5e9-5f0d-b0c7-d798ece1a8d4
+		sourceColumn: song
+
+		annotation SummarizationSetBy = User
+
+	/// Main artist on Spotify. OPM = 90%+ of their top-city listeners are in the Philippines, or an NDN / Vic's-list artist.
+	column artist
+		dataType: string
+		lineageTag: 36346fdb-6866-5d53-ad35-932881b27c7c
+		sourceColumn: artist
+
+		annotation SummarizationSetBy = User
+
+	/// Top 50 PH #1 = 100 ... #50 = 2; Viral Hits PH and Billboard PH Hot 100 #1 = 100 ... #100 = 1; added up over the three lists (most = 300).
+	column points
+		dataType: int64
+		formatString: #,0
+		lineageTag: 11d29e9f-19e4-5a20-bf41-a02480bba131
+		summarizeBy: none
+		sourceColumn: points
+
+		annotation SummarizationSetBy = User
+
+	/// Place on Spotify's Top 50 - Philippines (daily chart playlist). Empty = not on it.
+	column top50_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: bfb44a2b-8dd0-5a2e-a0c9-8768522df64f
+		summarizeBy: none
+		sourceColumn: top50_pos
+
+		annotation SummarizationSetBy = User
+
+	/// Place on Spotify's Viral Hits Philippines playlist. Empty = not on it.
+	column viral_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 2529fac5-d262-50f7-bdc5-506874082d55
+		summarizeBy: none
+		sourceColumn: viral_pos
+
+		annotation SummarizationSetBy = User
+
+	/// Place on the Billboard Philippines Hot 100 (a fan-made Spotify copy, updated weekly). Empty = not on it.
+	column billboard_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: d0ca598e-cfbb-57ea-a952-ce25932eb8ba
+		summarizeBy: none
+		sourceColumn: billboard_pos
+
+		annotation SummarizationSetBy = User
+
+	/// All TikTok videos using the song's counted sounds: its official sound plus versions found by searching the title on TikTok (every 3 days).
+	column tiktok_videos
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 29f385aa-5cf4-54fc-8370-eb783872751b
+		summarizeBy: none
+		sourceColumn: tiktok_videos
+
+		annotation SummarizationSetBy = User
+
+	/// New TikTok videos in about a week over those sounds. Empty until two counts 5+ days apart.
+	column videos_added_7d
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 9b50def3-9d93-57a8-a121-2a2cac3207fa
+		summarizeBy: none
+		sourceColumn: videos_added_7d
+
+		annotation SummarizationSetBy = User
+
+	/// Growth of those TikTok videos over 4 weeks; +50% = half as many again. Empty until a count 6+ days earlier exists.
+	column growth_4w
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 9c9965b8-940a-511b-8f53-2a2fb1ab76e5
+		summarizeBy: none
+		sourceColumn: growth_4w
+
+		annotation SummarizationSetBy = User
+
+	/// TikTok sounds counted for the song: credited to the artist, or 2+ captions on the sound's page name the artist.
+	column sounds_kept
+		dataType: int64
+		formatString: #,0
+		lineageTag: a0ff1fbf-e89f-56cf-923d-54ef1a284ac2
+		summarizeBy: none
+		sourceColumn: sounds_kept
+
+		annotation SummarizationSetBy = User
+
+	/// Of those, fan uploads (sped up, covers, 'original sound') that passed the caption check.
+	column fan_sounds_kept
+		dataType: int64
+		formatString: #,0
+		lineageTag: 73cceae8-486f-5a18-9e13-7d647c2c59ca
+		summarizeBy: none
+		sourceColumn: fan_sounds_kept
+
+		annotation SummarizationSetBy = User
+
+	/// Sounds found for the song whose captions are not checked yet.
+	column sounds_unchecked
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1eeb50be-632c-5a6a-8fca-b2e3792c93d2
+		summarizeBy: none
+		sourceColumn: sounds_unchecked
+
+		annotation SummarizationSetBy = User
+
+	/// The counted sound with the most videos (title / who uploaded it).
+	column top_sound
+		dataType: string
+		lineageTag: c3070954-17f7-5dbe-8929-e2b2bb9c7549
+		sourceColumn: top_sound
+
+		annotation SummarizationSetBy = User
+
+	/// The biggest sound's TikTok page.
+	column top_sound_link
+		dataType: string
+		lineageTag: 3dea02de-4c10-592a-91da-03b60dca1c23
+		dataCategory: WebUrl
+		sourceColumn: top_sound_link
+
+		annotation SummarizationSetBy = User
+
+	/// What is still missing for the song's TikTok numbers.
+	column to_do
+		dataType: string
+		lineageTag: e335fca4-475b-5084-8421-0fcd613509ca
+		sourceColumn: to_do
+
+		annotation SummarizationSetBy = User
+
+	/// Date of the latest TikTok count for the song's sounds.
+	column counted_on
+		dataType: dateTime
+		formatString: yyyy-mm-dd
+		lineageTag: 31672a7a-e62d-5c72-bf57-13aa878252eb
+		summarizeBy: none
+		sourceColumn: counted_on
+
+		annotation UnderlyingDateTimeDataType = Date
+
+		annotation SummarizationSetBy = User
+
+	/// yes = NDN already has this song on YouTube.
+	column on_ndn
+		dataType: string
+		lineageTag: c1bbcc8e-5aeb-5634-a67f-4e3503f48179
+		sourceColumn: on_ndn
+
+		annotation SummarizationSetBy = User
+
+	/// Who to invite (the artist never played for NDN) or Post or boost (NDN has the song or the band).
+	column invite_group
+		dataType: string
+		lineageTag: 3395657a-59aa-58e2-b126-30f9060b3f4a
+		sourceColumn: invite_group
+
+		annotation SummarizationSetBy = User
+
+	partition invite_top30 = m
+		mode: import
+		source =
+				let
+				    Source = fnLoadCsv("invite_top30.csv"),
+				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
+				    Typed = Table.TransformColumnTypes(Nulls, {{"rank", Int64.Type}, {"song", type text}, {"artist", type text}, {"points", Int64.Type}, {"top50_pos", Int64.Type}, {"viral_pos", Int64.Type}, {"billboard_pos", Int64.Type}, {"tiktok_videos", type number}, {"videos_added_7d", type number}, {"growth_4w", type number}, {"sounds_kept", Int64.Type}, {"fan_sounds_kept", Int64.Type}, {"sounds_unchecked", Int64.Type}, {"top_sound", type text}, {"top_sound_link", type text}, {"to_do", type text}, {"counted_on", type date}, {"on_ndn", type text}, {"invite_group", type text}}, "en-US")
+				in
+				    Typed

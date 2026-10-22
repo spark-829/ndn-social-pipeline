@@ -28,7 +28,8 @@
               },
               "queryRef": "tiktok_video.published_date_ph",
               "nativeQueryRef": "published_date_ph",
-              "active": true
+              "active": true,
+              "displayName": "Posted"
             }
           ]
         }

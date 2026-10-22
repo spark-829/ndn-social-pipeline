@@ -2,6 +2,7 @@
 table dim_video
 	lineageTag: ee1b023e-4d77-59df-983d-7b5179fa2a55
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 39736728-1614-50a6-a7c4-152c28269378
@@ -9,6 +10,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// The platform's own ID for the post.
 	column video_id
 		dataType: string
 		lineageTag: b3e710ea-1244-59a1-bc88-6107eef2f617
@@ -16,6 +18,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Title (YouTube) or caption (TikTok, Instagram) as posted, cut to 160 characters.
 	column title
 		dataType: string
 		lineageTag: 9a7c4eee-f11e-5fb3-ac8e-cee9e6965b88
@@ -23,6 +26,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Web address of the post.
 	column url
 		dataType: string
 		lineageTag: a986ced0-ed75-5c9c-82ab-852edd69bcce
@@ -30,6 +34,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Date and time the post went up, Philippine time.
 	column published_ph
 		dataType: dateTime
 		formatString: yyyy-mm-dd hh:nn
@@ -39,6 +44,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Day the post went up, Philippine time.
 	column published_date_ph
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -50,6 +56,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the week the post went up, Philippine time.
 	column published_weekday_ph
 		dataType: string
 		lineageTag: 875a8c9c-8cf9-55b9-9ca6-ebea8cc0908e
@@ -58,6 +65,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Only used to put the weekdays in order.
 	column published_weekday_num
 		dataType: int64
 		formatString: #,0
@@ -67,6 +75,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Hour of the day the post went up (0-23), Philippine time.
 	column published_hour_ph
 		dataType: int64
 		formatString: #,0
@@ -76,6 +85,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// '7 pm' = NDN's usual 7 pm PH slot; 'Other times' = any other hour.
 	column upload_slot
 		dataType: string
 		lineageTag: b7691ed3-759f-5791-b142-6c9ef5672b33
@@ -83,6 +93,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Video length from the platform (Instagram doesn't share it).
 	column duration_sec
 		dataType: int64
 		formatString: #,0
@@ -92,6 +103,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Full video, YouTube Short (60 s or less), TikTok clip, or Instagram Reel, post or carousel, from the platform's own data.
 	column video_format
 		dataType: string
 		lineageTag: 6492b369-327f-5290-bdcd-c137dae4627e
@@ -99,6 +111,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// The NDN show the post belongs to (e.g. Live at The Cozy Cove), read from the title.
 	column series
 		dataType: string
 		lineageTag: 461a3fc7-547a-5978-bae1-fd2e9eaae881
@@ -106,6 +119,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Song in the post, read from the title or caption.
 	column song
 		dataType: string
 		lineageTag: bfe98acd-b35d-5a02-9e55-0cf6feb566af
@@ -113,6 +127,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Artist in the post, read from the title or caption.
 	column artist
 		dataType: string
 		lineageTag: 07bf2e31-31ee-52eb-9eaf-59d71cb65f43
@@ -120,6 +135,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// All views at the latest daily public count, 9 am PH. Instagram's number includes Facebook views since April 2026.
 	column latest_views
 		dataType: int64
 		formatString: #,0
@@ -129,6 +145,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// All likes at the latest daily public count, 9 am PH.
 	column latest_likes
 		dataType: int64
 		formatString: #,0
@@ -138,6 +155,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// All comments at the latest daily public count, 9 am PH.
 	column latest_comments
 		dataType: int64
 		formatString: #,0
@@ -147,6 +165,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the latest daily count.
 	column latest_snapshot
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -158,6 +177,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Days between posting and the latest count.
 	column age_days
 		dataType: int64
 		formatString: #,0
@@ -167,6 +187,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// How old the post is: under 30 days, 1-3 months, 3-12 months, 1-2 years, over 2 years.
 	column age_band
 		dataType: string
 		lineageTag: bad30ff9-c346-5c70-a7d3-6a548fbfa46e
@@ -174,6 +195,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views so far ÷ days online, so new and old posts compare fairly.
 	column views_per_day
 		dataType: double
 		formatString: #,0
@@ -183,6 +205,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Likes so far ÷ days online, so new and old posts compare fairly.
 	column likes_per_day
 		dataType: double
 		formatString: #,0
@@ -192,6 +215,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views so far ÷ days online; likes for Instagram photos, which have no public views.
 	column perf_per_day
 		dataType: double
 		formatString: #,0
@@ -201,6 +225,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// (Likes + comments) ÷ views so far. 3% = 3 likes or comments for every 100 views.
 	column engagement_rate
 		dataType: double
 		formatString: 0.0%
@@ -210,6 +235,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views per day ÷ views per day of the middle video in the same series. 1.0 = usual for the series, 2.0 = twice as good.
 	column vs_series_median
 		dataType: double
 		formatString: 0.0
@@ -219,6 +245,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Views added over the last 7 daily counts.
 	column views_gained_7d
 		dataType: double
 		formatString: #,0.00
@@ -228,6 +255,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Likes added over the last 7 daily counts.
 	column likes_gained_7d
 		dataType: double
 		formatString: #,0.00
@@ -237,6 +265,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// People who played the artist on Spotify in the last 28 days (Spotify artist page, read weekly). Shows how big the artist is.
 	column artist_monthly_listeners
 		dataType: int64
 		formatString: #,0
@@ -246,6 +275,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// All-time Spotify plays of the studio version of the song (kworb.net, weekly).
 	column song_spotify_streams
 		dataType: int64
 		formatString: #,0
@@ -255,6 +285,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// What the Instagram caption announces: Premiere teaser, now streaming, event / tickets, performance clip or other.
 	column ig_caption_type
 		dataType: string
 		lineageTag: bca9c978-f451-5086-a786-8e5d0ef75b0b
@@ -262,6 +293,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Number of hashtags in the Instagram caption.
 	column ig_hashtags
 		dataType: int64
 		formatString: #,0
@@ -271,6 +303,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Times people reposted the post to their own profile (public Instagram count).
 	column ig_reposts
 		dataType: int64
 		formatString: #,0
@@ -280,6 +313,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Reposts ÷ views × 1,000. Shares and saves are private on Instagram, so reposts stand in for them.
 	column reposts_per_1k_views
 		dataType: double
 		formatString: #,0.00
@@ -289,6 +323,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Comments ÷ likes × 1,000: how much talk a post starts for its size.
 	column comments_per_1k_likes
 		dataType: double
 		formatString: #,0.00
@@ -298,6 +333,7 @@ table dim_video
 
 		annotation SummarizationSetBy = User
 
+	/// Hashtags in the caption, grouped: 0, 1-3, 4-5, 6 or more.
 	column ig_hashtag_group
 		dataType: string
 		lineageTag: c4ebf81a-07d6-560b-a259-f937ef1c698c

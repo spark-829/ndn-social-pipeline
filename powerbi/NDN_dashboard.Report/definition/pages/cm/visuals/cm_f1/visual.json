@@ -28,7 +28,8 @@
               },
               "queryRef": "fan_demand.latest_ask",
               "nativeQueryRef": "latest_ask",
-              "active": true
+              "active": true,
+              "displayName": "Latest ask"
             }
           ]
         }

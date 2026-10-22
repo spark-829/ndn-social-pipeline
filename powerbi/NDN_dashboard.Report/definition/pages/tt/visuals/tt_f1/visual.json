@@ -28,7 +28,8 @@
               },
               "queryRef": "tiktok_video.caption_type",
               "nativeQueryRef": "caption_type",
-              "active": true
+              "active": true,
+              "displayName": "Clip type"
             }
           ]
         }

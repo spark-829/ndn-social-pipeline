@@ -1,7 +1,8 @@
-/// Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026).
+/// Who to invite to Live at The Cozy Cove: score 0-100 (TikTok 55, Spotify 30, other 15), its nine parts and the raw numbers (sql/026, sql/028).
 table invite
 	lineageTag: f1ebbbac-1284-5517-ad56-570cd722122f
 
+	/// Spotify artist name; 4 letters of the Spotify ID are added when two artists share a name.
 	column artist
 		dataType: string
 		lineageTag: 7127127d-4a5e-5026-b773-5632f45d0e7e
@@ -9,6 +10,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Recommend = who to invite (never played for NDN); Post or boost = NDN has the song on YouTube, or the band played for NDN before.
 	column status
 		dataType: string
 		lineageTag: 144e2646-d4bc-5b3b-83a2-ee53e8189d40
@@ -16,6 +18,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// New hit not on NDN / Hit already on NDN / Played for NDN, song not filmed.
 	column hit_status
 		dataType: string
 		lineageTag: ac2848d8-a6ab-58cf-835e-836821402e7d
@@ -23,6 +26,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// 'New to NDN' or 'Played for NDN' before.
 	column ndn_history
 		dataType: string
 		lineageTag: 4813555f-644b-5f9c-806f-04399d024d89
@@ -30,6 +34,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// How the artist got on the list: an NDN artist or Vic's list, Spotify's Philippines weekly chart, or Spotify's Viral Hits Philippines playlist.
 	column found_via
 		dataType: string
 		lineageTag: 33cfe52b-f33c-5d76-93cf-925f693f47ed
@@ -37,6 +42,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// yes = on Spotify's Philippines weekly top 200 in the last 8 weeks.
 	column on_chart
 		dataType: string
 		lineageTag: 2d7ae0b9-b1c6-523a-bcd2-3104a4f18888
@@ -44,6 +50,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Place by invite score within its status group (1 = best).
 	column status_rank
 		dataType: int64
 		formatString: #,0
@@ -53,6 +60,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The nine parts added up with their weights: TikTok 55, Spotify 30, other 15. Each part scores 0-100 against all artists checked (100 = top, 50 = middle, no data = 0). Higher = better to invite now.
 	column score
 		dataType: double
 		formatString: 0.0
@@ -62,6 +70,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The four TikTok parts after weighting.
 	column tiktok_points
 		dataType: double
 		formatString: #,0.00
@@ -71,6 +80,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The three Spotify parts after weighting.
 	column spotify_points
 		dataType: double
 		formatString: #,0.00
@@ -80,6 +90,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Fan requests and artist size after weighting.
 	column other_points
 		dataType: double
 		formatString: #,0.00
@@ -89,6 +100,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// All TikTok videos using the new song (its official sound plus versions found by searching its title on TikTok every 3 days), as a 0-100 score against all artists checked. Weight 25%.
 	column tt_song_videos
 		dataType: int64
 		formatString: #,0
@@ -98,6 +110,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// How fast those videos grew over 4 weeks, as a 0-100 score against all artists checked. Weight 15%. 0 for everyone until the second weekly count (Mon 26 Oct 2026).
 	column tt_song_growth
 		dataType: int64
 		formatString: #,0
@@ -107,6 +120,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Follower growth of the artist's TikTok over 4 weeks (public profile, weekly), as a 0-100 score against all artists checked. Weight 10%.
 	column tt_follower_growth
 		dataType: int64
 		formatString: #,0
@@ -116,6 +130,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// How the artist's past NDN TikToks and YouTube sessions did compared with NDN's usual, as a 0-100 score against all artists checked. New artists get 50. Weight 5%.
 	column track_record
 		dataType: int64
 		formatString: #,0
@@ -125,6 +140,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Daily Spotify plays of the new song (kworb.net), as a 0-100 score against all artists checked. Weight 15%.
 	column new_hit_hype
 		dataType: int64
 		formatString: #,0
@@ -134,6 +150,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Best place on Spotify's Philippines weekly chart in the last 8 weeks, as a 0-100 score against all artists checked. Weight 10%.
 	column momentum
 		dataType: int64
 		formatString: #,0
@@ -143,6 +160,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Spotify listeners in Metro Manila and Baguio (half credit for the rest of the Philippines), from the artist's top 5 cities, as a 0-100 score against all artists checked. Weight 5%.
 	column local_reach
 		dataType: int64
 		formatString: #,0
@@ -152,6 +170,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Fans asking for the artist in NDN comments per 1,000 comments, as a 0-100 score against all artists checked. Weight 10%.
 	column fan_demand
 		dataType: int64
 		formatString: #,0
@@ -161,6 +180,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Spotify monthly listeners, as a 0-100 score against all artists checked. Weight 5%.
 	column size
 		dataType: int64
 		formatString: #,0
@@ -170,6 +190,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's song that came out after their last NDN visit and isn't on NDN's YouTube yet; if several, the one with the most TikTok videos.
 	column new_hit
 		dataType: string
 		lineageTag: d6a58ea9-23ee-5b6a-a01f-b1307367fd88
@@ -177,6 +198,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Where the new song's buzz shows: TikTok, Spotify or both.
 	column new_hit_found_on
 		dataType: string
 		lineageTag: a8cce8b7-2e31-5366-aca4-4e38f68369ff
@@ -184,6 +206,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Videos on TikTok using the new song's official sound (sound page, latest weekly count).
 	column new_hit_tiktok_videos
 		dataType: double
 		formatString: #,0.00
@@ -193,6 +216,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Change in that number of TikTok videos over 4 weeks; +50% = half as many again.
 	column new_hit_tiktok_growth_4w
 		dataType: double
 		formatString: #,0.00
@@ -202,6 +226,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Daily Spotify plays of the new song (kworb.net, latest).
 	column new_hit_daily_streams
 		dataType: int64
 		formatString: #,0
@@ -211,6 +236,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Release date (Deezer; if missing, the date the TikTok sound appeared).
 	column new_hit_released
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -222,6 +248,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's most-played song on Spotify right now.
 	column top_song
 		dataType: string
 		lineageTag: 94d78988-155d-563a-b04d-b22198995333
@@ -229,6 +256,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Daily Spotify plays of that top song (kworb.net).
 	column top_song_daily_streams
 		dataType: int64
 		formatString: #,0
@@ -238,6 +266,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// yes = NDN already has that song on YouTube.
 	column top_song_on_ndn
 		dataType: string
 		lineageTag: 68d4c9dd-7a39-580d-9c82-abeb78d5b863
@@ -245,6 +274,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's song with the most TikTok videos using its sound.
 	column top_tiktok_song
 		dataType: string
 		lineageTag: 70bcbbf3-8773-5d93-ab03-03596f494ddf
@@ -252,6 +282,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Videos on TikTok using that song's sound (weekly).
 	column top_tiktok_song_videos
 		dataType: double
 		formatString: #,0.00
@@ -261,6 +292,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// People who played the artist on Spotify in the last 28 days (Spotify artist page, weekly).
 	column monthly_listeners
 		dataType: int64
 		formatString: #,0
@@ -270,6 +302,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// People following the artist on Spotify (weekly).
 	column spotify_followers
 		dataType: int64
 		formatString: #,0
@@ -279,6 +312,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Spotify followers ÷ monthly listeners: how many listeners became fans. Shown, not scored.
 	column followers_per_listener
 		dataType: double
 		formatString: 0.00
@@ -288,6 +322,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Spotify listeners in the artist's top 5 cities that are in the Philippines.
 	column ph_listeners
 		dataType: double
 		formatString: #,0.00
@@ -297,6 +332,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Of those top 5 cities, listeners in Metro Manila or Baguio.
 	column manila_baguio_listeners
 		dataType: double
 		formatString: #,0.00
@@ -306,6 +342,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Best place on Spotify's Philippines weekly top 200 in the last 8 weeks (1 = top). Empty = not on it.
 	column best_chart_rank
 		dataType: int64
 		formatString: #,0
@@ -315,6 +352,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Weeks on Spotify's Philippines weekly top 200 in the last 8 weeks.
 	column weeks_on_chart
 		dataType: int64
 		formatString: #,0
@@ -324,6 +362,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's TikTok account: listed by Vic, tagged in NDN captions, or matched from their Instagram name and checked.
 	column tiktok_handle
 		dataType: string
 		lineageTag: a928ea68-4132-5b63-bd1c-1d2d32e2cb58
@@ -331,6 +370,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Vic's list, an NDN caption tag, or the Instagram name match.
 	column tiktok_found_by
 		dataType: string
 		lineageTag: d02c90b1-a553-506f-9927-d672f4a04fca
@@ -338,6 +378,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Followers on the artist's TikTok (public profile, weekly).
 	column tiktok_followers
 		dataType: int64
 		formatString: #,0
@@ -347,6 +388,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Change in those followers over 4 weeks.
 	column tiktok_follower_growth_4w
 		dataType: double
 		formatString: #,0.00
@@ -356,6 +398,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Different people asking NDN for this artist in YouTube + TikTok comments, last 12 months.
 	column fans_asking
 		dataType: int64
 		formatString: #,0
@@ -365,6 +408,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Comments on NDN's TikTok asking for this artist.
 	column tiktok_asks
 		dataType: int64
 		formatString: #,0
@@ -374,6 +418,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// NDN YouTube videos featuring the artist.
 	column ndn_youtube_videos
 		dataType: int64
 		formatString: #,0
@@ -383,6 +428,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// NDN TikToks featuring the artist.
 	column ndn_tiktok_clips
 		dataType: int64
 		formatString: #,0
@@ -392,6 +438,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's middle NDN TikTok: views ÷ the usual of the posts around it. 1.0 = usual.
 	column ndn_tiktok_index
 		dataType: double
 		formatString: 0.00
@@ -401,6 +448,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// The artist's middle NDN YouTube video compared with its series. 1.0 = usual.
 	column ndn_youtube_index
 		dataType: double
 		formatString: 0.00
@@ -410,6 +458,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Start of the artist's latest NDN filming visit, judged from post dates.
 	column latest_visit
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -421,6 +470,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// Latest NDN post featuring the artist.
 	column last_ndn_post
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -432,6 +482,7 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// 10 months after the latest NDN visit.
 	column cooldown_until
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -443,12 +494,123 @@ table invite
 
 		annotation SummarizationSetBy = User
 
+	/// New TikTok videos using the song in about a week: this week's count minus last week's, over the official sound and fan uploads that pass the caption check. Empty until two weekly counts exist.
+	column new_hit_tiktok_added_7d
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8785ba7a-93e7-5764-b9fc-6be0b79ffaf1
+		summarizeBy: none
+		sourceColumn: new_hit_tiktok_added_7d
+
+		annotation SummarizationSetBy = User
+
+	/// All TikTok videos so far (sql/029).
+	column tt_song_basis
+		dataType: string
+		lineageTag: 99b0e406-d0ee-5c97-9cd7-a87373500957
+		sourceColumn: tt_song_basis
+
+		annotation SummarizationSetBy = User
+
+	/// The new song's place in the OPM top 30 (Top 50 PH + Viral Hits PH + Billboard PH Hot 100).
+	column new_hit_top30_rank
+		dataType: int64
+		formatString: #,0
+		lineageTag: 29a220c5-8d8f-558c-be6a-8fc0a33f3792
+		summarizeBy: none
+		sourceColumn: new_hit_top30_rank
+
+		annotation SummarizationSetBy = User
+
+	/// The new song's points over the three lists (most = 300).
+	column new_hit_top30_points
+		dataType: int64
+		formatString: #,0
+		lineageTag: ec0c4f9f-1f11-55a1-b060-72019227e7c1
+		summarizeBy: none
+		sourceColumn: new_hit_top30_points
+
+		annotation SummarizationSetBy = User
+
+	/// The new song's place on Spotify's Top 50 - Philippines.
+	column new_hit_top50_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3b8c89f9-246f-581d-a8a9-4c8fc5d98d74
+		summarizeBy: none
+		sourceColumn: new_hit_top50_pos
+
+		annotation SummarizationSetBy = User
+
+	/// The new song's place on Viral Hits Philippines.
+	column new_hit_viral_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3dfa8c68-7891-507a-b1e3-373e38173f24
+		summarizeBy: none
+		sourceColumn: new_hit_viral_pos
+
+		annotation SummarizationSetBy = User
+
+	/// The new song's place on the Billboard Philippines Hot 100.
+	column new_hit_billboard_pos
+		dataType: int64
+		formatString: #,0
+		lineageTag: 1ff5563d-8d0d-5c6d-83d3-6ea20fc3b623
+		summarizeBy: none
+		sourceColumn: new_hit_billboard_pos
+
+		annotation SummarizationSetBy = User
+
+	/// yes = NDN already has the hot song on YouTube.
+	column new_hit_on_ndn
+		dataType: string
+		lineageTag: cbb90d3f-9ad0-5df1-88c9-89523e31d325
+		sourceColumn: new_hit_on_ndn
+
+		annotation SummarizationSetBy = User
+
+	/// Invite / boost the NDN video of this song / post the band's clips or film this song.
+	column action
+		dataType: string
+		lineageTag: 523577f1-655a-52e0-8835-d7bbfe54bcbd
+		sourceColumn: action
+
+		annotation SummarizationSetBy = User
+
+	/// NDN's YouTube video of this song; if none, the band's most viewed NDN video.
+	column ndn_video_title
+		dataType: string
+		lineageTag: 6dffab16-dafa-5c51-8a72-6b977bfa9d51
+		sourceColumn: ndn_video_title
+
+		annotation SummarizationSetBy = User
+
+	/// Link to that NDN YouTube video.
+	column ndn_video_link
+		dataType: string
+		lineageTag: 453dd43b-e67e-53a2-aae4-0f87b75b6f84
+		dataCategory: WebUrl
+		sourceColumn: ndn_video_link
+
+		annotation SummarizationSetBy = User
+
+	/// Views of that NDN video (latest daily count).
+	column ndn_video_views
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3f3e8841-fee6-51f9-9ec0-5f7c8ba921b7
+		summarizeBy: none
+		sourceColumn: ndn_video_views
+
+		annotation SummarizationSetBy = User
+
 	partition invite = m
 		mode: import
 		source =
 				let
 				    Source = fnLoadCsv("invite.csv"),
 				    Nulls = Table.ReplaceValue(Source, "", null, Replacer.ReplaceValue, Table.ColumnNames(Source)),
-				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"hit_status", type text}, {"ndn_history", type text}, {"found_via", type text}, {"on_chart", type text}, {"status_rank", Int64.Type}, {"score", type number}, {"tiktok_points", type number}, {"spotify_points", type number}, {"other_points", type number}, {"tt_song_videos", Int64.Type}, {"tt_song_growth", Int64.Type}, {"tt_follower_growth", Int64.Type}, {"track_record", Int64.Type}, {"new_hit_hype", Int64.Type}, {"momentum", Int64.Type}, {"local_reach", Int64.Type}, {"fan_demand", Int64.Type}, {"size", Int64.Type}, {"new_hit", type text}, {"new_hit_found_on", type text}, {"new_hit_tiktok_videos", type number}, {"new_hit_tiktok_growth_4w", type number}, {"new_hit_daily_streams", Int64.Type}, {"new_hit_released", type date}, {"top_song", type text}, {"top_song_daily_streams", Int64.Type}, {"top_song_on_ndn", type text}, {"top_tiktok_song", type text}, {"top_tiktok_song_videos", type number}, {"monthly_listeners", Int64.Type}, {"spotify_followers", Int64.Type}, {"followers_per_listener", type number}, {"ph_listeners", type number}, {"manila_baguio_listeners", type number}, {"best_chart_rank", Int64.Type}, {"weeks_on_chart", Int64.Type}, {"tiktok_handle", type text}, {"tiktok_found_by", type text}, {"tiktok_followers", Int64.Type}, {"tiktok_follower_growth_4w", type number}, {"fans_asking", Int64.Type}, {"tiktok_asks", Int64.Type}, {"ndn_youtube_videos", Int64.Type}, {"ndn_tiktok_clips", Int64.Type}, {"ndn_tiktok_index", type number}, {"ndn_youtube_index", type number}, {"latest_visit", type date}, {"last_ndn_post", type date}, {"cooldown_until", type date}}, "en-US")
+				    Typed = Table.TransformColumnTypes(Nulls, {{"artist", type text}, {"status", type text}, {"hit_status", type text}, {"ndn_history", type text}, {"found_via", type text}, {"on_chart", type text}, {"status_rank", Int64.Type}, {"score", type number}, {"tiktok_points", type number}, {"spotify_points", type number}, {"other_points", type number}, {"tt_song_videos", Int64.Type}, {"tt_song_growth", Int64.Type}, {"tt_follower_growth", Int64.Type}, {"track_record", Int64.Type}, {"new_hit_hype", Int64.Type}, {"momentum", Int64.Type}, {"local_reach", Int64.Type}, {"fan_demand", Int64.Type}, {"size", Int64.Type}, {"new_hit", type text}, {"new_hit_found_on", type text}, {"new_hit_tiktok_videos", type number}, {"new_hit_tiktok_growth_4w", type number}, {"new_hit_daily_streams", Int64.Type}, {"new_hit_released", type date}, {"top_song", type text}, {"top_song_daily_streams", Int64.Type}, {"top_song_on_ndn", type text}, {"top_tiktok_song", type text}, {"top_tiktok_song_videos", type number}, {"monthly_listeners", Int64.Type}, {"spotify_followers", Int64.Type}, {"followers_per_listener", type number}, {"ph_listeners", type number}, {"manila_baguio_listeners", type number}, {"best_chart_rank", Int64.Type}, {"weeks_on_chart", Int64.Type}, {"tiktok_handle", type text}, {"tiktok_found_by", type text}, {"tiktok_followers", Int64.Type}, {"tiktok_follower_growth_4w", type number}, {"fans_asking", Int64.Type}, {"tiktok_asks", Int64.Type}, {"ndn_youtube_videos", Int64.Type}, {"ndn_tiktok_clips", Int64.Type}, {"ndn_tiktok_index", type number}, {"ndn_youtube_index", type number}, {"latest_visit", type date}, {"last_ndn_post", type date}, {"cooldown_until", type date}, {"new_hit_tiktok_added_7d", Int64.Type}, {"tt_song_basis", type text}, {"new_hit_top30_rank", Int64.Type}, {"new_hit_top30_points", Int64.Type}, {"new_hit_top50_pos", Int64.Type}, {"new_hit_viral_pos", Int64.Type}, {"new_hit_billboard_pos", Int64.Type}, {"new_hit_on_ndn", type text}, {"action", type text}, {"ndn_video_title", type text}, {"ndn_video_link", type text}, {"ndn_video_views", Int64.Type}}, "en-US")
 				in
 				    Typed

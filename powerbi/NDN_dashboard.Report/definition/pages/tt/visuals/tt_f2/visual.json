@@ -28,7 +28,8 @@
               },
               "queryRef": "tiktok_video.sound_type",
               "nativeQueryRef": "sound_type",
-              "active": true
+              "active": true,
+              "displayName": "Sound"
             }
           ]
         }

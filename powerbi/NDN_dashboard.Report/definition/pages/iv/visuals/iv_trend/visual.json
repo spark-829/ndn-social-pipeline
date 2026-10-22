@@ -1,0 +1,649 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "iv_trend",
+  "position": {
+    "x": 30,
+    "y": 1048,
+    "z": 14000,
+    "height": 400,
+    "width": 1540,
+    "tabOrder": 14000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "rank"
+                }
+              },
+              "queryRef": "invite_top30.rank",
+              "nativeQueryRef": "rank",
+              "displayName": "#"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "song"
+                }
+              },
+              "queryRef": "invite_top30.song",
+              "nativeQueryRef": "song",
+              "displayName": "Song"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "artist"
+                }
+              },
+              "queryRef": "invite_top30.artist",
+              "nativeQueryRef": "artist",
+              "displayName": "Artist"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "points"
+                }
+              },
+              "queryRef": "invite_top30.points",
+              "nativeQueryRef": "points",
+              "displayName": "List points"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "top50_pos"
+                }
+              },
+              "queryRef": "invite_top30.top50_pos",
+              "nativeQueryRef": "top50_pos",
+              "displayName": "Top 50 PH"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "viral_pos"
+                }
+              },
+              "queryRef": "invite_top30.viral_pos",
+              "nativeQueryRef": "viral_pos",
+              "displayName": "Viral Hits PH"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "billboard_pos"
+                }
+              },
+              "queryRef": "invite_top30.billboard_pos",
+              "nativeQueryRef": "billboard_pos",
+              "displayName": "Billboard PH Hot 100"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "tiktok_videos"
+                }
+              },
+              "queryRef": "invite_top30.tiktok_videos",
+              "nativeQueryRef": "tiktok_videos",
+              "displayName": "TikTok videos so far"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "growth_4w"
+                }
+              },
+              "queryRef": "invite_top30.growth_4w",
+              "nativeQueryRef": "growth_4w",
+              "displayName": "Change in 4 weeks"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "sounds_kept"
+                }
+              },
+              "queryRef": "invite_top30.sounds_kept",
+              "nativeQueryRef": "sounds_kept",
+              "displayName": "Sounds counted"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "top_sound"
+                }
+              },
+              "queryRef": "invite_top30.top_sound",
+              "nativeQueryRef": "top_sound",
+              "displayName": "Biggest sound"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "top_sound_link"
+                }
+              },
+              "queryRef": "invite_top30.top_sound_link",
+              "nativeQueryRef": "top_sound_link",
+              "displayName": "Open it"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "invite_top30"
+                    }
+                  },
+                  "Property": "to_do"
+                }
+              },
+              "queryRef": "invite_top30.to_do",
+              "nativeQueryRef": "to_do",
+              "displayName": "To do"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "invite_top30"
+                  }
+                },
+                "Property": "rank"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#3a3124'"
+                    }
+                  }
+                }
+              }
+            },
+            "radius": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeader": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "foreground": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#c9b99a'"
+                    }
+                  }
+                }
+              }
+            },
+            "border": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "showTooltipButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showFocusModeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showVisualInformationButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPinButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showOptionsMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFilterRestatementButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopyVisualImageButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSeeDataLayoutToggleButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCommentButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPersonalizeVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSmartNarrativeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSetAlertButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFollowVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopilotSummaryButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "altText": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The OPM top 30 right now, and how much TikTok uses them'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'The OPM top 30 right now, and how much TikTok uses them'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "12D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI Semibold'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#f3e9d2'"
+                    }
+                  }
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Points: Spotify Top 50 PH #1 = 100 ... #50 = 2; Viral Hits PH and Billboard PH Hot 100 #1 = 100 ... #100 = 1; added up over the three lists. TikTok: each title searched on TikTok every 3 days, videos summed over the song''s sounds'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "9D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "fontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#9a8b70'"
+                    }
+                  }
+                }
+              }
+            },
+            "alignment": {
+              "expr": {
+                "Literal": {
+                  "Value": "'left'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeaderTooltip": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'#: Place in the OPM top 30 by list points (1 = most).\nSong: OPM song on Spotify''s Top 50 - Philippines, Viral Hits Philippines or the Billboard Philippines Hot 100 playlist (weekly).\nArtist: Main artist on Spotify. OPM = 90%+ of their top-city listeners are in the Philippines, or an NDN / Vic''s-list artist.\nList points: Top 50 PH #1 = 100 ... #50 = 2; Viral Hits PH and Billboard PH Hot 100 #1 = 100 ... #100 = 1; added up over the three lists (most = 300).\nTop 50 PH: Place on Spotify''s Top 50 - Philippines (daily chart playlist). Empty = not on it.\nViral Hits PH: Place on Spotify''s Viral Hits Philippines playlist. Empty = not on it.\nBillboard PH Hot 100: Place on the Billboard Philippines Hot 100 (a fan-made Spotify copy, updated weekly). Empty = not on it.\nTikTok videos so far: All TikTok videos using the song''s counted sounds: its official sound plus versions found by searching the title on TikTok (every 3 days).\nChange in 4 weeks: Growth of those TikTok videos over 4 weeks; +50% = half as many again. Empty until a count 6+ days earlier exists.\nSounds counted: TikTok sounds counted for the song: credited to the artist, or 2+ captions on the sound''s page name the artist.\nBiggest sound: The counted sound with the most videos (title / who uploaded it).\nOpen it: The biggest sound''s TikTok page.\nTo do: What is still missing for the song''s TikTok numbers.'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "titleFontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#f3e9d2'"
+                    }
+                  }
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2b261d'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

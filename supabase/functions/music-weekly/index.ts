@@ -5,6 +5,7 @@
 //                       - TikTok Creative Center top hashtags, last 7 days, overall + 19 industries.
 //                         Plain request, no signing (checked 2026-10-19); logged out = top 3 per list.
 //                       - kworb.net Spotify Philippines weekly chart (HTML page).
+//                       - kworb.net Spotify Philippines daily chart (HTML page; sql/028 trending-sound candidates).
 //   GET  ?part=deezer_todo[&since=ISO time]  next Deezer step for extract_music_catalog.py (home server, PH IP):
 //                           {step, items: [{key, path, query?}]}; step "done" when nothing is left.
 //   POST ?part=deezer_save  {step, rows: [{key, query?, payload}]} -> raw.deezer_* (untouched), or
@@ -20,6 +21,7 @@ const TIKTOK_API = "https://ads.tiktok.com/CreativeOne/KnowledgeAPI/GetHashtagLi
 // 26 and 30 returned nothing when probed; 10-29 are the industries the page filters by.
 const INDUSTRIES = [10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27, 28, 29];
 const KWORB = "https://kworb.net/spotify/country/ph_weekly.html";
+const KWORB_DAILY = "https://kworb.net/spotify/country/ph_daily.html";
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const phDate = () => new Date(Date.now() + 8 * 3600_000).toISOString().slice(0, 10);
@@ -65,8 +67,19 @@ async function trends(): Promise<Record<string, unknown>> {
   } else {
     failed.push(`kworb: HTTP ${page.status}, ${kworbRows} rows`);
   }
+  const daily = await fetch(KWORB_DAILY, { headers: { "User-Agent": UA } });
+  const dailyHtml = await daily.text();
+  const dailyRows = (dailyHtml.match(/<tr/g) ?? []).length - 1;
+  if (daily.status === 200 && dailyHtml.includes("Spotify Daily Chart - Philippines") && dailyRows > 50) {
+    await sql`
+      insert into raw.trend_responses (source, chart, snapshot_date, url, body)
+      values ('kworb', 'spotify_ph_daily', ${day}, ${KWORB_DAILY}, ${dailyHtml})
+      on conflict (source, chart, snapshot_date) do update set fetched_at = now(), body = excluded.body`;
+  } else {
+    failed.push(`kworb daily: HTTP ${daily.status}, ${dailyRows} rows`);
+  }
   return { snapshot_date: day, tiktok_lists: lists.length - failed.filter((f) => f.startsWith("hashtag")).length,
-           hashtags, kworb_rows: kworbRows, failed };
+           hashtags, kworb_rows: kworbRows, kworb_daily_rows: dailyRows, failed };
 }
 
 // Deezer runs from a Philippine IP (extract_music_catalog.py on the home server): Deezer filters

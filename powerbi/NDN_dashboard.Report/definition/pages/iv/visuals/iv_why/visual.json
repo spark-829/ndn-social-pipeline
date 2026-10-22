@@ -83,6 +83,36 @@
                       "Entity": "_Measures"
                     }
                   },
+                  "Property": "Inv new_hit_top30_rank"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_top30_rank",
+              "nativeQueryRef": "Inv new_hit_top30_rank",
+              "displayName": "OPM top 30 place"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Inv new_hit_top30_points"
+                }
+              },
+              "queryRef": "_Measures.Inv new_hit_top30_points",
+              "nativeQueryRef": "Inv new_hit_top30_points",
+              "displayName": "List points"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
                   "Property": "Inv new_hit_tiktok_videos"
                 }
               },
@@ -118,7 +148,7 @@
               },
               "queryRef": "_Measures.Inv new_hit_daily_streams",
               "nativeQueryRef": "Inv new_hit_daily_streams",
-              "displayName": "Spotify streams/day"
+              "displayName": "Spotify plays per day"
             },
             {
               "field": {
@@ -178,7 +208,7 @@
               },
               "queryRef": "_Measures.Inv best_chart_rank",
               "nativeQueryRef": "Inv best_chart_rank",
-              "displayName": "Best PH chart rank"
+              "displayName": "Best spot on Spotify PH chart"
             },
             {
               "field": {
@@ -329,6 +359,144 @@
             "show": {
               "expr": {
                 "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "foreground": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#c9b99a'"
+                    }
+                  }
+                }
+              }
+            },
+            "border": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#1e1a14'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
+                }
+              }
+            },
+            "showTooltipButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showFocusModeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "showVisualInformationButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPinButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showOptionsMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFilterRestatementButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopyVisualImageButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSeeDataLayoutToggleButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCommentButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showPersonalizeVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSmartNarrativeButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showSetAlertButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showFollowVisualButton": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "showCopilotSummaryButton": {
+              "expr": {
+                "Literal": {
                   "Value": "false"
                 }
               }
@@ -425,7 +593,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'TikTok: the artist''s own released songs in their latest 30 videos, ''videos using this sound'' weekly. Spotify: daily streams (kworb), PH weekly chart. Fan requests from NDN comments'"
+                  "Value": "'TikTok: the song''s official sound plus versions found by searching its title on TikTok every 3 days (fan uploads from the sheet NDN fan sounds too). Spotify: plays per day and the PH weekly chart. Fans: NDN comments'"
                 }
               }
             },
@@ -458,6 +626,62 @@
               "expr": {
                 "Literal": {
                   "Value": "'left'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "visualHeaderTooltip": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'#: Place by invite score among the artists the page filters leave (1 = best).\nArtist: Spotify artist name; 4 letters of the Spotify ID are added when two artists share a name.\nNew song to film: The artist''s song that came out after their last NDN visit and isn''t on NDN''s YouTube yet; if several, the one with the most TikTok videos.\nFound on: Where the new song''s buzz shows: TikTok, Spotify or both.\nOPM top 30 place: The new song''s place in the OPM top 30 (Top 50 PH + Viral Hits PH + Billboard PH Hot 100).\nList points: The new song''s points over the three lists (most = 300).\nTikTok videos using it: Videos on TikTok using the new song''s official sound (sound page, latest weekly count).\nChange in 4 weeks: Change in that number of TikTok videos over 4 weeks; +50% = half as many again.\nSpotify plays per day: Daily Spotify plays of the new song (kworb.net, latest).\nOut since: Release date (Deezer; if missing, the date the TikTok sound appeared).\nArtist TikTok: The artist''s TikTok account: listed by Vic, tagged in NDN captions, or matched from their Instagram name and checked.\nTikTok followers: Followers on the artist''s TikTok (public profile, weekly).\nBest spot on Spotify PH chart: Best place on Spotify''s Philippines weekly top 200 in the last 8 weeks (1 = top). Empty = not on it.\nFans asking NDN: Different people asking NDN for this artist in YouTube + TikTok comments, last 12 months.\nFound via: How the artist got on the list: an NDN artist or Vic''s list, Spotify''s Philippines weekly chart, or Spotify''s Viral Hits Philippines playlist.\nLast NDN post: Latest NDN post featuring the artist.'"
+                }
+              }
+            },
+            "fontSize": {
+              "expr": {
+                "Literal": {
+                  "Value": "10D"
+                }
+              }
+            },
+            "fontFamily": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segoe UI'"
+                }
+              }
+            },
+            "titleFontColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#f3e9d2'"
+                    }
+                  }
+                }
+              }
+            },
+            "background": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2b261d'"
+                    }
+                  }
+                }
+              }
+            },
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }

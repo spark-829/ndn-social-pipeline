@@ -2,6 +2,7 @@
 table bench_uploads
 	lineageTag: 51c77d4b-d778-52d8-97c1-20880b2bf203
 
+	/// Live-session channel compared with NDN.
 	column account
 		dataType: string
 		lineageTag: 040b8859-3888-5d5d-9a93-d004a0c3a3da
@@ -9,6 +10,7 @@ table bench_uploads
 
 		annotation SummarizationSetBy = User
 
+	/// ndn, domestic (Philippines), asia or international.
 	column region
 		dataType: string
 		lineageTag: 7e5bf336-661d-50c0-b544-139dc910882a
@@ -16,6 +18,7 @@ table bench_uploads
 
 		annotation SummarizationSetBy = User
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 91f82bd9-a0ff-5342-a049-7f6eaacbcae1
@@ -23,6 +26,7 @@ table bench_uploads
 
 		annotation SummarizationSetBy = User
 
+	/// Posts in the last 12 months, not counting the last 14 days.
 	column uploads_12m
 		dataType: int64
 		formatString: #,0
@@ -32,6 +36,7 @@ table bench_uploads
 
 		annotation SummarizationSetBy = User
 
+	/// Uploads in 12 months ÷ 12.
 	column uploads_per_month
 		dataType: double
 		formatString: 0.0
@@ -41,6 +46,7 @@ table bench_uploads
 
 		annotation SummarizationSetBy = User
 
+	/// Middle views of those uploads today: half got more, half fewer. Posts under 14 days old are left out so fresh uploads don't drag it down.
 	column median_views
 		dataType: double
 		formatString: #,0

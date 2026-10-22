@@ -2,6 +2,7 @@
 table platform_daily
 	lineageTag: b9072e3e-00e0-54d9-a6ae-29c047423a31
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 1f396c2a-18f1-522a-81e8-e4cd6a42c2c9
@@ -9,6 +10,7 @@ table platform_daily
 
 		annotation SummarizationSetBy = User
 
+	/// Day of the daily count (9 am PH).
 	column snapshot_date
 		dataType: dateTime
 		formatString: yyyy-mm-dd
@@ -20,6 +22,7 @@ table platform_daily
 
 		annotation SummarizationSetBy = User
 
+	/// 'real' = counted on the platform that day; 'synthetic' = made-up test history, left out of this report.
 	column data_source
 		dataType: string
 		lineageTag: 93de50ac-29ea-5a8e-b336-9e4a70c8d466
@@ -27,6 +30,7 @@ table platform_daily
 
 		annotation SummarizationSetBy = User
 
+	/// Views added since the day before, all posts added up.
 	column views_gained
 		dataType: double
 		formatString: #,0.00
@@ -36,6 +40,7 @@ table platform_daily
 
 		annotation SummarizationSetBy = User
 
+	/// Likes added since the day before, all posts added up.
 	column likes_gained
 		dataType: double
 		formatString: #,0.00
@@ -45,6 +50,7 @@ table platform_daily
 
 		annotation SummarizationSetBy = User
 
+	/// Posts counted that day.
 	column videos
 		dataType: int64
 		formatString: #,0

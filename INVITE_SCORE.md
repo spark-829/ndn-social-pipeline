@@ -77,4 +77,54 @@ Runs in GitHub Actions `weekly.yml` (TikTok blocks the home IP) → needs a push
 TikTok 55: new song's TikTok videos 25 · its 4-week TikTok growth 15 · artist TikTok follower growth 10 · NDN TikTok track record 5.
 Spotify 30: new hit daily streams 15 · PH chart momentum 10 · local reach (Manila + Baguio) 5.
 Other 15: fan requests 10 · size 5.
-Also in that build (Vic 2026-10-22): hover help on every column (source + meaning, as field descriptions + an "i" header tooltip per visual) and plain-language column labels for non-analysts.
+Also in that build (Vic 2026-10-22): hover help on every column (source + meaning, as field descriptions + an "i" header tooltip per visual) and plain-language column labels for non-analysts. Done 2026-10-22: `powerbi_labels.py`.
+
+## v3 (2026-10-23, Vic): songs from three Spotify playlists, TikTok by title search (`sql/029_invite_top30.sql`)
+Backup of v1/v2 (SQL, live view definitions, Power BI page, scripts, data): `backup/invite_v2_2026-10-23/` (local, gitignored).
+- **Songs:** Spotify's Top 50 - Philippines (`37i9dQZEVXbNBz9cRCSFkY`), Viral Hits Philippines (`37i9dQZF1DXe3Jzj3uus9u`)
+  and the Billboard Philippines Hot 100 playlist (`6r5KcNnlzOxlLYsbspfEMA`, fan-made by "The Child", retitled weekly;
+  Billboard has no official one). Read weekly by spotify.yml (`playlists` step). Points: Top 50 (51 - place) × 2,
+  the other two 101 - place, summed (max 300). OPM = main artist in `staging.opm_artist`. Top 30 = `staging.invite_top30`.
+- **TikTok:** `Home_Server/ndn_tiktok_search/top30_tiktok.py`, server cron `30 2 */3 * *` (02:30 PH, every 3rd day of
+  the month: 1, 4, 7 ... 31), dummy account: Sounds-tab search of "song artist" per top-30 song → the song's sounds
+  (official + versions) with their video counts → caption vote for sounds not credited (80 per run). Vic chose the
+  automated search knowing tiktok.com's robots.txt disallows /search and the account can be banned.
+- **Score:** weights unchanged. Pool = artists of the top 30 (25 on 2026-10-23); new song = their top-30 song, same gate
+  (not on NDN's YouTube; out since the last visit, or in the last 12 months for new artists; release date from Deezer,
+  else the song's earliest counted TikTok sound). tt_song_videos (25) = all TikTok videos over the song's counted sounds;
+  tt_song_growth (15) = their 4-week growth (`staging.tiktok_trend_song_growth`, needs counts 6+ days apart).
+- Power BI Who to invite: the trending table is now "The OPM top 30 right now" (`invite_top30.csv`); the "why" table shows
+  the song's top-30 place and list points.
+- **sql/030 (same night, Vic):** the top 30 now skips songs already on NDN's YouTube *before* taking 30
+  (`staging.ndn_youtube_song`; 029 wasted 8 slots on posted songs). No more pasting: `top30_tiktok.py` reads 3
+  Sounds-tab pages + the title alone + "title sped up" per song, so fan uploads with TikTok's "Contains music from"
+  the song are found and kept; other versions go to the caption vote (120 per run). TikTok's video search returned 0
+  videos even logged in (probe5.log, 2026-10-22), so it is not used. Pool now 26 artists, 12 recommended.
+- **sql/031 (same night, Vic): two groups, any release date.** The top 30 is again over all OPM songs, with `on_ndn`.
+  `status` = **Recommend** (Who to invite: never played for NDN, song not on NDN) or **Post or boost** (NDN has the
+  song on YouTube → boost that video; or the band played for NDN → post their clips / film this song). The new-song
+  date rule is gone (Kabisado, Syempre, Halik Sobrang Diin Pt. 2 now count); cooldown is shown, not a filter. The
+  artist's song = their highest-placed top-30 song (not on NDN first). New columns: action, ndn_video_title/link/views.
+  Power BI: KPIs To invite / To post or boost / Hot songs NDN has; one "Post or boost" table replaces Not now + Cooling.
+  2026-10-23: 15 to invite (top: RAPROJECT SIX Baby 123 44.7), 10 to post or boost (top: Cup of Joe Multo 65.6).
+- **sql/032 (same night, Vic): Claude's filter.** `raw.invite_exclude` (spotify_id null = the title for any artist;
+  title_key null = the whole artist; active = false to undo) is applied before the top 30 is taken. First rows (Vic's
+  examples): Willie Revillame (TV host, not a live act) and "Puede Nang Mangarap" (old viral song, any artist; Spotify
+  credits Lyca Gairanod). Their tracked TikTok songs were switched off. Screened the OPM top 50: nothing else clear-cut
+  (Yeng Constantino "Cool Off", 2007, #39, left in: a real live act). Power BI not rebuilt yet (Vic asked to wait).
+- **sql/033-037 (same night, Vic):**
+  - *Group order* (033): song on NDN's YouTube → Boost; band played and the song is newer than their latest session →
+    **Invite again** (Who to invite); band played and the song existed → Post or boost (check the session footage);
+    never played → Invite.
+  - *Sessions* (034, `staging.ndn_artist_visit`): a later batch of posts is a new session only if one of its songs came
+    out after the previous batch started (Jolianne: one session Oct 2024; "Irises" posted 2025-11 is old footage).
+  - *TikTok accounts* (033): DENȲ = @itsdenyph (Vic); new sources "linked in their Instagram" (bio/website via Meta
+    Business Discovery, artist_ig step now saves bio + website) and "TikTok search, name checked"
+    (`raw.artist_tiktok_found`, top30_tiktok.py user search for top-30 artists without one). 2026-10-23: 12 of 24
+    top-30 artists still without TikTok; no Instagram bio links one (bios have booking contacts instead).
+  - *Spotify pace* (035-037): the 15% Spotify-plays part = 7.5 plays per day now + 7.5 **pace for its age** = plays
+    per day / (total plays / days since release, first week = 7 days). Research: Spotify's popularity weighs "how recent
+    those plays are", Chartmetric weights recent tracks, research aligns songs on days since release. Release = Spotify
+    album date of the charting track (playlists step now saves `released` + `playcount`), else Deezer, else TikTok sound.
+    Plays + pace from the exact charting track id (Muli vs Muli (Secret Verse)).
+  - Power BI not rebuilt for 032-037 yet.

@@ -2,12 +2,14 @@
 table dim_platform
 	lineageTag: e34e5607-061c-55a1-b001-f26213f48643
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 375ac006-a456-5839-943b-9dfde96ca95c
 		sortByColumn: sort_order
 		sourceColumn: platform
 
+	/// Puts the platforms in the order TikTok, YouTube, Instagram.
 	column sort_order
 		dataType: int64
 		isHidden
@@ -16,6 +18,7 @@ table dim_platform
 		summarizeBy: none
 		sourceColumn: sort_order
 
+	/// The platform's colour on every chart.
 	column hex_color
 		dataType: string
 		isHidden

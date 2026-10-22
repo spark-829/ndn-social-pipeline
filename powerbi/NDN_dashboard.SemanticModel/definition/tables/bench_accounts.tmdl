@@ -2,6 +2,7 @@
 table bench_accounts
 	lineageTag: 564abde8-4474-53b0-90d4-9dda7d971862
 
+	/// Short code for the account.
 	column account_key
 		dataType: string
 		lineageTag: 3328a192-94ba-55e5-b491-440df9bfb2bf
@@ -9,6 +10,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// Live-session channel compared with NDN.
 	column account
 		dataType: string
 		lineageTag: 65aa1976-8f23-5b6b-bd97-76ea5f97e927
@@ -16,6 +18,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// ndn, domestic (Philippines), asia or international.
 	column region
 		dataType: string
 		lineageTag: 257a8713-1290-54cd-af9e-618149615b83
@@ -23,6 +26,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// TikTok, YouTube or Instagram.
 	column platform
 		dataType: string
 		lineageTag: 6b2703a1-f33f-52dd-a59d-a22778d4f47b
@@ -30,6 +34,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// Latest public follower count, read daily at 9:20 am PH.
 	column followers
 		dataType: int64
 		formatString: #,0
@@ -39,6 +44,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// All views on the account, latest daily count.
 	column total_views
 		dataType: int64
 		formatString: #,0
@@ -48,6 +54,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// All likes on the account, latest daily count.
 	column total_likes
 		dataType: int64
 		formatString: #,0
@@ -57,6 +64,7 @@ table bench_accounts
 
 		annotation SummarizationSetBy = User
 
+	/// Posts on the account, latest daily count.
 	column posts
 		dataType: int64
 		formatString: #,0

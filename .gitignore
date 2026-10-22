@@ -17,3 +17,6 @@ sql/_e.py
 powerbi/tools/schema_cache/
 # Supabase CLI local cache
 supabase/.temp/
+
+# local backups (data snapshots, server scripts): not for the public repo
+backup/

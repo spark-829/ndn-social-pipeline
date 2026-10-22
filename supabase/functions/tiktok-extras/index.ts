@@ -2,7 +2,8 @@
 // The script runs where TikTok answers (GitHub Actions weekly; Vic's PC for tests) and has no
 // database password, only NDN_CRON_SECRET.
 //   GET  ?step=pages|sounds|comments|profiles|artist_videos|artist_sounds&limit=N  -> {items: [...]} what to fetch next
-//        (artist_videos + artist_sounds: sql/026, the TikTok-first invite score)
+//        (artist_videos + artist_sounds: sql/026, the TikTok-first invite score; artist_sounds also counts
+//        the tracked trending-song sounds of sql/028)
 //   POST ?step=...  {rows: [...]}                          -> saves them (upsert)
 //   POST ?step=run  {status, detail}                       -> run log row in raw.music_runs (part tiktok_extras)
 // Same secret check as the other functions.
@@ -43,8 +44,8 @@ async function todo(step: string, limit: number) {
         union
         select c.handle from staging.tiktok_artist_account_candidate c
         where not exists (select 1 from raw.tiktok_accounts a where a.handle = c.handle)
-        union
-        select handle from staging.artist_tiktok_account where found_by = 'Instagram name, checked'
+        union   -- sql/033: every artist account found any way (Vic's list, Instagram link, TikTok search, ...)
+        select handle from staging.artist_tiktok_account
       )
       select a.handle from accts a
       left join raw.tiktok_account_snapshot s on s.handle = a.handle and s.snapshot_date > ${phDate()}::date - 6
@@ -61,6 +62,9 @@ async function todo(step: string, limit: number) {
         where not exists (select 1 from raw.tiktok_accounts a where a.handle = c.handle)
         union
         select tiktok_handle, null from raw.spotify_artists where active and tiktok_handle is not null
+        union   -- sql/033: accounts linked in the artist's Instagram or found by TikTok search
+        select handle, null from staging.artist_tiktok_account
+        where found_by in ('linked in their Instagram', 'TikTok search, name checked')
         union
         select ig.username, ig.spotify_id from staging.artist_instagram ig
         join raw.spotify_artists a on a.spotify_id = ig.spotify_id and a.active
@@ -78,12 +82,21 @@ async function todo(step: string, limit: number) {
          or f.fetched_at < now() - interval '30 days'
       order by o.guess_for is not null, f.fetched_at nulls first limit ${limit}`;
   }
-  if (step === "artist_sounds") {  // artists' own released songs (sound made in the last 3 years), once per week
+  if (step === "artist_sounds") {  // artists' own released songs (sound made in the last 3 years), once per week,
+    // plus the tracked trending-song sounds, official + fan uploads (sql/028; the home server counts any left over)
     return await sql`
-      select s.music_id, min(s.sound_title) as title from staging.tiktok_artist_sound s
-      left join raw.tiktok_sound_stats st on st.music_id = s.music_id and st.snapshot_date > ${phDate()}::date - 6
-      where st.music_id is null and s.sound_created > ${phDate()}::date - 1096
-      group by s.music_id order by max(s.own_videos) desc limit ${limit}`;
+      with x as (
+        select s.music_id, min(s.sound_title) as title, max(s.own_videos) as weight from staging.tiktok_artist_sound s
+        where s.sound_created > ${phDate()}::date - 1096 group by s.music_id
+        union all
+        select s.music_id, min(s.title), 0 from staging.tiktok_trend_sound s
+        join raw.tiktok_trend_song t using (song_key)
+        where t.active and s.status in ('kept', 'unchecked') group by s.music_id
+      )
+      select x.music_id, min(x.title) as title from x
+      left join raw.tiktok_sound_stats st on st.music_id = x.music_id and st.snapshot_date > ${phDate()}::date - 6
+      where st.music_id is null
+      group by x.music_id order by max(x.weight) desc limit ${limit}`;
   }
   throw new Error(`unknown step ${step}`);
 }

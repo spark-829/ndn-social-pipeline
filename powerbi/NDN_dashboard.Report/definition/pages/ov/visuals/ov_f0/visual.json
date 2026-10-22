@@ -28,7 +28,8 @@
               },
               "queryRef": "dim_platform.platform",
               "nativeQueryRef": "platform",
-              "active": true
+              "active": true,
+              "displayName": "Platform"
             }
           ]
         }
