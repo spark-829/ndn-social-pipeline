@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Could not connect - NDN Pipeline</title>
+<style>
+  body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; line-height: 1.6; max-width: 40rem; margin: 2rem auto; padding: 0 1rem; color: #111; background: #fff; }
+  h1 { font-size: 1.6rem; }
+  a { color: #0b57d0; }
+  .small { color: #555; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+<h1 id="title">Could not connect</h1>
+<p id="msg">Something went wrong. Please open the invite link again, or contact Vicson Yaris.</p>
+<p class="small">No changes were made to the channel. See the <a href="/privacy">Privacy Policy</a>.</p>
+<script>
+  // Only fixed messages are shown: the address carries a short code, never free text.
+  var texts = {
+    declined: ["Access not granted", "You chose not to allow access, so nothing was connected. If that was a mistake, open the invite link again."],
+    no_access: ["Connected, but no data is visible", "Google accepted the sign-in, but this account cannot see analytics for the Nine Degrees North channel. Please sign in with the Google account that owns the channel."],
+    expired: ["Link expired", "This sign-in link is old or was already used. Please open the invite link again."],
+    invalid: ["Invalid invite", "This invite link is not valid. Please ask Vicson Yaris for a new one."],
+    failed: ["Could not finish connecting", "Google could not complete the sign-in. Please open the invite link again. If it keeps failing, contact Vicson Yaris."]
+  };
+  var code = new URLSearchParams(location.search).get("r");
+  if (Object.prototype.hasOwnProperty.call(texts, code)) {
+    document.getElementById("title").textContent = texts[code][0];
+    document.getElementById("msg").textContent = texts[code][1];
+  }
+</script>
+</body>
+</html>
