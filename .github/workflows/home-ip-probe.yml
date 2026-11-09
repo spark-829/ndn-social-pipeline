@@ -1,0 +1,76 @@
+# One-off READ-ONLY test (2026-11-10). Writes nothing to Supabase.
+# Question: can GitHub Actions take over the two Monday jobs that ran on the home server?
+#   - Deezer catalogs: Deezer filters by the caller's country. 2026-10-20: Lola Amour shows 33 releases from a
+#     Philippine IP, 3 from Seoul. If GitHub's runner shows far fewer than ~30, the job must stay on a PH IP.
+#   - YouTube "most replayed": datacenter IPs often get "Sign in to confirm you're not a bot" from yt-dlp.
+# Run it by hand (Actions > home-ip-probe > Run workflow) and read the log. No secrets are printed.
+name: home-ip-probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - run: pip install -U "yt-dlp[default,curl-cffi]"
+
+      - name: Deezer from here (Lola Amour releases; PH IP = 33, Seoul = 3)
+        run: |
+          python - <<'PY'
+          import json, urllib.request
+          def get(u):
+              req = urllib.request.Request(u, headers={"User-Agent": "ndn-portfolio-pipeline/1.0"})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.loads(r.read())
+          try:
+              print("runner country:", get("https://ipinfo.io/json").get("country"))
+          except Exception as e:
+              print("runner country: unknown", e)
+          artist = get("https://api.deezer.com/search/artist?q=Lola%20Amour&limit=1")["data"][0]
+          url, seen = f"https://api.deezer.com/artist/{artist['id']}/albums?limit=100", 0
+          for _ in range(5):
+              page = get(url)
+              seen += len(page.get("data", []))
+              url = page.get("next")
+              if not url:
+                  break
+          print(f"Lola Amour (id {artist['id']}): {seen} releases seen from here")
+          print("PASS (looks like a PH catalog)" if seen >= 30 else "FAIL (filtered catalog: this job needs a Philippine IP)")
+          PY
+
+      - name: YouTube most-replayed from here (control video + 6 videos the pipeline needs)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: |
+          python - <<'PY'
+          import json, os, time, urllib.request, yt_dlp
+          req = urllib.request.Request(
+              os.environ["SUPABASE_URL"].rstrip("/") + "/functions/v1/youtube-extras?part=heatmap_todo&limit=6",
+              headers={"x-cron-secret": os.environ["NDN_CRON_SECRET"]})
+          items = json.loads(urllib.request.urlopen(req, timeout=60).read())["items"]
+          ids = ["dQw4w9WgXcQ"] + [i["video_id"] for i in items]     # first one is a popular control video that has a graph
+          ok = blocked = other = 0
+          with yt_dlp.YoutubeDL({"quiet": True, "no_warnings": True, "skip_download": True}) as ydl:
+              for vid in ids:
+                  try:
+                      info = ydl.extract_info(f"https://www.youtube.com/watch?v={vid}", download=False)
+                      print(vid, "read OK, graph points:", len(info.get("heatmap") or []))
+                      ok += 1
+                  except Exception as e:
+                      msg = str(e)
+                      if "confirm you" in msg and "bot" in msg:
+                          blocked += 1
+                          print(vid, "BLOCKED (bot check)")
+                      else:
+                          other += 1
+                          print(vid, "error:", msg[:120])
+                  time.sleep(2)
+          print(f"read OK {ok}, bot-blocked {blocked}, other errors {other}")
+          print("PASS" if ok and not blocked else "FAIL (YouTube blocks this IP: this job needs a home IP)")
+          PY
