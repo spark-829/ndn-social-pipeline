@@ -1,0 +1,34 @@
+# Weekly Deezer catalogs for every artist NDN has posted (extract_music_catalog.py -> music-weekly Edge Function -> raw.deezer_*).
+# Mondays 02:10 UTC = 10:10 PH, right after the 10:00 PH trends run (same time the home server used to run it).
+# Why it moved here (2026-11-10): the script's docstring says Deezer filtered its catalog by country (Seoul 3 releases, PH 33,
+# checked 2026-10-20). On 2026-11-10 a US GitHub runner saw the full 33 for Lola Amour (home-ip-probe.yml), and the home
+# server is being replaced by Windows. The script is byte-identical to the server copy; standard library only.
+# Needs repo secrets SUPABASE_URL and NDN_CRON_SECRET (same as daily.yml / weekly.yml).
+# Manual run: Actions > deezer-weekly > Run workflow. "since" re-fetches rows older than that time (ISO, e.g. 2026-11-10T00:00:00+08:00);
+# leave it blank for the normal run, which only does the work the Edge Function says is due.
+name: deezer-weekly
+
+on:
+  schedule:
+    - cron: "10 2 * * 1"
+  workflow_dispatch:
+    inputs:
+      since:
+        description: "optional: re-fetch rows older than this ISO time"
+        default: ""
+
+jobs:
+  deezer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Deezer catalogs, fetched here and uploaded to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          NDN_CRON_SECRET: ${{ secrets.NDN_CRON_SECRET }}
+        run: |
+          python extract_music_catalog.py --by github ${{ inputs.since && format('--since {0}', inputs.since) || '' }}
